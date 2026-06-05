@@ -1,0 +1,19 @@
+{
+  "task": "parity",
+  "mechanism": "gated",
+  "seq_len": 8,
+  "hidden": 20,
+  "cell_layers": 2,
+  "tau": 30.0,
+  "grad_factor": 1.0,
+  "lr": 0.01,
+  "batch_size": 16,
+  "iters": 20,
+  "seed": 0,
+  "device": "cpu",
+  "logic_gates": 80,
+  "best_val": 0.5024,
+  "test_acc": 0.4979,
+  "train_minutes": 0.5140772501627604,
+  "grad_profile": null
+}
