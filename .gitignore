@@ -1,5 +1,5 @@
-*/__pycache__
-*/data-mnist
+**/__pycache__/
+**/data-mnist/
 
 # compiled difflogic_cuda extension + build artifacts
 build/
