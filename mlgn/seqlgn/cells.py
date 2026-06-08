@@ -73,6 +73,27 @@ def _or(a, b):
     return a + b - a * b
 
 
+# Gate id 15 = TRUE (always outputs 1); see utils.GATE_NAMES / functional.bin_op.
+_TRUE_GATE = 15
+
+
+def bias_gate_keep(logic_mlp: "LogicMLP", strength: float) -> None:
+    """Bias a gate network toward outputting 1 ("keep") at initialisation by adding
+    ``strength`` to the TRUE-gate logit of its FINAL LogicLayer.
+
+    This is the logic-native analog of the **LSTM forget-gate bias** (Gers et al. 2000)
+    and difflogic's **residual initialisation** (Petersen et al. 2024): it switches the
+    constant-error carousel ON at init so state — and the gradient through it — persist
+    across long sequences. Without it, an unbiased gate (s≈0.5) lets state decay before the
+    network can *learn* to keep it (the cold-start we observed: copy-50 stuck at chance with
+    a flat loss). A moderate ``strength`` leaves a write path (soft s<1) so the cell can
+    still learn when to overwrite. ``strength=0`` disables it (reproduces the cold-start).
+    """
+    if strength:
+        with torch.no_grad():
+            logic_mlp.net[-1].weights[:, _TRUE_GATE] += strength
+
+
 class LogicMLP(nn.Module):
     """A stack of ``num_layers`` LogicLayers mapping ``in_dim -> out_dim``.
 
@@ -140,6 +161,7 @@ class LogicRecurrentCell(nn.Module):
         hidden_dim: int,
         mechanism: str = "gated",
         cell_layers: int = 2,
+        keep_bias: float = 3.0,
         device: str = "cuda",
         grad_factor: float = 1.0,
         implementation: str | None = None,
@@ -151,6 +173,7 @@ class LogicRecurrentCell(nn.Module):
         self.hidden_dim = hidden_dim
         self.mechanism = mechanism
         self.cell_layers = cell_layers
+        self.keep_bias = keep_bias
 
         cat_dim = input_dim + hidden_dim
         mlp_kwargs = dict(
@@ -170,6 +193,8 @@ class LogicRecurrentCell(nn.Module):
             # weight matrices for the candidate and the update gate).
             self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.gate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            # Keep-bias the update gate s so the carousel is ON at init (avoids cold-start).
+            bias_gate_keep(self.gate, keep_bias)
 
         elif mechanism == "lstm":
             # Paper #1 (richer arm): independent forget / input / candidate stages over z,
@@ -179,6 +204,8 @@ class LogicRecurrentCell(nn.Module):
             self.input = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.out_proj = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            # Keep-bias the forget gate f so the cell-state carousel is ON at init.
+            bias_gate_keep(self.forget, keep_bias)
             # readout sees [o ; C] (2*hidden_dim) -> hidden_dim; 2H >= 2H satisfies the
             # difflogic out*2>=in rule exactly (this is why we project z->o first instead
             # of feeding [z ; C] directly, which would violate it).
@@ -240,7 +267,8 @@ class LogicRecurrentCell(nn.Module):
         return state[1] if self.mechanism == "lstm" else state
 
     def extra_repr(self) -> str:
+        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm") else ""
         return (
             f"input_dim={self.input_dim}, hidden_dim={self.hidden_dim}, "
-            f"mechanism={self.mechanism!r}, cell_layers={self.cell_layers}"
+            f"mechanism={self.mechanism!r}, cell_layers={self.cell_layers}{kb}"
         )

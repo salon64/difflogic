@@ -13,6 +13,34 @@ Template:
 
 ---
 
+## 2026-06-08 — First GPU validation (copy task): cold-start found, keep-bias fix added
+Hardware: RTX 2080S. Task: copy/recall (chance = 12.5%, alphabet 8), hidden 1024,
+cell_layers 2, 20k iters. **No keep-bias yet (effectively keep_bias=0).**
+
+| run | seq | mech | best_val | test | grad ratio (early/late) | read |
+|---|---|---|---|---|---|---|
+| sanity | 8 | rddlgn | 0.868 | 0.874 | — | learns, but only after a long plateau (breaks ~iter 18k) |
+| sanity | 8 | gated | **1.000** | **1.000** | — | learns **instantly** (val=1.0 by iter 1k) |
+| val | 50 | rddlgn | 0.258 | 0.251 | 4e-20 | dead (catastrophic vanishing) |
+| val | 50 | gated | 0.252 | 0.246 | 7e-8 | **never started** — loss flat at log(8)=2.08 |
+
+**Reads:**
+- **Positive:** at seq-8 gating *dominates* (instant 100% vs rddlgn's struggling 87%);
+  gated gradient flow is **~12 orders of magnitude** better than the control (7e-8 vs
+  4e-20). The carousel works mechanically.
+- **Negative:** at seq-50 BOTH fail. gated's flat loss = a **cold start**, not slow
+  learning: the gate isn't keep-biased at init, so the symbol decays before the gate can
+  *learn* to keep it (chicken-and-egg), and there's no gradient signal to bootstrap.
+- **Diagnosis = the known LSTM cold-start.** Fix = positive forget/keep-gate bias at init
+  (Gers et al. 2000) ≡ difflogic residual init (Petersen 2024).
+
+**Action taken:** implemented `keep_bias` (adds to the TRUE-gate logit of the gate's final
+layer → carousel ON at init, write path preserved). CLI `--keep-bias` (default 3.0),
+applies to `gated` (gate) and `lstm` (forget). `bias_gate_keep` in `seqlgn/cells.py`.
+
+**Next (GPU):** re-run copy-50 `gated` with `--keep-bias 3` (sweep {2,3,5} if needed);
+expect it to break the plateau. Then rddlgn with `--grad-factor 2` for a fair control.
+
 ## 2026-06-04 — seqlgn infra built + smoke-tested (Paper #1 ready to run)
 - Built `mlgn/seqlgn/`: pluggable recurrent cell (`rddlgn` control / `gated` Paper#1 /
   `latch` stub), `SequenceClassifier`, benchmarks (smnist/smnist-pixel/psmnist/parity/
