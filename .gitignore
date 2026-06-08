@@ -6,3 +6,8 @@ build/
 *.pyd
 *.so
 *.egg-info/
+
+# stuff
+*/.vscode
+*/.idea
+*/.claude
