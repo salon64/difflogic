@@ -151,9 +151,24 @@ python -m mlgn.seqlgn.train --task copy --seq-len 8  --hidden 1024 --iters 20000
 python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-analysis --tag val
 python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --grad-analysis --tag val
 ```
-The first eval line prints elapsed time → you learn your real rate in ~2 min. To keep the
-control fair, also try the seq-50 `rddlgn` run with `--grad-factor 2`. See
+The first eval line prints elapsed time → you learn your real rate in ~2 min. See
 [docs/experiments.md](docs/experiments.md) for success criteria and the full protocol.
+
+### Cold-start fix re-run (run these after the above)
+
+The first seq-50 run (2026-06-08) showed `gated` **cold-starting** — loss stuck flat at
+`log(8)=2.08`, val at chance — because the gate wasn't keep-biased. `--keep-bias` (logic
+forget-bias / residual init) turns the carousel ON at init. Re-run with it, vs a *fair*
+control (`--grad-factor 2`, difflogic's anti-vanishing knob):
+
+```bash
+# gated WITH keep-bias — expect the seq-50 plateau to break (loss < 2.08, val > 12.5%)
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 3 --grad-analysis --tag keepbias
+# fair control
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-factor 2 --grad-analysis --tag fair
+```
+If `gated` still plateaus, sweep `--keep-bias 2` and `5` (too high saturates `s→1` and
+kills the write path). Success = `gated` ≫ chance while `rddlgn` stays near 12.5%.
 
 ### Full-scale runs (⚠️ GPU-HOURS — for the paper, not a casual check)
 
@@ -178,12 +193,14 @@ Full list: `python -m mlgn.seqlgn.train -h`.
 
 ## Status (2026-06-08)
 
-- ✅ Pipeline built and smoke-tested on CPU: `rddlgn`, `gated`, **`lstm`** (tuple state +
-  cell-state carousel), grad-analysis, gate counts.
-- ✅ Grad-analysis instrument works; early directional signal — earliest/latest grad ratio
-  `rddlgn` ~9e-12 vs `lstm` ~9e-4 (untrained/tiny, not a result, but the carousel clearly
-  propagates gradient much further).
-- ⏳ Real comparison runs (rddlgn vs gated vs lstm, equal-gates, ≥3 seeds) pending a GPU.
+- ✅ Pipeline built; `rddlgn` / `gated` / `lstm` all run (CPU dev + GPU).
+- ✅ **First GPU validation (copy task, RTX 2080S):** at seq-8 `gated` hits 100% instantly
+  vs `rddlgn`'s struggling 87%; gated gradient flow ~1e12× the control. At seq-50 **both
+  failed** — `gated` cold-starts (gate not keep-biased). See
+  [docs/experiments.md](docs/experiments.md) + `../research/04_experiment_log.md`.
+- ✅ **Fix added:** `--keep-bias` (logic forget-bias / residual init). Re-run pending.
+- ⏳ Re-run copy-50 `gated --keep-bias 3` (expect plateau to break); then equal-gates,
+  ≥3 seeds; add `lstm` arm.
 - ⏸ `latch` mechanism (Paper #2) stubbed — parked by decision.
 
 See [docs/experiments.md](docs/experiments.md) for the experiment protocol and what to

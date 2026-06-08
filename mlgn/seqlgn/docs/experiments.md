@@ -4,6 +4,31 @@ The claim: **a logic-native gate (2:1 MUX per bit) lets a recurrent LGN carry st
 long sequences where the recompute-every-step control (`rddlgn`) fails**, because the
 kept branch is a constant-error carousel. This doc says exactly what to run and report.
 
+## Results so far (2026-06-08, RTX 2080S, copy task, no keep-bias)
+
+First validation on `copy` (chance 12.5%, alphabet 8, hidden 1024, 20k iters):
+
+| seq | rddlgn | gated | note |
+|---|---|---|---|
+| 8 (sanity) | 0.87 (late) | **1.00 (instant)** | gating dominates short range |
+| 50 (val) | 0.25, grad 4e-20 | 0.25, grad 7e-8 | **both fail — gated cold-starts** |
+
+**Finding:** the carousel works mechanically (gated grad flow ~1e12× the control), but at
+seq-50 the gated cell never leaves the init plateau — a **cold start** because the gate
+isn't keep-biased. Fix added: `--keep-bias` (logic forget-bias / residual init). The
+**next run** below tests it. Full write-up: `../../research/04_experiment_log.md`.
+
+## Re-run with the cold-start fix (do this next)
+
+```bash
+# gated WITH keep-bias — expect it to break the seq-50 plateau
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag keepbias
+# fair control: rddlgn with the anti-vanishing knob
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-factor 2 --grad-analysis --tag fair
+```
+If `gated --keep-bias 3` still plateaus, sweep `--keep-bias {2, 5}` (too high saturates
+`s→1` and kills the write path). Success = gated ≫ chance while rddlgn stays near 12.5%.
+
 ## Fast validation (do this FIRST, ~30 min/run on one GPU)
 
 Before any GPU-hours run, validate the idea cheaply. psMNIST is 784 timesteps (~40 h) —

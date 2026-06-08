@@ -73,6 +73,17 @@ This is the LSTM/GRU trick that beats vanilla RNNs, realised in pure logic. The 
 control has no such path: `∂h'/∂h = J_update`, a product of softmax-gate Jacobians whose
 norm shrinks with depth/time → vanishing gradients on long sequences.
 
+**Keep-bias init (important — avoids cold-start).** The carousel only helps if the gate
+*keeps* (`s≈1`) early on. With a random gate (`s≈0.5`) on a long sequence, state decays
+before the network can learn to keep it, and there's no gradient signal to bootstrap — a
+**cold start** (empirically: copy-50 sat at chance with flat loss; see
+[experiments.md](experiments.md)). Fix: ``bias_gate_keep`` adds `keep_bias` to the
+TRUE-gate logit of the gate's final layer, so `s` defaults high (carousel ON) while a
+write path (`s<1`) remains. This is the logic-native form of the **LSTM forget-gate bias**
+(Gers et al. 2000) and difflogic **residual init** (Petersen 2024). CLI `--keep-bias`
+(default 3.0; `0` reproduces the cold-start). For `lstm` the same bias is applied to the
+forget gate `f`.
+
 > Early evidence (untrained, tiny, seq=8): the grad-norm-through-time instrument
 > (`utils.grad_norm_through_time`) already shows the `rddlgn` control's gradient at the
 > earliest timestep ~12 orders of magnitude below the latest. To be confirmed at scale,

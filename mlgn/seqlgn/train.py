@@ -82,6 +82,10 @@ def build_args():
                         "'lstm' (richer arm). 'latch' (Paper #2) is parked.")
     p.add_argument("--hidden", type=int, default=2000, help="hidden_dim (must be >= input_dim and divisible by num_classes)")
     p.add_argument("--cell-layers", type=int, default=2, help="logic layers per candidate/gate/update network")
+    p.add_argument("--keep-bias", type=float, default=3.0,
+                   help="keep-bias for the update/forget gate at init (logic forget-bias / "
+                        "residual init). Turns the carousel ON at start to avoid cold-start. "
+                        "0 disables it. Only affects 'gated'/'lstm'.")
     p.add_argument("--tau", type=float, default=30.0, help="GroupSum temperature")
     p.add_argument("--grad-factor", type=float, default=1.0, help="difflogic grad_factor (raise for deep/long unrolls)")
     p.add_argument("--seq-len", type=int, default=None, help="sequence length for synthetic tasks (parity/copy)")
@@ -122,6 +126,7 @@ def main():
         num_classes=task.num_classes,
         mechanism=args.mechanism,
         cell_layers=args.cell_layers,
+        keep_bias=args.keep_bias,
         tau=args.tau,
         device=device,
         grad_factor=args.grad_factor,
@@ -186,7 +191,8 @@ def main():
     out = os.path.join(RESULTS_DIR, f"{task.name}_{args.mechanism}{tag}_{stamp}.json")
     record = {
         "task": task.name, "mechanism": args.mechanism, "seq_len": task.seq_len,
-        "hidden": args.hidden, "cell_layers": args.cell_layers, "tau": args.tau,
+        "hidden": args.hidden, "cell_layers": args.cell_layers, "keep_bias": args.keep_bias,
+        "tau": args.tau,
         "grad_factor": args.grad_factor, "lr": args.lr, "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,
         "logic_gates": utils.count_gates(model),
