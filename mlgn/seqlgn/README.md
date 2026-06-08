@@ -13,7 +13,8 @@ in exactly one variable — how state is carried across time:
 | `--mechanism` | What it does | Role |
 |---|---|---|
 | `rddlgn` | concat-recurrence, state **recomputed** each step: `h' = LogicMLP([x;h])` | **control** (Bührer et al. 2025 / DiffLogic CA) |
-| `gated`  | logic-native MUX gate: `h' = s*h + (1-s)*c` (keep vs write per bit) | **Paper #1** |
+| `gated`  | logic-native MUX gate (GRU-style): `h' = s*h + (1-s)*c` (keep vs write per bit) | **Paper #1 primary** (2 LGNs, 1 state) |
+| `lstm`   | dedicated cell state `C` + forget/input/output: `C' = (C AND f) OR (i AND C̃)`, `h' = readout([o;C'])` | **Paper #1 richer arm** (5 LGNs, 2 states) |
 | `latch`  | bistable memory primitive (D-FF / latch) with custom STE | Paper #2 (parked → `NotImplementedError`) |
 
 The `gated` "keep" branch `s*h` is a **constant-error carousel**: when a bit is kept
@@ -135,14 +136,34 @@ Run from the **repo root** (the folder containing `difflogic/`):
 # CPU smoke test (a few seconds) — just checks the pipeline
 python -m mlgn.seqlgn.train --task parity --seq-len 8 --mechanism gated \
     --hidden 20 --iters 20 --eval-freq 10 --batch-size 16 --device cpu
+```
 
-# The Paper #1 comparison (run on GPU): flip --mechanism, hold all else fixed
-python -m mlgn.seqlgn.train --task psmnist --mechanism gated  --hidden 2000 --iters 50000
-python -m mlgn.seqlgn.train --task psmnist --mechanism rddlgn --hidden 2000 --iters 50000
+### Fast validation (single GPU, ~30 min/run) — DO THIS FIRST
 
-# Long-range memory + gradient-flow evidence
-python -m mlgn.seqlgn.train --task parity --seq-len 128 --mechanism gated  --grad-analysis
-python -m mlgn.seqlgn.train --task parity --seq-len 128 --mechanism rddlgn --grad-analysis
+Validate the idea cheaply on the `copy` task (chance = 12.5% for `--alphabet 8`). Short
+delay = sanity (both learn it); long delay = the test (expect `gated` ≫ `rddlgn`):
+
+```bash
+# sanity (short delay): both should beat chance
+python -m mlgn.seqlgn.train --task copy --seq-len 8  --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --tag sanity
+python -m mlgn.seqlgn.train --task copy --seq-len 8  --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --tag sanity
+# validation (long delay): gated should hold, rddlgn should collapse toward 12.5%
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-analysis --tag val
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --grad-analysis --tag val
+```
+The first eval line prints elapsed time → you learn your real rate in ~2 min. To keep the
+control fair, also try the seq-50 `rddlgn` run with `--grad-factor 2`. See
+[docs/experiments.md](docs/experiments.md) for success criteria and the full protocol.
+
+### Full-scale runs (⚠️ GPU-HOURS — for the paper, not a casual check)
+
+> Pixel-level sequential MNIST is **784 timesteps**; an RNN can't parallelise across time,
+> so these take **~20–40 h** each. Don't run them to "try it out" — use the fast validation
+> above first.
+
+```bash
+python -m mlgn.seqlgn.train --task psmnist --mechanism gated  --hidden 2000 --iters 50000   # ~40h
+python -m mlgn.seqlgn.train --task psmnist --mechanism rddlgn --hidden 2000 --iters 50000   # ~20h
 ```
 
 Key flags: `--task`, `--mechanism {rddlgn,gated}`, `--hidden`, `--cell-layers`, `--tau`,
@@ -155,11 +176,14 @@ Full list: `python -m mlgn.seqlgn.train -h`.
 - `hidden_dim % num_classes == 0` (GroupSum partitions output bits into classes).
 - Eval is always discrete: `model.eval()` (argmax gates) + inputs `.round()`.
 
-## Status (2026-06-04)
+## Status (2026-06-08)
 
-- ✅ Pipeline built and smoke-tested on CPU (`rddlgn` + `gated`, grad-analysis, gates).
-- ✅ Grad-analysis instrument works; control shows strong vanishing through time (expected).
-- ⏳ Real comparison runs pending a GPU machine.
+- ✅ Pipeline built and smoke-tested on CPU: `rddlgn`, `gated`, **`lstm`** (tuple state +
+  cell-state carousel), grad-analysis, gate counts.
+- ✅ Grad-analysis instrument works; early directional signal — earliest/latest grad ratio
+  `rddlgn` ~9e-12 vs `lstm` ~9e-4 (untrained/tiny, not a result, but the carousel clearly
+  propagates gradient much further).
+- ⏳ Real comparison runs (rddlgn vs gated vs lstm, equal-gates, ≥3 seeds) pending a GPU.
 - ⏸ `latch` mechanism (Paper #2) stubbed — parked by decision.
 
 See [docs/experiments.md](docs/experiments.md) for the experiment protocol and what to

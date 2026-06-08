@@ -78,6 +78,44 @@ norm shrinks with depth/time → vanishing gradients on long sequences.
 > earliest timestep ~12 orders of magnitude below the latest. To be confirmed at scale,
 > and contrasted with `gated`, during real training. See [experiments.md](experiments.md).
 
+### `lstm` — Paper #1, richer arm
+A logic-native LSTM with a **dedicated cell state `C`** carried across time (separate from
+the hidden/output `h`), and **independent forget / input / output** stages:
+```
+z   = [x_t ; h]
+f   = forget(z)            # keep-mask          in [0,1]^H
+i   = input(z)             # write-enable       in [0,1]^H
+C̃   = candidate(z)         # value to write     in [0,1]^H
+C'  = (C AND f) OR (i AND C̃)        # soft: OR(C·f, i·C̃) = a+b−ab
+o   = out_proj(z)          # project z to hidden_dim (output-gate-like)
+h'  = readout([o ; C'])    # 2H -> H
+state' = (h', C')
+```
+
+**Why OR (not multiply, not add).** Textbook LSTM is additive:
+`C_t = f⊙C_{t-1} + i⊙C̃`. In a logic net you can't add bits (`1+1 ∉ {0,1}`), so we use
+**OR as the stand-in for that addition** (`_or(a,b)=a+b−ab`). This is the crux:
+- *multiply* the two terms → when you're not writing (`i·C̃≈0`) the cell collapses to 0
+  and `∂C'/∂C = f·i·C̃ → 0`: memory and gradient both destroyed.
+- *add / OR* the two terms → not-writing leaves `C' = C·f` and `∂C'/∂C = f`: the cell
+  persists and the gradient flows. OR also saturates gracefully if both terms fire
+  (`1 OR 1 = 1`) instead of overflowing to 2.
+
+**The carousel is in `C`, not `h`.** `∂C'/∂C = f·(1 − i·C̃)`, which is `f` on bits you
+keep and don't overwrite (and `=1` when `f=1`). So `C` is the gradient highway; `h` is a
+readout of it. The grad-norm-through-time analysis therefore tracks **`C`** for lstm
+(`cell.carousel_state` returns `C`), and `h` for the other mechanisms.
+
+**Why project `z→o` before the readout.** The readout wants to see both `z` and `C'`, but
+feeding `[z ; C']` (width `input_dim + 2H`) into a `→H` layer violates difflogic's
+`out*2 ≥ in`. Projecting `z` to `o` (width `H`) first makes the readout `[o ; C'] (2H) → H`,
+where `2H ≥ 2H` holds exactly. (Equivalent in spirit to LSTM's `h = o ⊙ tanh(C)`, but a
+full LGN over `[o;C']` instead of a fixed AND — more expressive.)
+
+**Cost.** 5 LGNs (forget, input, candidate, out_proj, readout) and **two** carried states
+(`h`, `C`) — vs the gated cell's 2 LGNs / 1 state. So `lstm` is the "does the extra
+forget/input/output machinery earn its ~2.5× gates?" ablation; `gated` stays the primary.
+
 ## 4. Discreteness across time
 
 For the discretised circuit to be exact, the hidden state must stay binary at eval. It

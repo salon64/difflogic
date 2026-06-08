@@ -16,6 +16,16 @@ Memory mechanisms
       h_{t+1} = LogicMLP([x_t ; h_t])
   There is no explicit "keep" path — the network must relearn to copy state every step.
 
+- ``"lstm"``    — Paper #1 (richer arm). A logic-native LSTM with a dedicated cell state
+  ``C`` carried across time and independent forget / input / output stages:
+      f  = LGN_forget(z);  i = LGN_input(z);  C̃ = LGN_candidate(z)
+      C' = (C AND f) OR (i AND C̃)              # OR = logic stand-in for LSTM's '+'
+      o  = LGN_outproj(z)                       # project z to hidden_dim
+      h' = LGN_readout([o ; C'])                # 2H -> H
+  The carousel lives in the CELL state: ``∂C'/∂C = f`` (≈1 on kept bits). ``h'`` is a
+  readout. ~5 LGNs and TWO carried states (h, C) vs the gated cell's 2 LGNs / 1 state —
+  use it as the "does the extra forget/input/output machinery earn its cost?" ablation.
+
 - ``"gated"``   — Paper #1's contribution. A logic-native LSTM/GRU-style update where a
   learned **2:1 multiplexer per hidden bit** decides keep-vs-write:
       c_t = LogicMLP_candidate([x_t ; h_t])     # the candidate ("write") state
@@ -53,7 +63,14 @@ import torch.nn as nn
 from difflogic import LogicLayer
 
 
-MECHANISMS = ("rddlgn", "gated", "latch")
+MECHANISMS = ("rddlgn", "gated", "lstm", "latch")
+
+
+def _or(a, b):
+    """Soft logic OR, OR(a,b) = a + b - a*b (difflogic gate id 7). Exact at {0,1};
+    stays in [0,1] for a,b in [0,1]. Used as the Boolean stand-in for LSTM's additive
+    cell-state update (you can't add bits: 1+1 would leave {0,1})."""
+    return a + b - a * b
 
 
 class LogicMLP(nn.Module):
@@ -104,7 +121,13 @@ class LogicMLP(nn.Module):
 class LogicRecurrentCell(nn.Module):
     """One recurrent step built from logic gates, with a pluggable memory mechanism.
 
-    forward(x_t, h) -> h_next      (all tensors are [batch, dim])
+    forward(x_t, state) -> new_state      (all tensors are [batch, dim])
+
+    State convention (so one model loop drives every mechanism):
+      - ``rddlgn`` / ``gated``: state is a single tensor ``h``  [batch, hidden_dim].
+      - ``lstm``: state is a tuple ``(h, C)`` — hidden state and cell state.
+    Use the helpers ``init_state`` / ``readout_h`` / ``carousel_state`` rather than
+    poking at the state shape directly.
 
     The only thing that changes between the scientific conditions is ``mechanism``; the
     capacity (number/size of logic layers) is kept comparable so the comparison isolates
@@ -148,6 +171,19 @@ class LogicRecurrentCell(nn.Module):
             self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.gate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
 
+        elif mechanism == "lstm":
+            # Paper #1 (richer arm): independent forget / input / candidate stages over z,
+            # a dedicated cell state C with an OR-combine (logic stand-in for LSTM's '+'),
+            # and an output path that projects z to hidden_dim then reads out from [o ; C].
+            self.forget = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            self.input = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            self.out_proj = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            # readout sees [o ; C] (2*hidden_dim) -> hidden_dim; 2H >= 2H satisfies the
+            # difflogic out*2>=in rule exactly (this is why we project z->o first instead
+            # of feeding [z ; C] directly, which would violate it).
+            self.readout = LogicMLP(2 * hidden_dim, hidden_dim, **mlp_kwargs)
+
         elif mechanism == "latch":
             raise NotImplementedError(
                 "mechanism='latch' is Paper #2 and is currently PARKED. "
@@ -155,7 +191,9 @@ class LogicRecurrentCell(nn.Module):
                 "the planned D-flip-flop / gated-latch primitive with custom STE backprop."
             )
 
-    def forward(self, x_t: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
+    def forward(self, x_t: torch.Tensor, state):
+        # Unpack the (possibly tuple) state into the hidden vector h used to form z.
+        h = state[0] if self.mechanism == "lstm" else state
         z = torch.cat([x_t, h], dim=-1)  # [batch, input_dim + hidden_dim]
 
         if self.mechanism == "rddlgn":
@@ -169,7 +207,37 @@ class LogicRecurrentCell(nn.Module):
             # constant-error carousel: gradient ~1 through kept bits.
             return s * h + (1.0 - s) * c
 
+        if self.mechanism == "lstm":
+            _, C = state
+            f = self.forget(z)                 # forget gate (keep-mask), in [0,1]
+            i = self.input(z)                  # input gate (write-enable), in [0,1]
+            c_tilde = self.candidate(z)        # candidate cell value, in [0,1]
+            # C' = (C AND f) OR (i AND C̃): the OR is the logic stand-in for LSTM's
+            # additive C_t = f⊙C_{t-1} + i⊙C̃. ∂C'/∂C = f (≈1 on kept, non-overwritten
+            # bits) -> the cell-state carousel.
+            C_new = _or(C * f, i * c_tilde)
+            o = self.out_proj(z)               # project z to hidden_dim (output-gate-like)
+            h_new = self.readout(torch.cat([o, C_new], dim=-1))  # [o ; C'] (2H) -> H
+            return (h_new, C_new)
+
         raise RuntimeError(f"unhandled mechanism {self.mechanism!r}")
+
+    # --- state helpers (keep the model loop mechanism-agnostic) -----------------------
+    def init_state(self, batch: int, device, dtype=torch.float32):
+        h = torch.zeros(batch, self.hidden_dim, device=device, dtype=dtype)
+        if self.mechanism == "lstm":
+            C = torch.zeros(batch, self.hidden_dim, device=device, dtype=dtype)
+            return (h, C)
+        return h
+
+    def readout_h(self, state) -> torch.Tensor:
+        """The hidden vector used for classification (and fed back next step)."""
+        return state[0] if self.mechanism == "lstm" else state
+
+    def carousel_state(self, state) -> torch.Tensor:
+        """The state carrying the long-range gradient highway: the cell state C for
+        lstm, the hidden state h otherwise. Used by the grad-norm-through-time analysis."""
+        return state[1] if self.mechanism == "lstm" else state
 
     def extra_repr(self) -> str:
         return (

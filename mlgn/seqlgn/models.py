@@ -80,18 +80,20 @@ class SequenceClassifier(nn.Module):
         batch, seq_len, in_dim = x.shape
         assert in_dim == self.input_dim, (in_dim, self.input_dim)
 
-        h = torch.zeros(batch, self.hidden_dim, device=x.device, dtype=x.dtype)
+        state = self.cell.init_state(batch, device=x.device, dtype=x.dtype)
 
-        hidden_states = []
+        carousel_states = []
         for t in range(seq_len):
-            h = self.cell(x[:, t, :], h)
+            state = self.cell(x[:, t, :], state)
             if return_hidden:
-                h.retain_grad()
-                hidden_states.append(h)
+                # track the gradient highway (cell state C for lstm, hidden h otherwise)
+                cs = self.cell.carousel_state(state)
+                cs.retain_grad()
+                carousel_states.append(cs)
 
-        logits = self.head(h)
+        logits = self.head(self.cell.readout_h(state))
         if return_hidden:
-            return logits, hidden_states
+            return logits, carousel_states
         return logits
 
     def extra_repr(self) -> str:

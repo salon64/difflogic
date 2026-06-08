@@ -4,9 +4,37 @@ The claim: **a logic-native gate (2:1 MUX per bit) lets a recurrent LGN carry st
 long sequences where the recompute-every-step control (`rddlgn`) fails**, because the
 kept branch is a constant-error carousel. This doc says exactly what to run and report.
 
+## Fast validation (do this FIRST, ~30 min/run on one GPU)
+
+Before any GPU-hours run, validate the idea cheaply. psMNIST is 784 timesteps (~40 h) —
+overkill for a yes/no. The `copy` task isolates exactly the claim (carry state across a
+delay) and lets you pick a short sequence:
+
+```bash
+# sanity (short delay, both should learn): seq 8
+python -m mlgn.seqlgn.train --task copy --seq-len 8  --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --tag sanity
+python -m mlgn.seqlgn.train --task copy --seq-len 8  --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --tag sanity
+# validation (long delay, expect gated >> rddlgn): seq 50
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-analysis --tag val
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --grad-analysis --tag val
+```
+
+**Pass criteria** (chance = 1/alphabet = 12.5%):
+- seq 8: both mechanisms clearly beat chance (the cell can learn copy at all).
+- seq 50: `gated` ≫ `rddlgn`; `rddlgn` collapses toward ~12.5%. ← the idea validated.
+- `--grad-analysis`: `gated` earliest/latest ratio ≈ 1 (flat); `rddlgn` tiny (vanishing).
+
+**Fairness:** also run the seq-50 `rddlgn` with `--grad-factor 2` (difflogic's anti-vanishing
+knob) so you're not beating a hobbled baseline. Optionally add `--mechanism lstm` and
+`--task parity --seq-len 64` as extra arms. Watch the first eval line's elapsed time to
+calibrate your rate, then scale `--iters`/`--hidden` toward budget.
+
 ## The controlled comparison
 
-Hold *everything* fixed and flip one variable: `--mechanism rddlgn` vs `--mechanism gated`.
+Hold *everything* fixed and flip one variable: `--mechanism` ∈ {`rddlgn` (control),
+`gated` (GRU-style, primary), `lstm` (richer arm)}. The three-way tells you both *whether*
+gating helps (`gated`/`lstm` vs `rddlgn`) and *whether the LSTM's extra forget/input/output
+machinery earns its ~2.5× gates* (`lstm` vs `gated`).
 
 ```bash
 # realistic long-range task
