@@ -1,0 +1,19 @@
+{
+  "task": "copy",
+  "mechanism": "rddlgn",
+  "seq_len": 8,
+  "hidden": 1024,
+  "cell_layers": 2,
+  "tau": 30.0,
+  "grad_factor": 1.0,
+  "lr": 0.01,
+  "batch_size": 128,
+  "iters": 20000,
+  "seed": 0,
+  "device": "cuda",
+  "logic_gates": 2048,
+  "best_val": 0.8684,
+  "test_acc": 0.8737,
+  "train_minutes": 5.240633940696716,
+  "grad_profile": null
+}
