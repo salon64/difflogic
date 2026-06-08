@@ -48,6 +48,85 @@ Needs `torch` + the `difflogic` package at the repo root.
 > ⚠️ The Python/CPU path is ~50–100× slower than the CUDA kernels. CPU is for plumbing,
 > debugging, and tiny sanity runs — not for the actual experiments.
 
+## Setting up a new machine (GPU build) — step by step
+
+This is the full recipe for getting the CUDA path working from scratch, written from a
+real Windows + RTX 2080 SUPER setup. The hard part is **compiling the `difflogic_cuda`
+extension** — `pip install difflogic` does *not* do it (it only installs the pure-Python
+package; the fused kernels must be compiled locally).
+
+> Known-good reference config: Windows 10, Python 3.13, `torch==2.6.0+cu124`,
+> CUDA Toolkit 12.x, Visual Studio 2022 Build Tools, GPU compute capability 7.5 (sm_75).
+> Linux is easier (gcc instead of MSVC) — skip the Visual Studio step and run the build
+> from a normal shell.
+
+### 1. Prerequisites
+
+| Need | What / why | Check |
+|---|---|---|
+| **NVIDIA GPU + driver** | the actual hardware | `nvidia-smi` |
+| **CUDA Toolkit (`nvcc`)** | compiles the `.cu` kernels. Its **major** version must match the CUDA your torch was built with (minor mismatch is fine — just a warning on torch 2.x) | `nvcc --version` |
+| **PyTorch (CUDA build)** | e.g. `torch==2.6.0+cu124`. The `+cuXXX` tag must match the toolkit's major version | `python -c "import torch;print(torch.version.cuda, torch.cuda.is_available())"` |
+| **MSVC C++ compiler** *(Windows only)* | `nvcc` needs `cl.exe` as host compiler. Install **Visual Studio Build Tools → "Desktop development with C++"** | open *"x64 Native Tools Command Prompt for VS 2022"* |
+
+### 2. Python env + difflogic package
+
+```bash
+python -m venv .venv
+# install a torch wheel whose CUDA matches your toolkit's major version, e.g. cu124:
+.venv/Scripts/pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+.venv/Scripts/pip install -e .          # installs the difflogic package (editable, from repo root)
+```
+
+### 3. Compile the CUDA extension
+
+On **Windows**, this must run from a **"x64 Native Tools Command Prompt for VS 2022"** —
+that's the only shell where both `cl.exe` and `nvcc` are on `PATH`:
+
+```bat
+cd <repo-root>
+.\.venv\Scripts\python.exe setup.py build_ext --inplace
+```
+
+Harmless warnings you can ignore: *ninja not found*, *CUDA 12.8 vs 12.4 minor mismatch*,
+*"declared but never referenced"*. Success = a `difflogic_cuda.cp3XX-win_amd64.pyd`
+appears at the repo root with no error at the end.
+
+### 4. Verify (run from any shell — torch must be imported first!)
+
+```bash
+.venv/Scripts/python -c "import torch; import difflogic_cuda; print('real kernels:', difflogic_cuda.__file__)"
+.venv/Scripts/python -m mlgn.seqlgn.train --task parity --seq-len 8 --mechanism gated \
+    --hidden 32 --iters 50 --eval-freq 25 --batch-size 16
+```
+
+If the first line prints the `.pyd` path (not a stub) and the run finishes without a
+`RuntimeError`, the GPU path is live and `--device cuda` (the default) works.
+
+### Troubleshooting (everything that bit us)
+
+- **`ModuleNotFoundError: No module named 'mlgn'`** — the package dir must be lowercase
+  `mlgn/` and you must invoke it lowercase. Windows' filesystem is case-insensitive but
+  Python imports are case-sensitive.
+- **`pip install difflogic` says "already satisfied" but nothing changed** — that only
+  confirms the *Python* package. The compiled `difflogic_cuda` is separate; you must run
+  the `build_ext` step above.
+- **Build fails: *"Microsoft Visual C++ 14.0 or greater is required"* / `cl.exe` not
+  found** — you're not in the VS Native Tools prompt, or the C++ workload isn't installed.
+- **Build fails with `nvcc` errors** about `.type()` → `c10::ScalarType` or a `{.member =}`
+  designated initializer — stale upstream kernel vs newer PyTorch. Already patched in this
+  fork ([`difflogic/cuda/difflogic_kernel.cu`](../../difflogic/cuda/difflogic_kernel.cu):
+  `.type()`→`.scalar_type()`, and the union init rewritten for C++17).
+- **Runtime: `RuntimeError: difflogic_cuda ... is not installed` even though the `.pyd`
+  exists** — the real extension failed its DLL load and the CPU stub got injected. On
+  Windows the `.pyd` needs torch's CUDA DLLs, which are only on the search path *after*
+  `import torch`. [`_cpu_compat.py`](_cpu_compat.py) now imports torch before probing for
+  the extension, which fixes this. If it recurs, confirm `import torch; import
+  difflogic_cuda` works standalone — that isolates a DLL/ABI problem from an import-order
+  one.
+- **Build artifacts** — `build/` and the `*.pyd` at the repo root are generated; add them
+  to `.gitignore`.
+
 ## Quickstart
 
 Run from the **repo root** (the folder containing `difflogic/`):
