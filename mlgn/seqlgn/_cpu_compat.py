@@ -29,6 +29,17 @@ def ensure_cpu_importable() -> bool:
     if "difflogic_cuda" in sys.modules:
         return not getattr(sys.modules["difflogic_cuda"], "_IS_CPU_STUB", False)
 
+    # Import torch FIRST. On Windows the compiled extension depends on torch's CUDA DLLs
+    # (torch_cuda.dll, c10_cuda.dll, cudart); importing torch registers its lib dir on the
+    # DLL search path so `import difflogic_cuda` can resolve them. Because this runs at
+    # package-import time (seqlgn/__init__) — before train.py's own `import torch` — without
+    # this the real extension raises "DLL load failed" and we wrongly fall back to the CPU
+    # stub even when the kernels are built.
+    try:
+        import torch  # noqa: F401
+    except Exception:
+        pass
+
     try:
         import difflogic_cuda  # noqa: F401  (real extension available)
         return True
