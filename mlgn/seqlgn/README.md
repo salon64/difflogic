@@ -10,12 +10,12 @@ landscape, novelty scout, and the 3-paper plan.
 A recurrent cell where the memory mechanism is **pluggable**, so every experiment differs
 in exactly one variable — how state is carried across time:
 
-| `--mechanism` | What it does | Role |
-|---|---|---|
-| `rddlgn` | concat-recurrence, state **recomputed** each step: `h' = LogicMLP([x;h])` | **control** (Bührer et al. 2025 / DiffLogic CA) |
-| `gated`  | logic-native MUX gate (GRU-style): `h' = s*h + (1-s)*c` (keep vs write per bit) | **Paper #1 primary** (2 LGNs, 1 state) |
-| `lstm`   | dedicated cell state `C` + forget/input/output: `C' = (C AND f) OR (i AND C̃)`, `h' = readout([o;C'])` | **Paper #1 richer arm** (5 LGNs, 2 states) |
-| `latch`  | bistable memory primitive (D-FF / latch) with custom STE | Paper #2 (parked → `NotImplementedError`) |
+| `--mechanism` | What it does                                                                                          | Role                                            |
+| ------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `rddlgn`      | concat-recurrence, state **recomputed** each step: `h' = LogicMLP([x;h])`                             | **control** (Bührer et al. 2025 / DiffLogic CA) |
+| `gated`       | logic-native MUX gate (GRU-style): `h' = s*h + (1-s)*c` (keep vs write per bit)                       | **Paper #1 primary** (2 LGNs, 1 state)          |
+| `lstm`        | dedicated cell state `C` + forget/input/output: `C' = (C AND f) OR (i AND C̃)`, `h' = readout([o;C'])` | **Paper #1 richer arm** (5 LGNs, 2 states)      |
+| `latch`       | bistable memory primitive (D-FF / latch) with custom STE                                              | Paper #2 (parked → `NotImplementedError`)       |
 
 The `gated` "keep" branch `s*h` is a **constant-error carousel**: when a bit is kept
 (`s≈1`), the gradient flows back through time un-attenuated. That's the mechanism this
@@ -53,7 +53,7 @@ Needs `torch` + the `difflogic` package at the repo root.
 
 This is the full recipe for getting the CUDA path working from scratch, written from a
 real Windows + RTX 2080 SUPER setup. The hard part is **compiling the `difflogic_cuda`
-extension** — `pip install difflogic` does *not* do it (it only installs the pure-Python
+extension** — `pip install difflogic` does _not_ do it (it only installs the pure-Python
 package; the fused kernels must be compiled locally).
 
 > Known-good reference config: Windows 10, Python 3.13, `torch==2.6.0+cu124`,
@@ -63,12 +63,12 @@ package; the fused kernels must be compiled locally).
 
 ### 1. Prerequisites
 
-| Need | What / why | Check |
-|---|---|---|
-| **NVIDIA GPU + driver** | the actual hardware | `nvidia-smi` |
-| **CUDA Toolkit (`nvcc`)** | compiles the `.cu` kernels. Its **major** version must match the CUDA your torch was built with (minor mismatch is fine — just a warning on torch 2.x) | `nvcc --version` |
-| **PyTorch (CUDA build)** | e.g. `torch==2.6.0+cu124`. The `+cuXXX` tag must match the toolkit's major version | `python -c "import torch;print(torch.version.cuda, torch.cuda.is_available())"` |
-| **MSVC C++ compiler** *(Windows only)* | `nvcc` needs `cl.exe` as host compiler. Install **Visual Studio Build Tools → "Desktop development with C++"** | open *"x64 Native Tools Command Prompt for VS 2022"* |
+| Need                                   | What / why                                                                                                                                             | Check                                                                           |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| **NVIDIA GPU + driver**                | the actual hardware                                                                                                                                    | `nvidia-smi`                                                                    |
+| **CUDA Toolkit (`nvcc`)**              | compiles the `.cu` kernels. Its **major** version must match the CUDA your torch was built with (minor mismatch is fine — just a warning on torch 2.x) | `nvcc --version`                                                                |
+| **PyTorch (CUDA build)**               | e.g. `torch==2.6.0+cu124`. The `+cuXXX` tag must match the toolkit's major version                                                                     | `python -c "import torch;print(torch.version.cuda, torch.cuda.is_available())"` |
+| **MSVC C++ compiler** _(Windows only)_ | `nvcc` needs `cl.exe` as host compiler. Install **Visual Studio Build Tools → "Desktop development with C++"**                                         | open _"x64 Native Tools Command Prompt for VS 2022"_                            |
 
 ### 2. Python env + difflogic package
 
@@ -89,8 +89,8 @@ cd <repo-root>
 .\.venv\Scripts\python.exe setup.py build_ext --inplace
 ```
 
-Harmless warnings you can ignore: *ninja not found*, *CUDA 12.8 vs 12.4 minor mismatch*,
-*"declared but never referenced"*. Success = a `difflogic_cuda.cp3XX-win_amd64.pyd`
+Harmless warnings you can ignore: _ninja not found_, _CUDA 12.8 vs 12.4 minor mismatch_,
+_"declared but never referenced"_. Success = a `difflogic_cuda.cp3XX-win_amd64.pyd`
 appears at the repo root with no error at the end.
 
 ### 4. Verify (run from any shell — torch must be imported first!)
@@ -110,9 +110,9 @@ If the first line prints the `.pyd` path (not a stub) and the run finishes witho
   `mlgn/` and you must invoke it lowercase. Windows' filesystem is case-insensitive but
   Python imports are case-sensitive.
 - **`pip install difflogic` says "already satisfied" but nothing changed** — that only
-  confirms the *Python* package. The compiled `difflogic_cuda` is separate; you must run
+  confirms the _Python_ package. The compiled `difflogic_cuda` is separate; you must run
   the `build_ext` step above.
-- **Build fails: *"Microsoft Visual C++ 14.0 or greater is required"* / `cl.exe` not
+- **Build fails: _"Microsoft Visual C++ 14.0 or greater is required"_ / `cl.exe` not
   found** — you're not in the VS Native Tools prompt, or the C++ workload isn't installed.
 - **Build fails with `nvcc` errors** about `.type()` → `c10::ScalarType` or a `{.member =}`
   designated initializer — stale upstream kernel vs newer PyTorch. Already patched in this
@@ -120,10 +120,10 @@ If the first line prints the `.pyd` path (not a stub) and the run finishes witho
   `.type()`→`.scalar_type()`, and the union init rewritten for C++17).
 - **Runtime: `RuntimeError: difflogic_cuda ... is not installed` even though the `.pyd`
   exists** — the real extension failed its DLL load and the CPU stub got injected. On
-  Windows the `.pyd` needs torch's CUDA DLLs, which are only on the search path *after*
+  Windows the `.pyd` needs torch's CUDA DLLs, which are only on the search path _after_
   `import torch`. [`_cpu_compat.py`](_cpu_compat.py) now imports torch before probing for
   the extension, which fixes this. If it recurs, confirm `import torch; import
-  difflogic_cuda` works standalone — that isolates a DLL/ABI problem from an import-order
+difflogic_cuda` works standalone — that isolates a DLL/ABI problem from an import-order
   one.
 - **Build artifacts** — `build/` and the `*.pyd` at the repo root are generated; add them
   to `.gitignore`.
@@ -151,6 +151,7 @@ python -m mlgn.seqlgn.train --task copy --seq-len 8  --hidden 1024 --iters 20000
 python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-analysis --tag val
 python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated  --grad-analysis --tag val
 ```
+
 The first eval line prints elapsed time → you learn your real rate in ~2 min. See
 [docs/experiments.md](docs/experiments.md) for success criteria and the full protocol.
 
@@ -158,7 +159,7 @@ The first eval line prints elapsed time → you learn your real rate in ~2 min. 
 
 The first seq-50 run (2026-06-08) showed `gated` **cold-starting** — loss stuck flat at
 `log(8)=2.08`, val at chance — because the gate wasn't keep-biased. `--keep-bias` (logic
-forget-bias / residual init) turns the carousel ON at init. Re-run with it, vs a *fair*
+forget-bias / residual init) turns the carousel ON at init. Re-run with it, vs a _fair_
 control (`--grad-factor 2`, difflogic's anti-vanishing knob):
 
 ```bash
@@ -167,8 +168,18 @@ python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000
 # fair control
 python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-factor 2 --grad-analysis --tag fair
 ```
+
 If `gated` still plateaus, sweep `--keep-bias 2` and `5` (too high saturates `s→1` and
 kills the write path). Success = `gated` ≫ chance while `rddlgn` stays near 12.5%.
+
+### follow up experiment
+
+```bash
+python -m mlgn.seqlgn.train --task copy --seq-len 20 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L20
+python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L35
+# is seq-50 just under-trained? give it more iters:
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 50000 --eval-freq 2000 --mechanism gated --keep-bias 3 --tag L50long
+```
 
 ### Full-scale runs (⚠️ GPU-HOURS — for the paper, not a casual check)
 

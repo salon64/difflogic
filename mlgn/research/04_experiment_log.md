@@ -13,6 +13,32 @@ Template:
 
 ---
 
+## 2026-06-09 — keep-bias fixes the cold-start; bottleneck moves to discretization gap
+copy, seq 50, hidden 1024, 20k iters (RTX 2080S).
+
+| run | mech | keep_bias / gradf | best_val (discrete) | test | train loss | grad ratio | read |
+|---|---|---|---|---|---|---|---|
+| keepbias | gated | kb=3 | **0.379** | 0.373 | ~0.52 | 2e+4 | cold-start GONE; learns; beats control |
+| fair | rddlgn | gradf=2 | 0.258 | 0.251 | 2.08 (flat) | 4e-4 | still DEAD — grad-factor 2 didn't save it |
+
+**Verdict: directional claim validated.** gated (37%) ≫ fair control (25% ≈ chance) on a
+50-step memory task; cold-start fixed (loss 2.08→0.52, gradient now reaches t=0, ratio 2e4
+vs 7e-8 before). The control is genuinely dead even with grad-factor 2 → clean contrast.
+
+**But not *solved* (37%, not 80%+).** Split: training **loss ~0.5** (soft model learning)
+vs **discrete val ~0.37** → the **difflogic discretization gap** is now the dominant
+bottleneck, plus discrete val was still noisy-climbing at 20k (under-trained). Cold-start
+✅ → bottleneck is now (a) discretization gap, (b) under-training.
+
+**Instrument added:** `evaluate(..., discrete=False)` → every eval now prints `soft` acc
+and `gap = soft − discrete`; `test_soft`/`discretization_gap` in results JSON. Lets us
+quantify the gap directly next run.
+
+**Next:** (1) length sweep gated kb=3 {20,35,50} to find the clean-win regime + map the
+frontier (the headline acc-vs-length plot); (2) more iters (50k) at seq50 to separate
+"gap" from "under-trained"; (3) if soft ≫ discrete, implement Gumbel+STE (Mind the Gap,
+arXiv:2506.07500) — the principled gap fix. Also probe keep_bias=2.
+
 ## 2026-06-08 — First GPU validation (copy task): cold-start found, keep-bias fix added
 Hardware: RTX 2080S. Task: copy/recall (chance = 12.5%, alphabet 8), hidden 1024,
 cell_layers 2, 20k iters. **No keep-bias yet (effectively keep_bias=0).**

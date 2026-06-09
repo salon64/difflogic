@@ -4,19 +4,20 @@ The claim: **a logic-native gate (2:1 MUX per bit) lets a recurrent LGN carry st
 long sequences where the recompute-every-step control (`rddlgn`) fails**, because the
 kept branch is a constant-error carousel. This doc says exactly what to run and report.
 
-## Results so far (2026-06-08, RTX 2080S, copy task, no keep-bias)
+## Results so far (RTX 2080S, copy task, chance 12.5%, hidden 1024, 20k iters)
 
-First validation on `copy` (chance 12.5%, alphabet 8, hidden 1024, 20k iters):
+| seq | rddlgn | gated (kb=0) | gated (kb=3) | note |
+|---|---|---|---|---|
+| 8 | 0.87 (late) | **1.00 (instant)** | — | gating dominates short range |
+| 50 | 0.25 (grad 4e-20) | 0.25 cold-start (grad 7e-8) | **0.37** (grad 2e4) | keep-bias fixes cold-start |
 
-| seq | rddlgn | gated | note |
-|---|---|---|---|
-| 8 (sanity) | 0.87 (late) | **1.00 (instant)** | gating dominates short range |
-| 50 (val) | 0.25, grad 4e-20 | 0.25, grad 7e-8 | **both fail — gated cold-starts** |
-
-**Finding:** the carousel works mechanically (gated grad flow ~1e12× the control), but at
-seq-50 the gated cell never leaves the init plateau — a **cold start** because the gate
-isn't keep-biased. Fix added: `--keep-bias` (logic forget-bias / residual init). The
-**next run** below tests it. Full write-up: `../../research/04_experiment_log.md`.
+**Story so far:** (1) at seq-8 gating ≫ control. (2) at seq-50 *without* keep-bias the
+gated cell **cold-starts** (flat loss). (3) `--keep-bias 3` fixes it — loss 2.08→0.52,
+gradient reaches t=0, and gated (37%) now beats the fair control (rddlgn + `--grad-factor
+2` = 25% ≈ chance). **Directional claim validated.** (4) But 37% ≠ solved: training loss
+~0.5 with discrete val ~0.37 ⇒ the **discretization gap** is now the bottleneck (+
+under-training). The `soft`/`gap` columns in the eval output now quantify it. Full
+write-up: `../../research/04_experiment_log.md`.
 
 ## Re-run with the cold-start fix (do this next)
 

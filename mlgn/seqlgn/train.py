@@ -59,13 +59,17 @@ def cycle(loader):
 
 
 @torch.no_grad()
-def evaluate(model, loader, device) -> float:
-    """Discrete-locked accuracy: eval mode (argmax gates) + binarised inputs."""
+def evaluate(model, loader, device, discrete: bool = True) -> float:
+    """Accuracy. discrete=True: eval mode (argmax gates) + binarised inputs — the REAL
+    logic-circuit accuracy. discrete=False: train mode (softmax gates), inputs unrounded —
+    the soft/relaxed model. The difference (soft - discrete) is the *discretization gap*."""
     was_training = model.training
-    model.eval()
+    model.eval() if discrete else model.train()
     correct = total = 0
     for x, y in loader:
-        x = x.to(device).round()
+        x = x.to(device)
+        if discrete:
+            x = x.round()
         y = y.to(device)
         preds = model(x).argmax(-1)
         correct += (preds == y).sum().item()
@@ -153,9 +157,10 @@ def main():
         optimizer.step()
 
         if (i + 1) % args.eval_freq == 0:
-            val = evaluate(model, task.val_loader, device)
+            val = evaluate(model, task.val_loader, device, discrete=True)
+            val_soft = evaluate(model, task.val_loader, device, discrete=False)
             print(f"[{i + 1:>7}/{args.iters}] loss={loss.item():.4f}  val={val:.4f}  "
-                  f"({(time.time() - t0) / 60:.1f} min)")
+                  f"soft={val_soft:.4f}  gap={val_soft - val:+.4f}  ({(time.time() - t0) / 60:.1f} min)")
             if val > best_val:
                 best_val = val
                 best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
@@ -163,10 +168,12 @@ def main():
     # ---- final test on the best checkpoint (discrete-locked) -------------------------
     if best_state is not None:
         model.load_state_dict(best_state)
-    test_acc = evaluate(model, task.test_loader, device)
+    test_acc = evaluate(model, task.test_loader, device, discrete=True)
+    test_soft = evaluate(model, task.test_loader, device, discrete=False)
     train_minutes = (time.time() - t0) / 60
-    print("\n--- final (discrete locked gates) ---")
-    print(f"best_val={best_val:.4f}  test={test_acc:.4f}  train_time={train_minutes:.1f} min")
+    print("\n--- final ---")
+    print(f"best_val={best_val:.4f}  test={test_acc:.4f}  test_soft={test_soft:.4f}  "
+          f"gap={test_soft - test_acc:+.4f}  train_time={train_minutes:.1f} min")
 
     # ---- optional analyses -----------------------------------------------------------
     grad_profile = None
@@ -196,7 +203,8 @@ def main():
         "grad_factor": args.grad_factor, "lr": args.lr, "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,
         "logic_gates": utils.count_gates(model),
-        "best_val": best_val, "test_acc": test_acc, "train_minutes": train_minutes,
+        "best_val": best_val, "test_acc": test_acc, "test_soft": test_soft,
+        "discretization_gap": test_soft - test_acc, "train_minutes": train_minutes,
         "grad_profile": grad_profile,
     }
     with open(out, "w") as f:
