@@ -92,6 +92,10 @@ def build_args():
                         "0 disables it. Only affects 'gated'/'lstm'.")
     p.add_argument("--tau", type=float, default=30.0, help="GroupSum temperature")
     p.add_argument("--grad-factor", type=float, default=1.0, help="difflogic grad_factor (raise for deep/long unrolls)")
+    p.add_argument("--grad-clip", type=float, default=1.0,
+                   help="clip global grad norm to this value (RNN exploding-gradient fix). "
+                        "0 disables. Keep-bias fixes vanishing but can over-correct into "
+                        "exploding gradients on long sequences (NaN) — clipping prevents it.")
     p.add_argument("--seq-len", type=int, default=None, help="sequence length for synthetic tasks (parity/copy)")
     p.add_argument("--alphabet", type=int, default=8, help="alphabet size for the copy task")
 
@@ -144,6 +148,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     best_val, best_state = 0.0, None
+    grad_norm = float("nan")
     t0 = time.time()
     model.train()
     for i, (x, y) in enumerate(cycle(task.train_loader)):
@@ -152,15 +157,27 @@ def main():
         x, y = x.to(device), y.to(device)
         logits = model(x)
         loss = loss_fn(logits, y)
+
+        # NaN guard: once the loss is non-finite the weights are already poisoned — stop
+        # instead of burning the rest of the run (usually means exploding gradients →
+        # tighten --grad-clip or lower --lr).
+        if not torch.isfinite(loss):
+            print(f"[warn] non-finite loss at iter {i + 1} (grad_norm={grad_norm:.2e}). "
+                  f"Stopping — try a tighter --grad-clip or lower --lr.")
+            break
+
         optimizer.zero_grad()
         loss.backward()
+        if args.grad_clip > 0:
+            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip).item()
         optimizer.step()
 
         if (i + 1) % args.eval_freq == 0:
             val = evaluate(model, task.val_loader, device, discrete=True)
             val_soft = evaluate(model, task.val_loader, device, discrete=False)
             print(f"[{i + 1:>7}/{args.iters}] loss={loss.item():.4f}  val={val:.4f}  "
-                  f"soft={val_soft:.4f}  gap={val_soft - val:+.4f}  ({(time.time() - t0) / 60:.1f} min)")
+                  f"soft={val_soft:.4f}  gap={val_soft - val:+.4f}  gnorm={grad_norm:.2f}  "
+                  f"({(time.time() - t0) / 60:.1f} min)")
             if val > best_val:
                 best_val = val
                 best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
@@ -200,7 +217,8 @@ def main():
         "task": task.name, "mechanism": args.mechanism, "seq_len": task.seq_len,
         "hidden": args.hidden, "cell_layers": args.cell_layers, "keep_bias": args.keep_bias,
         "tau": args.tau,
-        "grad_factor": args.grad_factor, "lr": args.lr, "batch_size": args.batch_size,
+        "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
+        "lr": args.lr, "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,
         "logic_gates": utils.count_gates(model),
         "best_val": best_val, "test_acc": test_acc, "test_soft": test_soft,

@@ -6,10 +6,12 @@ kept branch is a constant-error carousel. This doc says exactly what to run and 
 
 ## Results so far (RTX 2080S, copy task, chance 12.5%, hidden 1024, 20k iters)
 
-| seq | rddlgn | gated (kb=0) | gated (kb=3) | note |
+| seq | rddlgn | gated (kb=0) | gated (kb=3, no clip) | note |
 |---|---|---|---|---|
 | 8 | 0.87 (late) | **1.00 (instant)** | — | gating dominates short range |
-| 50 | 0.25 (grad 4e-20) | 0.25 cold-start (grad 7e-8) | **0.37** (grad 2e4) | keep-bias fixes cold-start |
+| 20 | — | — | **1.00, gap=0.00** | **SOLVED** — perfect, no discretization gap |
+| 35 | — | — | 0.51 then **NaN** | exploding gradient → needs `--grad-clip` |
+| 50 | 0.25 (grad 4e-20) | 0.25 cold-start (grad 7e-8) | 0.37 / NaN at 50k | keep-bias fixes cold-start; then explodes |
 
 **Story so far:** (1) at seq-8 gating ≫ control. (2) at seq-50 *without* keep-bias the
 gated cell **cold-starts** (flat loss). (3) `--keep-bias 3` fixes it — loss 2.08→0.52,
@@ -19,16 +21,28 @@ gradient reaches t=0, and gated (37%) now beats the fair control (rddlgn + `--gr
 under-training). The `soft`/`gap` columns in the eval output now quantify it. Full
 write-up: `../../research/04_experiment_log.md`.
 
-## Re-run with the cold-start fix (do this next)
+## Two RNN pathologies, two fixes (both now in)
+
+Training recurrent LGNs hit both classic RNN failure modes, in order:
+1. **Vanishing** (unbiased gate): the cold-start — gated copy-50 stuck at chance with flat
+   loss. Fix: **`--keep-bias`** (default 3) turns the carousel ON at init.
+2. **Exploding** (keep-bias over-corrects on long seq): `loss=NaN` at seq≥35. Fix:
+   **`--grad-clip`** (default 1.0) + a NaN early-stop guard.
+
+With both, gated **solves copy-20 at 100% (gap=0)**; the seq≥35 re-runs (with clipping)
+are next.
+
+## Re-run the frontier with clipping (do this next)
 
 ```bash
-# gated WITH keep-bias — expect it to break the seq-50 plateau
-python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag keepbias
-# fair control: rddlgn with the anti-vanishing knob
-python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism rddlgn --grad-factor 2 --grad-analysis --tag fair
+# seq 35 & 50 — clipping is default; expect them to extend the clean win seen at seq-20
+python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L35clip
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L50clip
 ```
-If `gated --keep-bias 3` still plateaus, sweep `--keep-bias {2, 5}` (too high saturates
-`s→1` and kills the write path). Success = gated ≫ chance while rddlgn stays near 12.5%.
+Watch the `gnorm` column: if it sits pinned at `1.00` while loss is still high, clipping is
+too tight — raise `--grad-clip` to 5–10. The NaN guard stops the run early if it still
+blows up (so you don't lose hours). The fair control stays
+`rddlgn --grad-factor 2` (dead at ~12.5%).
 
 ## Fast validation (do this FIRST, ~30 min/run on one GPU)
 

@@ -13,6 +13,31 @@ Template:
 
 ---
 
+## 2026-06-10 — gated SOLVES copy-20 (gap=0); seq≥35 NaNs (exploding grad) → added clipping
+copy, gated, keep_bias 3, hidden 1024 (RTX 2080S).
+
+| seq | best_val | test | gap (soft−disc) | outcome |
+|---|---|---|---|---|
+| **20** | **1.000** | **1.000** | **0.000** | **SOLVED** — perfect, zero discretization gap |
+| 35 | 0.511 | 0.510 | +0.12 | learned to 51%/76%-soft then **loss=NaN @ iter 4000** |
+| 50 (50k it) | 0.124 | 0.125 | +0.26 | soft 0.38 @ 2k then **NaN @ iter 4000** (wasted 149 min) |
+
+**Two findings:**
+1. **Clean win at seq-20:** a logic GRU holds a symbol over 20 blank steps at 100%, and
+   **gap→0** — the earlier 37%@seq-50 wasn't a fundamental gap; a fully-solved length
+   discretizes perfectly. Quotable result.
+2. **seq≥35 blocker is NaN = exploding gradients, not the gap.** keep-bias makes the
+   recurrence Jacobian ≈ s ≈ 1 (fixes vanishing) but over 35–50 steps it creeps >1 →
+   explodes. No gradient clipping was in the loop. We've now hit BOTH classic RNN
+   pathologies: vanishing (→ keep-bias) and exploding (→ clipping). Coherent "how to train
+   recurrent LGNs" story.
+
+**Fix added:** `--grad-clip` (default 1.0, global grad-norm clip) + NaN early-stop guard +
+`gnorm` logged each eval + `grad_clip` in JSON. `train.py`.
+
+**Next:** re-run seq 35 & 50 with clipping (now default); watch `gnorm` (if pinned at 1.0
+while loss still high → raise to 5–10). Expect the frontier to extend like seq-20.
+
 ## 2026-06-09 — keep-bias fixes the cold-start; bottleneck moves to discretization gap
 copy, seq 50, hidden 1024, 20k iters (RTX 2080S).
 

@@ -181,6 +181,13 @@ python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000
 python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 50000 --eval-freq 2000 --mechanism gated --keep-bias 3 --tag L50long
 ```
 
+### Re-run (clipping is now on by default)
+
+´´´bash
+python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L35clip
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L50clip
+´´´
+
 ### Full-scale runs (⚠️ GPU-HOURS — for the paper, not a casual check)
 
 > Pixel-level sequential MNIST is **784 timesteps**; an RNN can't parallelise across time,
