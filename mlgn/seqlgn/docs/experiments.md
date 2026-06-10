@@ -26,22 +26,28 @@ write-up: `../../research/04_experiment_log.md`.
 Training recurrent LGNs hit both classic RNN failure modes, in order:
 1. **Vanishing** (unbiased gate): the cold-start — gated copy-50 stuck at chance with flat
    loss. Fix: **`--keep-bias`** (default 3) turns the carousel ON at init.
-2. **Exploding** (keep-bias over-corrects on long seq): `loss=NaN` at seq≥35. Fix:
-   **`--grad-clip`** (default 1.0) + a NaN early-stop guard.
+2. **Exploding** (keep-bias over-corrects on long seq): `loss=NaN` at seq≥35
+   (grad@t=0 ≈ 341 at seq-50). Fix: **skip the optimizer step on non-finite grad norm**
+   (`--grad-clip` magnitude clipping alone is insufficient — it runs after backward, so an
+   already-overflowed grad clips to nan). The skip keeps the model out of the NaN basin.
 
-With both, gated **solves copy-20 at 100% (gap=0)**; the seq≥35 re-runs (with clipping)
-are next.
+With both fixes, gated **solves copy-20 at 100% (gap=0)** and the **soft model reaches 87%
+on copy-50** before (previously) blowing up — so 50-step memory is within reach once
+stable. Watch `skip=`: if >20% of steps skip, lower `--lr` (0.003) and/or `--grad-factor
+0.5`.
 
-## Re-run the frontier with clipping (do this next)
+## Re-run the frontier with skip-step (do this next)
+
+Skip-step (skip the update on non-finite grad) is automatic. Re-run seq 35/50:
 
 ```bash
-# seq 35 & 50 — clipping is default; expect them to extend the clean win seen at seq-20
-python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L35clip
-python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L50clip
+python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L35skip
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L50skip
 ```
-Watch the `gnorm` column: if it sits pinned at `1.00` while loss is still high, clipping is
-too tight — raise `--grad-clip` to 5–10. The NaN guard stops the run early if it still
-blows up (so you don't lose hours). The fair control stays
+Watch `skip=`. If it climbs past ~20% of steps (the model keeps hitting the unstable
+region), add stability: `--lr 0.003` and/or `--grad-factor 0.5` (difflogic's per-layer
+gradient damping — *lower* than 1 fights exploding). The soft model already hit 87% on
+copy-50, so finishing the training should solve it. Fair control stays
 `rddlgn --grad-factor 2` (dead at ~12.5%).
 
 ## Fast validation (do this FIRST, ~30 min/run on one GPU)

@@ -149,6 +149,7 @@ def main():
 
     best_val, best_state = 0.0, None
     grad_norm = float("nan")
+    n_skipped = 0
     t0 = time.time()
     model.train()
     for i, (x, y) in enumerate(cycle(task.train_loader)):
@@ -158,26 +159,26 @@ def main():
         logits = model(x)
         loss = loss_fn(logits, y)
 
-        # NaN guard: once the loss is non-finite the weights are already poisoned — stop
-        # instead of burning the rest of the run (usually means exploding gradients →
-        # tighten --grad-clip or lower --lr).
-        if not torch.isfinite(loss):
-            print(f"[warn] non-finite loss at iter {i + 1} (grad_norm={grad_norm:.2e}). "
-                  f"Stopping — try a tighter --grad-clip or lower --lr.")
-            break
-
         optimizer.zero_grad()
         loss.backward()
-        if args.grad_clip > 0:
-            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip).item()
-        optimizer.step()
+        # Measure (and optionally clip) the global grad norm; SKIP the update when it is
+        # non-finite. An exploding-gradient batch then never poisons the weights, and the
+        # model is kept OUT of the NaN basin rather than pushed into it. Post-hoc clipping
+        # alone can't do this: once a backward overflows to inf, clipping it yields nan.
+        clip = args.grad_clip if args.grad_clip > 0 else float("inf")
+        total = torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
+        grad_norm = total.item()
+        if torch.isfinite(total):
+            optimizer.step()
+        else:
+            n_skipped += 1
 
         if (i + 1) % args.eval_freq == 0:
             val = evaluate(model, task.val_loader, device, discrete=True)
             val_soft = evaluate(model, task.val_loader, device, discrete=False)
             print(f"[{i + 1:>7}/{args.iters}] loss={loss.item():.4f}  val={val:.4f}  "
                   f"soft={val_soft:.4f}  gap={val_soft - val:+.4f}  gnorm={grad_norm:.2f}  "
-                  f"({(time.time() - t0) / 60:.1f} min)")
+                  f"skip={n_skipped}  ({(time.time() - t0) / 60:.1f} min)")
             if val > best_val:
                 best_val = val
                 best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
@@ -190,7 +191,11 @@ def main():
     train_minutes = (time.time() - t0) / 60
     print("\n--- final ---")
     print(f"best_val={best_val:.4f}  test={test_acc:.4f}  test_soft={test_soft:.4f}  "
-          f"gap={test_soft - test_acc:+.4f}  train_time={train_minutes:.1f} min")
+          f"gap={test_soft - test_acc:+.4f}  skipped={n_skipped}/{args.iters}  "
+          f"train_time={train_minutes:.1f} min")
+    if n_skipped > args.iters * 0.2:
+        print(f"[note] {100 * n_skipped / args.iters:.0f}% of steps skipped (exploding grads) "
+              f"— consider a lower --lr (e.g. 0.003) and/or --grad-factor 0.5.")
 
     # ---- optional analyses -----------------------------------------------------------
     grad_profile = None
@@ -222,7 +227,8 @@ def main():
         "iters": args.iters, "seed": args.seed, "device": device,
         "logic_gates": utils.count_gates(model),
         "best_val": best_val, "test_acc": test_acc, "test_soft": test_soft,
-        "discretization_gap": test_soft - test_acc, "train_minutes": train_minutes,
+        "discretization_gap": test_soft - test_acc, "n_skipped": n_skipped,
+        "train_minutes": train_minutes,
         "grad_profile": grad_profile,
     }
     with open(out, "w") as f:

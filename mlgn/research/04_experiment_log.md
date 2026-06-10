@@ -13,6 +13,30 @@ Template:
 
 ---
 
+## 2026-06-10 (pm) — clip 1.0 insufficient; soft model hits 87%@seq50 → skip-step fix
+Re-ran seq 35/50 with `--grad-clip 1.0`. **Clip did NOT prevent the NaN** — both still blew
+up (NaN guard stopped them early: L35clip 6.2 min, L50clip 17.5 min).
+
+| seq | best_val (disc) | test | **test_soft** | gap | grad@t=0 | outcome |
+|---|---|---|---|---|---|---|
+| 35 | 0.511 | 0.510 | 0.631 | 0.12 | 0.88 | NaN'd again (~iter 4k) |
+| 50 | 0.363 | 0.373 | **0.867** | 0.49 | **341** | NaN'd (~iter 6k) — but soft was at 87%! |
+
+**Key insight: the soft model nearly SOLVES copy-50 (87%) before exploding.** So gating
+*can* do 50-step memory; the only blocker is numerical stability. grad@t=0 = 341 confirms a
+real exploding gradient (~17000× early-vs-late).
+
+**Why clip 1.0 failed:** `clip_grad_norm_` runs *after* backward — once a single backward
+overflows to inf, clipping it yields nan (post-hoc clip can't rescue an overflowed grad).
+
+**Better fix added: SKIP the optimizer step when the global grad norm is non-finite.** The
+blow-up batch never touches the weights, and the model is kept OUT of the NaN basin (the
+steps that would push it unstable are exactly the ones skipped). Tracks `skip=`/`skipped=`;
+auto-suggests lower `--lr`/`--grad-factor 0.5` if >20% skipped. `train.py`.
+
+**Next:** re-run seq 35/50 (skip-step is automatic). If it stalls (high skip count),
+add `--lr 0.003` and/or `--grad-factor 0.5`. Expect seq-50 to finish solving (soft was 87%).
+
 ## 2026-06-10 — gated SOLVES copy-20 (gap=0); seq≥35 NaNs (exploding grad) → added clipping
 copy, gated, keep_bias 3, hidden 1024 (RTX 2080S).
 
