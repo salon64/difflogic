@@ -13,6 +13,25 @@ Template:
 
 ---
 
+## 2026-06-10 (pm3) — lr=0.003 FIXES stability; only the discretization gap remains
+copy-50, gated, kb=3, **lr 0.003**, 30k iters: **skip=0, no NaN** the whole run (explosion
+fully fixed). **soft reaches 0.876 (hit 1.000 @ iter 13k)** but **discrete stuck at 0.37,
+gap +0.50**, discrete flat from iter 14k → more training won't help.
+
+**So all three bottlenecks resolved in order:** vanishing→keep-bias, exploding→lower LR,
+**discretization gap = the sole remaining wall.** The gap is a *general difflogic* property
+(orthogonal to our gating contribution), NOT specific to recurrence — and at seq-20 it was
+**0** (fully solved discretizes perfectly). So the seq-50 gap is partly under-solving at
+that length.
+
+**Next steps to close it (cheapest first — NOT yet done):**
+1. **More capacity** (bigger `--hidden`, `--cell-layers`) so seq-50 fully solves like
+   seq-20 did → gap likely closes on its own (no special method).
+2. **Gate-entropy regularizer** (push gate distributions to one-hot; `utils.gate_entropy`
+   sketch noted) — cheap, CUDA/CPU-agnostic.
+3. **Gumbel+STE (Mind the Gap, 2506.07500)** — proven heavy-artillery; only if 1–2 fail.
+Likely don't *need* (3); it's borrowed plumbing, not our contribution. Try 1, then 2.
+
 ## 2026-06-10 (pm2) — skip-step shows failure is "tip into dead region" → prevention (lower LR)
 Re-ran seq 35/50 with skip-step. It **learns then dies**: seq-50 soft hit **0.875** @ iter
 6k, then one update poisons the weights → from there ~100% of steps skip and it spins on
