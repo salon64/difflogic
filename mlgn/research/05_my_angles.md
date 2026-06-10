@@ -157,6 +157,59 @@ the CAM angle before committing.** Separate (non-recurrent) bet from #1/#2.
 
 ---
 
+## Angle #5 — Skip / Highway connections for feedforward LGNs (FUTURE fast-follow, post-P1/P2)
+
+**Origin (2026-06-10).** The recurrent **constant-error carousel** (P1's MUX keep-path +
+`keep_bias`) is the *temporal* twin of a feedforward **skip / residual connection** — the
+same identity-path-for-gradient trick, on the depth axis instead of the time axis. Idea:
+port the method to feedforward LGNs as a learned skip connection.
+
+**Decision (malcolm, 2026-06-10): PARK as a potential quick ICLR/NeurIPS *workshop*
+fast-follow to write up AFTER P1 and P2 ship with good results — explicitly NOT a diversion
+from them.** This entry is the "future work" note so the idea isn't lost.
+
+**The idea / key insight.** A learned **2:1 MUX per unit** selecting between a layer's
+processed output and a bypassed earlier-layer signal, biased to pass-through at init
+(`keep_bias`) — i.e. a **Highway-network gate realized in logic**, the depth-axis twin of
+P1's gated cell.
+
+**Preliminary read (mine, NOT yet scouted): weak as a standalone — the obvious form is
+already occupied.**
+- **The simple transfer already exists = Petersen's *residual initialization*** (LogicTreeNet,
+  NeurIPS'24 Oral — [02_papers.md](02_papers.md) [2]): bias gate logits toward pass-through
+  "A" so deep stacks ≈ identity at init → gradient flows. Our `bias_gate_keep` docstring
+  already cites this. So "`keep_bias` → feedforward" is **not novel**; it's a named technique.
+- **Additive residual *connections* were tried and reportedly didn't help** test performance
+  (Light DLGN — [03_open_problems.md](03_open_problems.md) §A6). A standing negative result
+  to overcome. (Nuance: that's a *generalization* finding, not necessarily *trainability*.)
+- **Motivation is weak in the feedforward direction:** deep-LGN gradient decay is already
+  largely handled (residual init + `grad_factor` + IWP) and nets aren't deep enough for it to
+  bite — unlike recurrence, where the concat control is *genuinely dead* (4e-20 grad ratio).
+  That asymmetry is why recurrence is the publishable lane.
+- **Contested ground:** depth/training-scaling is ETH's lane (Light DLGN; our training-speed
+  scout = NO-GO/saturated, [09_training_speed_scout.md](09_training_speed_scout.md)).
+
+**The one surviving sliver:** a **learned, *gated* (Highway/MUX) skip** vs. Petersen's
+**fixed residual *init***. Crisp falsifiable question: *does a learned keep-gate beat a
+one-time init prior in deep feedforward LGNs, and does the gap widen with depth?* Real
+baseline (residual init), clean negative fallback ("init suffices because LGNs are shallow —
+here's why").
+
+**Open gate before committing even one experiment:** `research-scout` for any 2025–26
+"residual / dense / highway LGN" preprint beyond Petersen's init (can't rule out from the
+current bib). Steer the scout at the narrow *gated-skip* framing, not "skip connections"
+broadly (that's occupied).
+
+**Dual value even if it never becomes a paper:** the carousel↔residual-init equivalence is a
+**free framing upgrade for P1's write-up** — position `keep_bias` as the *temporal
+generalization of residual init* and the MUX as the gated generalization of both
+(Highway/LSTM lineage), tying P1's mechanism to a NeurIPS Oral. Fold in at P1 write-up time.
+
+**Cheapest falsifying test (when the time comes):** add a gated skip to a deep FC/conv LGN;
+does it beat residual-init-only as depth grows (CIFAR-10 or a deep-MNIST stress)? One short run.
+
+---
+
 ### Status board
 | Angle | Scouted | Verdict | Risk type |
 |---|---|---|---|
@@ -164,3 +217,4 @@ the CAM angle before committing.** Separate (non-recurrent) bet from #1/#2.
 | #2 Latch primitives | ✅ | **GO** (best moat) | execution |
 | #3 Fourier theory | partial | companion/cite (method layer occupied by 2601.13953) | — |
 | #4 Hard-attention / CAM | ❌ | reframe, then scout | novelty |
+| #5 Skip / Highway LGN | ❌ (future) | fast-follow after P1/P2; simple form = Petersen residual init (occupied); sliver = learned gated skip | novelty (weak motiv.) |
