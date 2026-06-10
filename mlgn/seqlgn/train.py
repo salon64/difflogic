@@ -150,6 +150,7 @@ def main():
     best_val, best_state = 0.0, None
     grad_norm = float("nan")
     n_skipped = 0
+    skips_at_last_eval = 0
     t0 = time.time()
     model.train()
     for i, (x, y) in enumerate(cycle(task.train_loader)):
@@ -176,12 +177,21 @@ def main():
         if (i + 1) % args.eval_freq == 0:
             val = evaluate(model, task.val_loader, device, discrete=True)
             val_soft = evaluate(model, task.val_loader, device, discrete=False)
+            window_skips = n_skipped - skips_at_last_eval
+            skips_at_last_eval = n_skipped
             print(f"[{i + 1:>7}/{args.iters}] loss={loss.item():.4f}  val={val:.4f}  "
                   f"soft={val_soft:.4f}  gap={val_soft - val:+.4f}  gnorm={grad_norm:.2f}  "
                   f"skip={n_skipped}  ({(time.time() - t0) / 60:.1f} min)")
             if val > best_val:
                 best_val = val
                 best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
+            # Dead-weights early stop: if a whole eval window was skipped, the weights have
+            # gone non-finite and will never recover — stop instead of spinning for 30 min.
+            if window_skips >= args.eval_freq:
+                print(f"[stop] all {args.eval_freq} steps this window skipped → weights are "
+                      f"non-finite (dead). Best checkpoint kept. Prevent it with a lower "
+                      f"--lr (e.g. 0.003) and/or --grad-factor 0.5.")
+                break
 
     # ---- final test on the best checkpoint (discrete-locked) -------------------------
     if best_state is not None:

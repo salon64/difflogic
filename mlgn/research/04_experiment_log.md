@@ -13,6 +13,25 @@ Template:
 
 ---
 
+## 2026-06-10 (pm2) — skip-step shows failure is "tip into dead region" → prevention (lower LR)
+Re-ran seq 35/50 with skip-step. It **learns then dies**: seq-50 soft hit **0.875** @ iter
+6k, then one update poisons the weights → from there ~100% of steps skip and it spins on
+NaN. Skip-step catches the aftermath but can't un-poison. seq-35: best_val 0.511 (soft
+0.76) then dead @ ~4k; seq-50: best_val 0.489 (soft 0.875) then dead @ ~6k.
+
+**Mechanism:** a finite-but-huge gradient slips through one step; Adam rescales it (small
+2nd-moment → giant effective step) → a weight overflows → `softmax(inf)=nan` → dead. So
+clipping/skip (magnitude safety nets) can't fix it; the fix is **prevention** — keep the
+weights out of that region. Standard lever: **lower LR** (0.01 is aggressive for a 50-step
+unroll). Also added a **dead-weights early-stop** (whole window skipped → break) so failed
+runs die in seconds, not 30 min.
+
+**Status for the paper:** seq-20 fully solved (100%, gap 0); seq-50 *soft* reaches 87.5% —
+gating clearly enables 50-step memory; only the optimization is unstable at long lengths.
+
+**Next:** seq-50 with `--lr 0.003` (then 0.001 / `--grad-factor 0.5` / `--keep-bias 2` if
+needed). Watch `skip=` stays low and soft/val climb to convergence.
+
 ## 2026-06-10 (pm) — clip 1.0 insufficient; soft model hits 87%@seq50 → skip-step fix
 Re-ran seq 35/50 with `--grad-clip 1.0`. **Clip did NOT prevent the NaN** — both still blew
 up (NaN guard stopped them early: L35clip 6.2 min, L50clip 17.5 min).

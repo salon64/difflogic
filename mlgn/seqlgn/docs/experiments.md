@@ -36,19 +36,21 @@ on copy-50** before (previously) blowing up — so 50-step memory is within reac
 stable. Watch `skip=`: if >20% of steps skip, lower `--lr` (0.003) and/or `--grad-factor
 0.5`.
 
-## Re-run the frontier with skip-step (do this next)
+## Stabilise long sequences with a lower LR (do this next)
 
-Skip-step (skip the update on non-finite grad) is automatic. Re-run seq 35/50:
+skip-step + clip are only safety nets — the real failure is the model *learning then
+tipping into a dead (NaN) region* (one big update + Adam rescaling → weight overflow). The
+fix is **prevention via a lower LR**. A dead-weights early-stop now kills a poisoned run in
+seconds.
 
 ```bash
-python -m mlgn.seqlgn.train --task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L35skip
-python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --grad-analysis --tag L50skip
+# seq-50 with a calmer LR — soft already hit 87.5%, so converging should solve it
+python -m mlgn.seqlgn.train --task copy --seq-len 50 --hidden 1024 --iters 30000 --eval-freq 1000 --mechanism gated --keep-bias 3 --lr 0.003 --grad-analysis --tag L50lr3
 ```
-Watch `skip=`. If it climbs past ~20% of steps (the model keeps hitting the unstable
-region), add stability: `--lr 0.003` and/or `--grad-factor 0.5` (difflogic's per-layer
-gradient damping — *lower* than 1 fights exploding). The soft model already hit 87% on
-copy-50, so finishing the training should solve it. Fair control stays
-`rddlgn --grad-factor 2` (dead at ~12.5%).
+If it still dies early (`[stop] ... dead`), escalate: `--lr 0.001`, then add
+`--grad-factor 0.5` (difflogic per-layer gradient damping — *below* 1 fights exploding),
+then `--keep-bias 2`. Watch `skip=` stays near 0 and `soft`/`val` climb to convergence.
+Fair control stays `rddlgn --grad-factor 2` (dead at ~12.5%).
 
 ## Fast validation (do this FIRST, ~30 min/run on one GPU)
 
