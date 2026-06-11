@@ -13,6 +13,27 @@ Template:
 
 ---
 
+## 2026-06-10 (pm4) — §1a capacity bump: discrete 0.37→0.76; isolates a true residual gap
+copy-50, gated, kb=3, lr 0.003, **hidden 2048** (2×), 30k iters.
+**Result: test 0.757** (was 0.380 at hidden 1024) — chance 0.125, control ~0.125. Big win.
+
+Two clean splits:
+- **Capacity closed the *under-solving*:** discrete 0.37→0.75. Confirms §1a hypothesis.
+- **A genuine ~0.25 discretization gap remains:** soft → **1.000** (iter 15k+) while
+  discrete **plateaus at 0.75** (stable iters 12k–18k). So now it's a *true* gap (soft
+  solved, discrete lags), not under-solving → **§1b entropy reg now properly motivated.**
+- **NaN returned @ iter 19k** (loss had dropped to 0.07 → sharp gates → gradients spike
+  again even at lr 0.003). Dead-weights early-stop fired (best ckpt 0.75 kept). So
+  stability must hold through the *confident* late phase.
+
+**Standing result for P1:** copy-50 gated **75.7%** vs control ~12.5%. Decisive; path to
+~100% = close the residual gap (entropy reg) + stabilize the sharp phase.
+
+**Next:** (i) §1b gate-entropy reg to close the 0.25 gap; (ii) late-phase stability — LR
+decay (0.003→~3e-4) or `--grad-factor 0.5`. These pair (entropy reg sharpens gates →
+needs the stability). Bigger capacity (4096) is a fallback but the gap, not under-solving,
+is now the wall.
+
 ## 2026-06-10 (pm3) — lr=0.003 FIXES stability; only the discretization gap remains
 copy-50, gated, kb=3, **lr 0.003**, 30k iters: **skip=0, no NaN** the whole run (explosion
 fully fixed). **soft reaches 0.876 (hit 1.000 @ iter 13k)** but **discrete stuck at 0.37,

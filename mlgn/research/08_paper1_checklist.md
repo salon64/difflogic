@@ -53,6 +53,30 @@ solves; for longer sequences we [bump capacity / apply an off-the-shelf gap-redu
 note this is independent of the gating mechanism." Cite Mind the Gap. Do **not** present a
 gap method as a contribution.
 
+## Write-up framing — free wins (cost nothing, strengthen the paper)
+
+**Carousel ↔ residual-init equivalence (positions `keep_bias` as a principled
+generalization, not an ad-hoc trick).** Our `keep_bias` sits exactly where two established
+techniques coincide:
+- **LSTM forget-gate bias** (Gers et al. 2000) — a *temporal* keep bias.
+- **Petersen's residual initialisation** (LogicTreeNet, **NeurIPS 2024 Oral**) — biasing
+  gate logits toward the pass-through "A" gate to get differentiable residual/skip
+  connections in *deep feedforward* LGNs.
+
+The constant-error carousel (`keep_bias` + MUX) is the **temporal twin of a feedforward
+skip/residual connection**: a learnable identity that, applied *through time* instead of
+*through depth*, is the carousel. So frame `keep_bias` as **the temporal generalization of
+the NeurIPS-Oral residual-init technique** — same mechanism (a learnable keep/skip),
+recurrent axis. `bias_gate_keep` already cites both.
+
+**Caveat (don't overclaim):** the *feedforward* residual-init idea is Petersen's
+(occupied — see [[lgn-recurrent-scout-verdicts]] Angle #5). Our contribution is the
+**recurrent/temporal** use + the **gated MUX** carousel + the empirical "it's *necessary*"
+result (the cold-start ablation: `keep_bias=0` → dead, `keep_bias=3` → solves copy-20).
+Credit residual-init; claim the temporal generalization, not the residual idea itself. The
+standalone learned-gated/Highway skip angle stays **parked as a post-P1/P2 workshop
+fast-follow** (scout `residual/dense/highway LGN` before any experiment there).
+
 ## Paper tier (honest)
 - **Now:** solid **workshop** paper (NeurIPS/ICLR workshop) — essentially ready on the
   seq-20 result + the two-pathology recipe + dead control.
