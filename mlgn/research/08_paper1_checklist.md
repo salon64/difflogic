@@ -20,9 +20,10 @@ The gap is a *general difflogic* property, orthogonal to our contribution, and w
 seq-20**. So treat it as under-solving, cheapest fix first:
 - [ ] **1a. Capacity bump** — re-run copy-50 with bigger `--hidden` (e.g. 2048) and/or
   `--cell-layers 3`. If soft→confident-100% the discrete likely follows (as at seq-20).
-- [ ] **1b. Gate-entropy regularizer** — add `lambda * utils.gate_entropy(model)` to the
-  loss, ramped up over training, to push gates one-hot → shrink the gap. Cheap,
-  CUDA/CPU-agnostic, opt-in (default off). _(implementation noted, not yet built)_
+- [x] **1b. Gate-entropy regularizer** — BUILT. `--entropy-reg` (coeff, ramped via
+  `--entropy-ramp`) adds `lambda*utils.gate_entropy(model)` to push gates one-hot. Pairs
+  with **cosine LR decay** (`--lr-min`) to absorb the late-phase explosion once gates
+  sharpen. Both opt-in (default off). _Run pending._
 - [ ] **1c. (Fallback only) Gumbel+STE** — Mind the Gap (arXiv:2506.07500). Proven but
   touches the CUDA `LogicLayer` forward; only if 1a/1b fail. **Borrowed plumbing — cite,
   don't over-invest.** Likely NOT needed.

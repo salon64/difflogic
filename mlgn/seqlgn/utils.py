@@ -66,6 +66,24 @@ def format_gate_distribution(dist: dict[str, np.ndarray]) -> str:
     return "\n".join(lines)
 
 
+def gate_entropy(model) -> torch.Tensor:
+    """Mean entropy (nats) of the per-neuron gate distributions across all LogicLayers.
+
+    0 = fully committed (one-hot → the soft model equals its discretised form, so the
+    discretization gap vanishes); log(16) ≈ 2.77 = uniform (maximally undecided). Adding
+    ``lambda * gate_entropy(model)`` to the loss pushes gates to COMMIT during training,
+    shrinking the train(soft)→inference(hard) gap. Differentiable; a cheap, CUDA/CPU-agnostic
+    alternative to Gumbel+STE (it only reads ``LogicLayer.weights``)."""
+    ents = []
+    for m in model.modules():
+        if isinstance(m, LogicLayer):
+            p = torch.softmax(m.weights, dim=-1)
+            ents.append(-(p * torch.log(p + 1e-9)).sum(-1).mean())
+    if not ents:
+        return torch.zeros((), device=next(model.parameters()).device)
+    return torch.stack(ents).mean()
+
+
 def grad_norm_through_time(model, x, y, loss_fn) -> list[float]:
     """Return the L2 norm of dL/dh_t at each timestep t.
 

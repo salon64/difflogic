@@ -100,6 +100,15 @@ def build_args():
     p.add_argument("--alphabet", type=int, default=8, help="alphabet size for the copy task")
 
     p.add_argument("--lr", type=float, default=0.01)
+    p.add_argument("--lr-min", type=float, default=-1.0,
+                   help="if >=0 and < --lr, cosine-decay the LR from --lr to this over training "
+                        "(absorbs the late-phase explosion once gates sharpen). -1 = constant LR.")
+    p.add_argument("--entropy-reg", type=float, default=0.0,
+                   help="coefficient on a gate-entropy penalty pushing gates toward one-hot, "
+                        "to shrink the discretization gap. 0 = off.")
+    p.add_argument("--entropy-ramp", type=float, default=1.0,
+                   help="fraction of training over which --entropy-reg ramps 0→full (explore "
+                        "early, commit late). 1.0 = ramp across the whole run.")
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--iters", type=int, default=50_000)
     p.add_argument("--eval-freq", type=int, default=2_000)
@@ -146,9 +155,14 @@ def main():
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = None
+    if 0 <= args.lr_min < args.lr:
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=args.iters, eta_min=args.lr_min)
 
     best_val, best_state = 0.0, None
     grad_norm = float("nan")
+    ent_val = float("nan")
     n_skipped = 0
     skips_at_last_eval = 0
     t0 = time.time()
@@ -158,10 +172,18 @@ def main():
             break
         x, y = x.to(device), y.to(device)
         logits = model(x)
-        loss = loss_fn(logits, y)
+        loss = loss_fn(logits, y)          # task (CE) loss — reported as `loss`
+
+        # Optional gate-entropy penalty (ramped): pushes gates one-hot to shrink the gap.
+        total_loss = loss
+        if args.entropy_reg > 0:
+            ramp = min(1.0, (i + 1) / max(1, args.entropy_ramp * args.iters))
+            ent = utils.gate_entropy(model)
+            ent_val = ent.item()
+            total_loss = loss + (args.entropy_reg * ramp) * ent
 
         optimizer.zero_grad()
-        loss.backward()
+        total_loss.backward()
         # Measure (and optionally clip) the global grad norm; SKIP the update when it is
         # non-finite. An exploding-gradient batch then never poisons the weights, and the
         # model is kept OUT of the NaN basin rather than pushed into it. Post-hoc clipping
@@ -173,15 +195,22 @@ def main():
             optimizer.step()
         else:
             n_skipped += 1
+        if scheduler is not None:
+            scheduler.step()
 
         if (i + 1) % args.eval_freq == 0:
             val = evaluate(model, task.val_loader, device, discrete=True)
             val_soft = evaluate(model, task.val_loader, device, discrete=False)
             window_skips = n_skipped - skips_at_last_eval
             skips_at_last_eval = n_skipped
+            extra = ""
+            if args.entropy_reg > 0:
+                extra += f"  ent={ent_val:.3f}"
+            if scheduler is not None:
+                extra += f"  lr={optimizer.param_groups[0]['lr']:.4f}"
             print(f"[{i + 1:>7}/{args.iters}] loss={loss.item():.4f}  val={val:.4f}  "
                   f"soft={val_soft:.4f}  gap={val_soft - val:+.4f}  gnorm={grad_norm:.2f}  "
-                  f"skip={n_skipped}  ({(time.time() - t0) / 60:.1f} min)")
+                  f"skip={n_skipped}{extra}  ({(time.time() - t0) / 60:.1f} min)")
             if val > best_val:
                 best_val = val
                 best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
@@ -233,7 +262,8 @@ def main():
         "hidden": args.hidden, "cell_layers": args.cell_layers, "keep_bias": args.keep_bias,
         "tau": args.tau,
         "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
-        "lr": args.lr, "batch_size": args.batch_size,
+        "lr": args.lr, "lr_min": args.lr_min, "entropy_reg": args.entropy_reg,
+        "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,
         "logic_gates": utils.count_gates(model),
         "best_val": best_val, "test_acc": test_acc, "test_soft": test_soft,
