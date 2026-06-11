@@ -77,7 +77,9 @@ Three contributions, sharing one codebase. Prior art they must beat/cite: RDDLGN
   where a *real* state element should decisively beat combinational recurrence.
 
 ## Paper 3 — FPGA / ASIC synthesis of sequential LGNs (FUTURE, deferred)
-**Status: deferred on purpose — same call RDDLGN & DiffLogic CA made.**
+**Status: scouted 2026-06-11 → GO ~80% but only P2-coupled; urgency ↑ (ETH has RDDLGN +
+BitLogic RTL pipeline in one lab). See [10_fpga_scout.md](10_fpga_scout.md): plan shift =
+minimal D-FF FPGA demo goes INTO P2; full toolchain/eval paper → FCCM/FPL'27.**
 
 - **Claim (later):** synthesize the learned sequential circuit (registers + logic) to
   FPGA/ASIC; measure ns-latency / energy; this is where the "true sequential circuit →
