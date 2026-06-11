@@ -24,6 +24,9 @@ seq-20**. So treat it as under-solving, cheapest fix first:
   `--entropy-ramp`) adds `lambda*utils.gate_entropy(model)` to push gates one-hot. Pairs
   with **cosine LR decay** (`--lr-min`) to absorb the late-phase explosion once gates
   sharpen. Both opt-in (default off). _Run pending._
+  - _Infra TODO (future, not blocking): make the LR schedule first-class & pluggable —
+    explicit `--lr-schedule {none,cosine,linear,step}` set independently, not inferred from
+    `--lr-min`. (TODO comment is in `train.py` at the scheduler.)_
 - [ ] **1c. (Fallback only) Gumbel+STE** — Mind the Gap (arXiv:2506.07500). Proven but
   touches the CUDA `LogicLayer` forward; only if 1a/1b fail. **Borrowed plumbing — cite,
   don't over-invest.** Likely NOT needed.

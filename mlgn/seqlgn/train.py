@@ -155,6 +155,10 @@ def main():
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    # TODO(future): make the LR schedule a first-class, pluggable choice — an explicit
+    # `--lr-schedule {none,cosine,linear,step,...}` selected independently, rather than
+    # inferring "cosine decay" from the presence of `--lr-min`. Coupling the schedule to
+    # lr_min is a stopgap; a settable schedule (with its own params) is cleaner.
     scheduler = None
     if 0 <= args.lr_min < args.lr:
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
