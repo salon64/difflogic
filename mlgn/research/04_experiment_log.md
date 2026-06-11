@@ -13,6 +13,26 @@ Template:
 
 ---
 
+## 2026-06-11 (pm) — LSTM cold-starts (worse than GRU); fix = also close the input gate at init
+First `lstm` run (copy-20, hidden 1024, keep-bias 3, lr-decay): **total failure** — flat at
+chance (0.13), loss 2.08 all 20k, grad@t=0 = 8e-7 (**vanishing**, ratio 1.2e-3).
+
+**Diagnosis:** LSTM carousel `∂C'/∂C = f·(1 − i·C̃)`. We keep-biased `f` (≈0.78) but `i`
+(input gate) + `C̃` are random at init → `i·C̃ ≈ 0.25` **eats the carousel** → ∂C'/∂C ≈ 0.58
+(vs GRU's `∂h'/∂h = s ≈ 0.78`). 0.58²⁰ → vanish → cold-start. So the LSTM's *separate*
+forget/input gates make init harder than the GRU's single MUX gate.
+
+**Fix:** standard LSTM init — keep-bias forget AND **close the input gate** (`bias_gate_closed`
+→ FALSE logit) so `i·C̃≈0`, ∂C'/∂C ≈ f (strong), write path preserved. Applied in `cells.py`
+lstm branch (both scaled by `keep_bias`). At keep_bias 4: f≈0.89, i≈0.11, carousel≈0.84.
+
+**Note for the LSTM-vs-GRU framing:** even with the fix, this already shows the **GRU is
+more robust to train** (single complementary gate vs LSTM's two independent gates needing
+coordinated init) — a legitimate ablation point *for* the GRU as the recommended cell.
+
+**Next:** re-run copy-20 lstm with `--keep-bias 4` (sweep 6 if still vanishing). Watch
+grad@t=0 stops vanishing + loss drops below 2.08.
+
 ## 2026-06-11 — §1b entropy reg = NEGATIVE result; LR decay fixes stability; 0.75 is a discrete ceiling
 copy-50, gated, hidden 2048, lr 0.003→3e-4 cosine, entropy-reg 0.05, 30k iters.
 - ✅ **LR decay fixed stability:** skip=0 all 30k, no NaN (vs L50cap NaN @19k). Keep this.

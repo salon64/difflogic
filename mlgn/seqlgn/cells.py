@@ -73,8 +73,24 @@ def _or(a, b):
     return a + b - a * b
 
 
-# Gate id 15 = TRUE (always outputs 1); see utils.GATE_NAMES / functional.bin_op.
+# Gate ids: 15 = TRUE (always 1), 0 = FALSE (always 0); see utils.GATE_NAMES / functional.
 _TRUE_GATE = 15
+_FALSE_GATE = 0
+
+
+def bias_gate_closed(logic_mlp: "LogicMLP", strength: float) -> None:
+    """Bias a gate toward outputting 0 ("closed" / don't-write) at init by adding
+    ``strength`` to the FALSE-gate logit of its final LogicLayer.
+
+    Used for the **LSTM input gate**: paired with a keep-biased forget gate, this is the
+    standard "remember + don't-overwrite" LSTM initialisation. Without it, a random input
+    gate makes the cell-state carousel ``∂C'/∂C = f·(1 − i·C̃) ≈ 0.58`` at init (the input
+    path eats the keep) → vanishing → cold-start. Closing the input gate gives
+    ``i·C̃ ≈ 0`` so ``∂C'/∂C ≈ f`` (strong), while leaving a write path (i>0) the gate can
+    learn to open. ``strength=0`` disables it."""
+    if strength:
+        with torch.no_grad():
+            logic_mlp.net[-1].weights[:, _FALSE_GATE] += strength
 
 
 def bias_gate_keep(logic_mlp: "LogicMLP", strength: float) -> None:
@@ -204,8 +220,11 @@ class LogicRecurrentCell(nn.Module):
             self.input = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.out_proj = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
-            # Keep-bias the forget gate f so the cell-state carousel is ON at init.
+            # Standard LSTM init: keep-bias the forget gate (remember) AND close the input
+            # gate (don't-overwrite), so the cell-state carousel ∂C'/∂C ≈ f is strong at
+            # init instead of being eaten by a random input path (which cold-starts it).
             bias_gate_keep(self.forget, keep_bias)
+            bias_gate_closed(self.input, keep_bias)
             # readout sees [o ; C] (2*hidden_dim) -> hidden_dim; 2H >= 2H satisfies the
             # difflogic out*2>=in rule exactly (this is why we project z->o first instead
             # of feeding [z ; C] directly, which would violate it).
