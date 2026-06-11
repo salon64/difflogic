@@ -16,8 +16,14 @@ memory where the recompute-recurrence control (RDDLGN-style) fails. Pairs with
 ## Remaining experiments (ordered)
 
 ### 1. Close the long-sequence frontier (seq-50+) cleanly
-The gap is a *general difflogic* property, orthogonal to our contribution, and was **0 at
-seq-20**. So treat it as under-solving, cheapest fix first:
+**Status (2026-06-11): de-prioritized — orthogonal plumbing, diminishing returns.**
+§1a (capacity) lifted discrete 0.37→0.75; §1b (entropy reg) was a **negative result** (it
+drags soft *down* to discrete, doesn't lift discrete). 0.75 is a **capacity-bound discrete
+ceiling** at hidden 2048 for copy-50. LR decay (§stability) is a keeper. The mechanism is
+already validated (seq-20 100%, seq-50 75% discrete / soft-solvable, control ~12.5%), so
+**recommend banking this and moving to §2–§4**; only return for STE/capacity if a clean
+seq-50 number is wanted. The gap is a *general difflogic* property, orthogonal to our
+contribution, and was **0 at seq-20**:
 - [ ] **1a. Capacity bump** — re-run copy-50 with bigger `--hidden` (e.g. 2048) and/or
   `--cell-layers 3`. If soft→confident-100% the discrete likely follows (as at seq-20).
 - [x] **1b. Gate-entropy regularizer** — BUILT. `--entropy-reg` (coeff, ramped via

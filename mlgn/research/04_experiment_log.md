@@ -13,6 +13,27 @@ Template:
 
 ---
 
+## 2026-06-11 — §1b entropy reg = NEGATIVE result; LR decay fixes stability; 0.75 is a discrete ceiling
+copy-50, gated, hidden 2048, lr 0.003→3e-4 cosine, entropy-reg 0.05, 30k iters.
+- ✅ **LR decay fixed stability:** skip=0 all 30k, no NaN (vs L50cap NaN @19k). Keep this.
+- ✅ entropy reg committed gates: `ent` 1.6→0.03 (near one-hot).
+- ❌ **Gap did NOT close.** val **0.75** (test 0.754), soft dropped **1.0→0.886**. Discrete
+  unchanged vs L50cap (0.75); entropy reg pulled *soft DOWN* to discrete, not discrete up.
+
+**Finding:** entropy/commitment reg is the WRONG tool — soft's 100% solution uses the gate
+*mixture*; forcing one-hot destroys it and lands on the same 0.75 discrete circuit. We need
+discrete→soft, not soft→discrete. **0.75 discrete is a capacity-bound ceiling** at hidden
+2048 for copy-50 (recalls ~6/8 symbols), not a regularizable soft/hard mismatch.
+
+**To lift discrete:** (a) more capacity (hidden 4096 / cell_layers 3), or (b) **STE / Mind
+the Gap (§1c)** — hard forward + soft backward, optimizes the discrete circuit directly.
+
+**Strategic call:** mechanism is VALIDATED (seq-20 100%, seq-50 75% discrete / soft-solvable,
+control ~12.5%). Closing seq-50 to ~100% is orthogonal plumbing w/ diminishing returns.
+**Recommend: bank this, pivot to core paper experiments** (lstm arm, length sweep, ≥3 seeds,
+equal-gates). STE/capacity = optional polish, do only if a clean seq-50 is wanted.
+Keep `--lr-min` (decay) as default-on infra going forward; drop `--entropy-reg`.
+
 ## 2026-06-10 (pm4) — §1a capacity bump: discrete 0.37→0.76; isolates a true residual gap
 copy-50, gated, kb=3, lr 0.003, **hidden 2048** (2×), 30k iters.
 **Result: test 0.757** (was 0.380 at hidden 1024) — chance 0.125, control ~0.125. Big win.
