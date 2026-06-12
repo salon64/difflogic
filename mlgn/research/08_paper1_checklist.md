@@ -37,10 +37,23 @@ contribution, and was **0 at seq-20**:
   touches the CUDA `LogicLayer` forward; only if 1a/1b fail. **Borrowed plumbing — cite,
   don't over-invest.** Likely NOT needed.
 
-### 2. The `lstm` arm (richer-mechanism ablation)
-- [ ] Run `lstm` (keep-bias on forget gate) across the copy length sweep {20, 35, 50}.
-- [ ] Question to answer: does the dedicated cell state + forget/input/output (5 LGNs,
-  ~2.5× gates) beat the single-gate `gated` cell? Report acc-vs-gates.
+### 2. Cell-mechanism ablation — the 2×2 (copy length sweep {20, 35, 50})
+The four mechanisms isolate two variables (gate structure × state separation):
+
+| | single MUX gate | two independent gates |
+|---|---|---|
+| **single state** | `gated` (GRU) — 2 LGNs | — |
+| **separate state (h,C)** | `gru_cell` — 4 LGNs | `lstm` — 5 LGNs |
+| (+ control) | `rddlgn` concat-recurrence | |
+
+- [x] `rddlgn` / `gated` / `lstm` swept {20,35,50} (2026-06-12): **GRU wins** (1.0/0.88/0.38),
+  control dead (~0.25), **LSTM cold-starts at ≥35** even with the input-gate-closed fix →
+  GRU > LSTM (cleanly).
+- [x] `lstm` fix: keep-bias forget **+ close input gate** (`bias_gate_closed`) — engages at
+  seq-20 (0.13→0.76) but needs ever-higher keep-bias as length grows.
+- [ ] **`gru_cell` sweep {20,35,50}** — the 2×2 completion: does a separate cell state help
+  *with the robust MUX gate*? `gru_cell` vs `gated`; watch seq-50 (does it beat gated@0.38?).
+- [ ] (opt) `lstm` keep-bias 6 @20/35 — firm up "LSTM harder even w/ strong init."
 
 ### 3. A harder / real benchmark
 - [ ] **psMNIST** (the original target, 784 steps) now that the stability recipe exists —

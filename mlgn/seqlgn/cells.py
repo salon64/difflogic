@@ -63,7 +63,9 @@ import torch.nn as nn
 from difflogic import LogicLayer
 
 
-MECHANISMS = ("rddlgn", "gated", "lstm", "latch")
+MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch")
+# Mechanisms that carry a tuple state (h, C) — a separate cell state C from the output h.
+_TUPLE_STATE = ("lstm", "gru_cell")
 
 
 def _or(a, b):
@@ -230,6 +232,16 @@ class LogicRecurrentCell(nn.Module):
             # of feeding [z ; C] directly, which would violate it).
             self.readout = LogicMLP(2 * hidden_dim, hidden_dim, **mlp_kwargs)
 
+        elif mechanism == "gru_cell":
+            # 2x2 ablation: a dedicated cell state C (like LSTM) updated by the GRU's single
+            # complementary MUX gate (like `gated`), with a separate output readout. Tests
+            # whether decoupling memory (C) from output (h) helps, with the robust gate.
+            self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            self.gate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            self.out_proj = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+            self.readout = LogicMLP(2 * hidden_dim, hidden_dim, **mlp_kwargs)
+            bias_gate_keep(self.gate, keep_bias)  # MUX carousel on C: ∂C'/∂C = s, no leak
+
         elif mechanism == "latch":
             raise NotImplementedError(
                 "mechanism='latch' is Paper #2 and is currently PARKED. "
@@ -239,7 +251,7 @@ class LogicRecurrentCell(nn.Module):
 
     def forward(self, x_t: torch.Tensor, state):
         # Unpack the (possibly tuple) state into the hidden vector h used to form z.
-        h = state[0] if self.mechanism == "lstm" else state
+        h = state[0] if self.mechanism in _TUPLE_STATE else state
         z = torch.cat([x_t, h], dim=-1)  # [batch, input_dim + hidden_dim]
 
         if self.mechanism == "rddlgn":
@@ -266,24 +278,34 @@ class LogicRecurrentCell(nn.Module):
             h_new = self.readout(torch.cat([o, C_new], dim=-1))  # [o ; C'] (2H) -> H
             return (h_new, C_new)
 
+        if self.mechanism == "gru_cell":
+            _, C = state
+            s = self.gate(z)                   # single complementary gate (keep-biased)
+            c_tilde = self.candidate(z)
+            C_new = s * C + (1.0 - s) * c_tilde  # GRU MUX on the cell state; ∂C'/∂C = s
+            o = self.out_proj(z)
+            h_new = self.readout(torch.cat([o, C_new], dim=-1))
+            return (h_new, C_new)
+
         raise RuntimeError(f"unhandled mechanism {self.mechanism!r}")
 
     # --- state helpers (keep the model loop mechanism-agnostic) -----------------------
     def init_state(self, batch: int, device, dtype=torch.float32):
         h = torch.zeros(batch, self.hidden_dim, device=device, dtype=dtype)
-        if self.mechanism == "lstm":
+        if self.mechanism in _TUPLE_STATE:
             C = torch.zeros(batch, self.hidden_dim, device=device, dtype=dtype)
             return (h, C)
         return h
 
     def readout_h(self, state) -> torch.Tensor:
         """The hidden vector used for classification (and fed back next step)."""
-        return state[0] if self.mechanism == "lstm" else state
+        return state[0] if self.mechanism in _TUPLE_STATE else state
 
     def carousel_state(self, state) -> torch.Tensor:
         """The state carrying the long-range gradient highway: the cell state C for
-        lstm, the hidden state h otherwise. Used by the grad-norm-through-time analysis."""
-        return state[1] if self.mechanism == "lstm" else state
+        tuple-state mechanisms (lstm/gru_cell), the hidden state h otherwise. Used by the
+        grad-norm-through-time analysis."""
+        return state[1] if self.mechanism in _TUPLE_STATE else state
 
     def extra_repr(self) -> str:
         kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm") else ""

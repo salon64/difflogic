@@ -103,12 +103,18 @@ def _synthetic_task(
 # Sequential MNIST family
 # --------------------------------------------------------------------------------------
 class _SeqMNIST(Dataset):
-    """Wraps a torchvision MNIST dataset and emits sequences [seq_len, input_dim]."""
+    """Wraps a torchvision MNIST dataset and emits sequences [seq_len, input_dim].
 
-    def __init__(self, base, mode: str, permutation: torch.Tensor | None = None):
+    pixel mode with ``chunk=k`` feeds k pixels per timestep (seq_len = 784//k, input_dim
+    = k) — a knob to make MNIST a *feasible* long sequence (e.g. k=14 → 56 steps) instead
+    of the full 784-step version that's beyond the cell's frontier and ~40h/run.
+    """
+
+    def __init__(self, base, mode: str, permutation: torch.Tensor | None = None, chunk: int = 1):
         self.base = base
         self.mode = mode
         self.permutation = permutation
+        self.chunk = chunk
 
     def __len__(self):
         return len(self.base)
@@ -117,15 +123,18 @@ class _SeqMNIST(Dataset):
         img, label = self.base[i]            # img: [1, 28, 28] in [0,1]
         if self.mode == "row":
             seq = img.view(28, 28)           # [T=28, input_dim=28]
-        else:  # pixel / permuted-pixel
+        else:  # pixel / permuted-pixel, optionally chunked
             flat = img.view(784)
             if self.permutation is not None:
                 flat = flat[self.permutation]
-            seq = flat.view(784, 1)          # [T=784, input_dim=1]
+            c = self.chunk
+            n = (784 // c) * c               # trim remainder so it reshapes cleanly
+            seq = flat[:n].view(n // c, c)   # [T=784//c, input_dim=c]
         return seq, label
 
 
-def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: int) -> TaskSpec:
+def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: int,
+                chunk: int = 1) -> TaskSpec:
     import torchvision
 
     tfm = torchvision.transforms.ToTensor()
@@ -136,8 +145,8 @@ def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: in
     if name == "psmnist":
         permutation = torch.randperm(784, generator=torch.Generator().manual_seed(1234))
 
-    train_set = _SeqMNIST(train_full, mode, permutation)
-    test_set = _SeqMNIST(test_base, mode, permutation)
+    train_set = _SeqMNIST(train_full, mode, permutation, chunk=chunk)
+    test_set = _SeqMNIST(test_base, mode, permutation, chunk=chunk)
 
     val_size = int(len(train_set) * val_frac)
     train_size = len(train_set) - val_size
@@ -145,8 +154,8 @@ def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: in
         train_set, [train_size, val_size], generator=torch.Generator().manual_seed(seed)
     )
 
-    input_dim = 28 if mode == "row" else 1
-    seq_len = 28 if mode == "row" else 784
+    input_dim = 28 if mode == "row" else chunk
+    seq_len = 28 if mode == "row" else (784 // chunk)
     return TaskSpec(
         name=name,
         input_dim=input_dim,
@@ -166,21 +175,23 @@ def get_task(
     batch_size: int = 128,
     seq_len: int | None = None,
     alphabet: int = 8,
+    chunk: int = 1,
     val_frac: float = 0.1,
     n_train: int = 50_000,
     n_val: int = 5_000,
     n_test: int = 10_000,
     seed: int = 0,
 ) -> TaskSpec:
-    """Build a :class:`TaskSpec`. ``seq_len`` overrides the default for synthetic tasks."""
+    """Build a :class:`TaskSpec`. ``seq_len`` overrides synthetic-task length; ``chunk``
+    sets pixels-per-step for the pixel-MNIST tasks (seq_len = 784//chunk)."""
     name = name.lower()
 
     if name in ("smnist", "smnist-row"):
         return _mnist_task("smnist", "row", batch_size, val_frac, seed)
     if name == "smnist-pixel":
-        return _mnist_task("smnist-pixel", "pixel", batch_size, val_frac, seed)
+        return _mnist_task("smnist-pixel", "pixel", batch_size, val_frac, seed, chunk=chunk)
     if name == "psmnist":
-        return _mnist_task("psmnist", "pixel", batch_size, val_frac, seed)
+        return _mnist_task("psmnist", "pixel", batch_size, val_frac, seed, chunk=chunk)
 
     if name == "parity":
         L = seq_len or 64

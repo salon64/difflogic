@@ -127,6 +127,30 @@ full LGN over `[o;C']` instead of a fixed AND — more expressive.)
 (`h`, `C`) — vs the gated cell's 2 LGNs / 1 state. So `lstm` is the "does the extra
 forget/input/output machinery earn its ~2.5× gates?" ablation; `gated` stays the primary.
 
+### `gru_cell` — the 2×2-completing ablation
+A **dedicated cell state `C` (like LSTM) updated by the GRU's single complementary MUX
+gate (like `gated`)**, with a separate output readout:
+```
+s = gate(z);  C̃ = candidate(z)
+C' = s·C + (1−s)·C̃          # GRU MUX on the cell state; ∂C'/∂C = s (clean carousel, no leak)
+o  = out_proj(z)
+h' = readout([o ; C'])       # h is a learned readout of C
+state = (h', C')
+```
+This isolates **"separate cell state"** from **"gate structure"** — the two things `gated`
+and `lstm` change at once:
+
+| | single MUX gate | two independent gates |
+|---|---|---|
+| **single state** (h) | `gated` (GRU) | — |
+| **separate state** (h, C) | **`gru_cell`** | `lstm` |
+
+Because the gate is a single complementary MUX, the carousel `∂C'/∂C = s` is clean (no
+input-path leak) → it should be **robust to train**, unlike `lstm`. 4 LGNs (candidate,
+gate, out_proj, readout) = 8,192 gates at hidden 1024 (2× `gated`, < `lstm`). Read it as
+`gru_cell` vs `gated`: if ≈, the separate cell buys nothing (GRU wins); if it extends the
+long-sequence frontier, decoupling memory from output helps. keep-bias goes on the gate.
+
 ## 4. Discreteness across time
 
 For the discretised circuit to be exact, the hidden state must stay binary at eval. It

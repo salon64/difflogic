@@ -81,9 +81,10 @@ def evaluate(model, loader, device, discrete: bool = True) -> float:
 def build_args():
     p = argparse.ArgumentParser(description="Train a recurrent Logic Gate Network.")
     p.add_argument("--task", default="psmnist", choices=AVAILABLE_TASKS)
-    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm"),
+    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell"),
                    help="memory mechanism: 'rddlgn' control, 'gated' (GRU-style, Paper #1), "
-                        "'lstm' (richer arm). 'latch' (Paper #2) is parked.")
+                        "'lstm' (richer arm), 'gru_cell' (separate cell state + GRU MUX — "
+                        "the 2x2 ablation). 'latch' (Paper #2) is parked.")
     p.add_argument("--hidden", type=int, default=2000, help="hidden_dim (must be >= input_dim and divisible by num_classes)")
     p.add_argument("--cell-layers", type=int, default=2, help="logic layers per candidate/gate/update network")
     p.add_argument("--keep-bias", type=float, default=3.0,
@@ -98,6 +99,9 @@ def build_args():
                         "exploding gradients on long sequences (NaN) — clipping prevents it.")
     p.add_argument("--seq-len", type=int, default=None, help="sequence length for synthetic tasks (parity/copy)")
     p.add_argument("--alphabet", type=int, default=8, help="alphabet size for the copy task")
+    p.add_argument("--chunk", type=int, default=1,
+                   help="pixels per timestep for pixel-MNIST tasks (smnist-pixel/psmnist); "
+                        "seq_len = 784//chunk. e.g. 14 → 56 steps, 8 → 98 steps.")
 
     p.add_argument("--lr", type=float, default=0.01)
     p.add_argument("--lr-min", type=float, default=-1.0,
@@ -132,7 +136,7 @@ def main():
 
     task = get_task(
         args.task, batch_size=args.batch_size, seq_len=args.seq_len,
-        alphabet=args.alphabet, seed=args.seed,
+        alphabet=args.alphabet, chunk=args.chunk, seed=args.seed,
     )
     print(f"task={task.name}  seq_len={task.seq_len}  input_dim={task.input_dim}  "
           f"num_classes={task.num_classes}")

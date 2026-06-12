@@ -13,6 +13,33 @@ Template:
 
 ---
 
+## 2026-06-12 — THE SWEEP: GRU wins decisively; GRU > LSTM; control dead. (headline curve)
+copy, hidden 1024, lr 0.003→3e-4, 20k iters. Discrete test acc:
+
+| seq | rddlgn (control) | **gated (GRU)** | lstm (kb4, fixed) |
+|---|---|---|---|
+| 20 | 0.25 | **1.00** | 0.76 |
+| 35 | 0.26 | **0.88** | 0.13 ✗ cold-start |
+| 50 | 0.26 | 0.38 (soft 1.0) | 0.13 ✗ cold-start |
+
+(gated@50 = **0.75 at hidden 2048** — capacity extends the frontier; control `soft`≈0.12 =
+genuinely dead at all lengths.)
+
+**Findings:**
+1. **GRU ≫ control at every length** (1.0/0.88/0.38 vs flat ~0.25). The headline figure.
+2. **LSTM input-gate-closed fix WORKED at seq-20** (0.13→0.76; grad ratio 1.2e-3→1.1e+2 =
+   carousel engaged). But **cold-starts again at seq-35/50** (kb4 carousel≈0.84, 0.84⁵⁰≈2e-4
+   → vanish). LSTM needs ever-stronger keep-bias as length grows.
+3. **GRU > LSTM cleanly** — even where LSTM works (seq-20) it's worse (0.76 vs 1.00) and far
+   more finicky. → **ablation justifies the GRU**: one complementary MUX gate beats two
+   independent gates needing coordinated init.
+
+**Paper message locked:** the simple logic-GRU cell is the sweet spot — robust long-range
+memory, beats the recompute control decisively, beats the more complex LSTM.
+
+**Next (§4 rigor):** 3 seeds on the GRU points + equal-gates control (size rddlgn up to
+gated's gate count). Optional: lstm kb6 @20/35 to firm up "LSTM harder even w/ strong init."
+
 ## 2026-06-11 (pm) — LSTM cold-starts (worse than GRU); fix = also close the input gate at init
 First `lstm` run (copy-20, hidden 1024, keep-bias 3, lr-decay): **total failure** — flat at
 chance (0.13), loss 2.08 all 20k, grad@t=0 = 8e-7 (**vanishing**, ratio 1.2e-3).
