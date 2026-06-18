@@ -8,7 +8,9 @@
 # after a disconnect or container restart resumes instead of redoing finished work
 # (resume is per-job, not mid-job: an interrupted run restarts from scratch).
 #
-# Run detached so it survives a closed browser tab:
+# Run detached so it survives a closed browser tab (mkdir first — the shell opens
+# the redirect before the script's own mkdir runs):
+#   cd ~/work/difflogic && mkdir -p logs
 #   nohup bash mlgn/seqlgn/run_queue.sh > logs/queue.log 2>&1 &
 #   tail -f logs/queue.log
 set -uo pipefail
