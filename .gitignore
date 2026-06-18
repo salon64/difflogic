@@ -1,5 +1,6 @@
 **/__pycache__/
 **/data-mnist/
+**/logs/
 **/.vscode
 # compiled difflogic_cuda extension + build artifacts
 build/
