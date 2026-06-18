@@ -23,10 +23,21 @@ cd "$ROOT"
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
-  # Phase A — cell ablation, GRU-style logic cell (gru_cell)
-  "--task copy --seq-len 20 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gru_cell --keep-bias 3 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag grucell_L20"
-  "--task copy --seq-len 35 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gru_cell --keep-bias 3 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag grucell_L35"
-  "--task copy --seq-len 50 --hidden 1024 --iters 20000 --eval-freq 1000 --mechanism gru_cell --keep-bias 3 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag grucell_L50"
+  # Phase C — gated vs rddlgn control across the length ladder (keep-bias held at 4)
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_rddlgn"
+  "--task psmnist --chunk 16 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm49_gated"
+  "--task psmnist --chunk 16 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm49_rddlgn"
+  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm56_gated"
+  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm56_rddlgn"
+  "--task psmnist --chunk  8 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm98_gated"
+  "--task psmnist --chunk  8 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm98_rddlgn"
+  "--task psmnist --chunk  7 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm112_gated"
+  "--task psmnist --chunk  7 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag
+psm112_rddlgn"
+  # 4-arm comparison at the anchor (gated/rddlgn @56 above double as the other two arms)
+  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --em     --keep-bias 6 --lr 0.003 --lr-min 0.0003--grad-analysis --tag psm56_lstm"
+  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --e_cell --keep-bias 4 --lr 0.003 --lr-min 0.0003--grad-analysis --tag psm56_grucell"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
