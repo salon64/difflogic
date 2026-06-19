@@ -1,0 +1,3 @@
+# To switch to a "bake difflogic into the image" variant that COPYs
+# difflogic/ + setup.py + README.md, replace this with targeted excludes instead.
+*

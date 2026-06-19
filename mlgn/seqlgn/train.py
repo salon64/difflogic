@@ -102,6 +102,9 @@ def build_args():
     p.add_argument("--chunk", type=int, default=1,
                    help="pixels per timestep for pixel-MNIST tasks (smnist-pixel/psmnist); "
                         "seq_len = 784//chunk. e.g. 14 → 56 steps, 8 → 98 steps.")
+    p.add_argument("--delay", type=int, default=0,
+                   help="append N blank steps after an MNIST image (RECALL test: hold the "
+                        "digit through the delay, then classify). seq_len = image_steps + N.")
 
     p.add_argument("--lr", type=float, default=0.01)
     p.add_argument("--lr-min", type=float, default=-1.0,
@@ -136,7 +139,7 @@ def main():
 
     task = get_task(
         args.task, batch_size=args.batch_size, seq_len=args.seq_len,
-        alphabet=args.alphabet, chunk=args.chunk, seed=args.seed,
+        alphabet=args.alphabet, chunk=args.chunk, delay=args.delay, seed=args.seed,
     )
     print(f"task={task.name}  seq_len={task.seq_len}  input_dim={task.input_dim}  "
           f"num_classes={task.num_classes}")

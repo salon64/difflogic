@@ -13,7 +13,29 @@ Template:
 
 ---
 
-## 2026-06-12 — THE SWEEP: GRU wins decisively; GRU > LSTM; control dead. (headline curve)
+## 2026-06-18 — PIVOTAL: gating wins COPY but LOSES psMNIST. Win is narrow (recall only).
+Full sweeps done (fig: `mlgn/seqlgn/results/curves.png`, `plot.py`).
+
+**copy (synthetic recall), test acc:** gated **0.96 / 0.79 / 0.33** (L20/35/50, 3 seeds);
+rddlgn dead ~0.25; lstm & gru_cell cold-start to chance at L≥35 (only work at L20, < gated).
+→ on pure recall, **gated wins decisively**, and GRU > LSTM/gru_cell (simpler is better).
+
+**psMNIST (real, chunked), test acc:** **rddlgn (control) BEATS gated at EVERY length:**
+0.62/0.61/0.60/0.52 (L28/49/56/98) vs gated 0.39/0.38/0.30/0.28/0.32 (L28..112). NO crossover.
+
+**Diagnosis — two effects, both against gated on psMNIST:**
+1. **MUX discretization gap.** Soft models ≈ tied (~0.65 short), but gated gap +0.18..0.27
+   vs rddlgn +0.03..0.05. The MUX `s·h+(1−s)·c` blends → analog hidden state → discretizes
+   badly when the task isn't fully solvable; rddlgn's logic-recompute stays near-binary.
+2. **keep-bias ⊥ integration.** gated's *soft* also degrades faster (0.66→0.50 by L98 vs
+   rddlgn 0.65→0.57): keep-bias 4 makes it KEEP (under-write), which helps recall but hurts
+   classification (needs to absorb every input). And at 28–98 steps rddlgn's vanishing
+   (grad 1e-3) isn't fatal → gating's gradient-flow edge buys nothing here.
+
+**Conclusion:** **the carousel helps long-range RECALL, not classification/integration.**
+"Gating wins for recurrent LGNs" is NOT supported in general — only on pure-recall tasks.
+This confirms the old scout read: P1 (gating) is an honest *workshop characterization*, not
+a main-conf "our method wins"; **P2 (latch) is the real anchor.** Options + decision in chat.
 copy, hidden 1024, lr 0.003→3e-4, 20k iters. Discrete test acc:
 
 | seq | rddlgn (control) | **gated (GRU)** | lstm (kb4, fixed) |

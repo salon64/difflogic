@@ -110,11 +110,13 @@ class _SeqMNIST(Dataset):
     of the full 784-step version that's beyond the cell's frontier and ~40h/run.
     """
 
-    def __init__(self, base, mode: str, permutation: torch.Tensor | None = None, chunk: int = 1):
+    def __init__(self, base, mode: str, permutation: torch.Tensor | None = None,
+                 chunk: int = 1, delay: int = 0):
         self.base = base
         self.mode = mode
         self.permutation = permutation
         self.chunk = chunk
+        self.delay = delay
 
     def __len__(self):
         return len(self.base)
@@ -130,11 +132,15 @@ class _SeqMNIST(Dataset):
             c = self.chunk
             n = (784 // c) * c               # trim remainder so it reshapes cleanly
             seq = flat[:n].view(n // c, c)   # [T=784//c, input_dim=c]
+        if self.delay > 0:
+            # Append `delay` blank steps after the image — a RECALL test: the cell must
+            # HOLD the digit through the delay before classifying. Plays to the carousel.
+            seq = torch.cat([seq, torch.zeros(self.delay, seq.shape[1])], dim=0)
         return seq, label
 
 
 def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: int,
-                chunk: int = 1) -> TaskSpec:
+                chunk: int = 1, delay: int = 0) -> TaskSpec:
     import torchvision
 
     tfm = torchvision.transforms.ToTensor()
@@ -145,8 +151,8 @@ def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: in
     if name == "psmnist":
         permutation = torch.randperm(784, generator=torch.Generator().manual_seed(1234))
 
-    train_set = _SeqMNIST(train_full, mode, permutation, chunk=chunk)
-    test_set = _SeqMNIST(test_base, mode, permutation, chunk=chunk)
+    train_set = _SeqMNIST(train_full, mode, permutation, chunk=chunk, delay=delay)
+    test_set = _SeqMNIST(test_base, mode, permutation, chunk=chunk, delay=delay)
 
     val_size = int(len(train_set) * val_frac)
     train_size = len(train_set) - val_size
@@ -155,7 +161,7 @@ def _mnist_task(name: str, mode: str, batch_size: int, val_frac: float, seed: in
     )
 
     input_dim = 28 if mode == "row" else chunk
-    seq_len = 28 if mode == "row" else (784 // chunk)
+    seq_len = (28 if mode == "row" else (784 // chunk)) + delay
     return TaskSpec(
         name=name,
         input_dim=input_dim,
@@ -176,6 +182,7 @@ def get_task(
     seq_len: int | None = None,
     alphabet: int = 8,
     chunk: int = 1,
+    delay: int = 0,
     val_frac: float = 0.1,
     n_train: int = 50_000,
     n_val: int = 5_000,
@@ -187,11 +194,11 @@ def get_task(
     name = name.lower()
 
     if name in ("smnist", "smnist-row"):
-        return _mnist_task("smnist", "row", batch_size, val_frac, seed)
+        return _mnist_task("smnist", "row", batch_size, val_frac, seed, delay=delay)
     if name == "smnist-pixel":
-        return _mnist_task("smnist-pixel", "pixel", batch_size, val_frac, seed, chunk=chunk)
+        return _mnist_task("smnist-pixel", "pixel", batch_size, val_frac, seed, chunk=chunk, delay=delay)
     if name == "psmnist":
-        return _mnist_task("psmnist", "pixel", batch_size, val_frac, seed, chunk=chunk)
+        return _mnist_task("psmnist", "pixel", batch_size, val_frac, seed, chunk=chunk, delay=delay)
 
     if name == "parity":
         L = seq_len or 64
