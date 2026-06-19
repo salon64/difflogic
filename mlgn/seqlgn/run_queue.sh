@@ -23,21 +23,17 @@ cd "$ROOT"
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
-  # Phase C — gated vs rddlgn control across the length ladder (keep-bias held at 4)
-  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated"
-  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_rddlgn"
-  "--task psmnist --chunk 16 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm49_gated"
-  "--task psmnist --chunk 16 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm49_rddlgn"
-  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm56_gated"
-  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm56_rddlgn"
-  "--task psmnist --chunk  8 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm98_gated"
-  "--task psmnist --chunk  8 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm98_rddlgn"
-  "--task psmnist --chunk  7 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 4 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm112_gated"
-  "--task psmnist --chunk  7 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag
-psm112_rddlgn"
-  # 4-arm comparison at the anchor (gated/rddlgn @56 above double as the other two arms)
-  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --em     --keep-bias 6 --lr 0.003 --lr-min 0.0003--grad-analysis --tag psm56_lstm"
-  "--task psmnist --chunk 14 --hidden 1000 --iters 20000 --e_cell --keep-bias 4 --lr 0.003 --lr-min 0.0003--grad-analysis --tag psm56_grucell"
+  # B — integration-tension: does LOW keep-bias help gated on psMNIST? (compare vs existing kb4)
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 0 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated_kb0"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 1 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated_kb1"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 2 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated_kb2"
+  # C — real-data recall: encode-in-1-step (chunk 784), HOLD through delay, then classify
+  "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d0_gated"
+  "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d0_rddlgn"
+  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d50_gated"
+  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d50_rddlgn"
+  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d100_gated"
+  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d100_rddlgn"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
