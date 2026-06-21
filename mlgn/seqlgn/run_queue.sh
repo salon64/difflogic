@@ -23,10 +23,6 @@ cd "$ROOT"
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
-  # B — integration-tension: does LOW keep-bias help gated on psMNIST? (compare vs existing kb4)
-  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 0 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated_kb0"
-  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 1 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated_kb1"
-  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 2 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_gated_kb2"
   # C — real-data recall: encode-in-1-step (chunk 784), HOLD through delay, then classify
   "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d0_gated"
   "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d0_rddlgn"

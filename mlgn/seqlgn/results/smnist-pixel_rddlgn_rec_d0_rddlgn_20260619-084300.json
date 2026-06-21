@@ -1,0 +1,28 @@
+{
+  "task": "smnist-pixel",
+  "mechanism": "rddlgn",
+  "seq_len": 1,
+  "hidden": 1000,
+  "cell_layers": 2,
+  "keep_bias": 3.0,
+  "tau": 30.0,
+  "grad_factor": 1.0,
+  "grad_clip": 1.0,
+  "lr": 0.003,
+  "lr_min": 0.0003,
+  "entropy_reg": 0.0,
+  "batch_size": 128,
+  "iters": 20000,
+  "seed": 0,
+  "device": "cuda",
+  "logic_gates": 2000,
+  "best_val": 0.544,
+  "test_acc": 0.5537,
+  "test_soft": 0.6501,
+  "discretization_gap": 0.09640000000000004,
+  "n_skipped": 0,
+  "train_minutes": 5.396830940246582,
+  "grad_profile": [
+    0.026877297088503838
+  ]
+}
