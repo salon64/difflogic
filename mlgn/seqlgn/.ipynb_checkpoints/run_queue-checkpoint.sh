@@ -23,13 +23,9 @@ cd "$ROOT"
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
-  # C — real-data recall: encode-in-1-step (chunk 784), HOLD through delay, then classify
-  "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d0_gated"
-  "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d0_rddlgn"
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d50_gated"
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d50_rddlgn"
-  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d100_gated"
-  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag rec_d100_rddlgn"
+  # gate count 
+
+  "--task psmnist --chunk 28 --hidden 2000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --grad-analysis --tag psm28_rddlgn_eqgates"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
