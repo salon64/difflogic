@@ -23,23 +23,11 @@ cd "$ROOT"
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
-  # ── delayed-MNIST error bars: gated seeds 1 & 2 at the existing delays (seed 0 already done) ──
-  "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d0_gated_s1"
-  "--task smnist-pixel --chunk 784 --delay 0   --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d0_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d50_gated_s1"
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d50_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d100_gated_s1"
-  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d100_gated_s2"
-  # ── intermediate delays 25 & 75: gated (seeds 0/1/2) + control, to densify the curve ──
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003          --tag rec_d25_gated"
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d25_gated_s1"
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d25_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min         --tag rec_d75_gated"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min--seed 1 --tag rec_d75_gated_s1"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min--seed 2 --tag rec_d75_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --tag rec_d25_rddlgn"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --tag
-rec_d75_rddlgn"
+  # rerun jobs that failed on gpu0
+  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --tag rec_d75_gated"
+  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d75_gated_s1"
+  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d75_gated_s2"
+  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --tag rec_d75_rddlgn"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
