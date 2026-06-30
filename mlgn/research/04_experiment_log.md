@@ -13,7 +13,48 @@ Template:
 
 ---
 
-## 2026-06-18 — PIVOTAL: gating wins COPY but LOSES psMNIST. Win is narrow (recall only).
+## 2026-06-21 — STORY FLIPS POSITIVE: keep-bias is task-dependent; gating wins recall AND classification
+B + C results (fig: `results/curves_bc.png`). The psMNIST "loss" was a keep-bias artifact.
+
+**B — psMNIST-28, gated, keep-bias sweep (vs rddlgn 0.620 / soft 0.652):**
+| kb | test | soft | gap |
+|---|---|---|---|
+| 0 | **0.632** | **0.709** | +0.077 |
+| 1 | 0.547 | 0.660 | +0.112 |
+| 2 | 0.541 | 0.668 | +0.126 |
+| 4 (old) | 0.389 | 0.659 | +0.270 |
+→ **low keep-bias rescues integration:** soft 0.66→0.71, gap 0.27→0.08, and gated **kb0
+beats the control** (0.632 > 0.620; soft 0.709 > 0.652). The earlier "gating loses
+psMNIST" was keep-bias=4 *over-holding* (under-writing) on a task that needs to absorb
+inputs. (Caveat: gated kb0 = 4k gates vs rddlgn 2k → firm up with an equal-gates control;
+but soft superiority + the recall win below make the claim solid.)
+
+**C — delayed-MNIST recall (1-step encode + delay), gated kb6 vs rddlgn:**
+| delay | gated | rddlgn |
+|---|---|---|
+| 0 | 0.700 | 0.554 |
+| 50 | **0.369** | **0.114 (chance)** |
+| 100 | **0.339** | **0.114 (chance)** |
+→ **decisive recall win:** the control collapses to chance at any delay (can't even learn
+softly; grad ratio 0 = total vanishing), gated holds ~3× chance through 100 blank steps
+(grad ratio 1.4e4). Clean real-data demonstration of the carousel.
+
+**KEY INSIGHT:** keep-bias is **task-dependent** — HIGH for *recall* (hold state), LOW for
+*integration* (absorb inputs).
+
+**CORRECTION (equal-gates control, same day):** rddlgn at hidden 2000 = **4,000 gates**
+(matching gated kb0) gets psMNIST-28 **test 0.655 > gated 0.632** (soft 0.694 vs 0.709).
+So **gating does NOT win classification at equal gates** — my mid-day "gated beats control
+on psMNIST" was a gate-count artifact (gated had 2×). low-keep-bias makes gated
+*competitive* (0.63 vs 0.66) but the MUX discretization gap (0.077 vs 0.038) keeps it
+behind. **Honest scope: gating helps long-range RECALL, not classification.**
+
+**FINAL P1 story (scoped, airtight):** the gated carousel enables **long-range recall**
+where concat-recurrence *completely fails* — copy (0.96 vs dead) and **delayed-MNIST
+(control → chance at any delay; gated holds ~3×chance through 100 steps).** On
+classification (psMNIST) gating gives no benefit at equal gates (control ties/wins).
+Secondary: keep-bias is task-dependent; + the training recipe (keep-bias/lr-decay/skip-step).
+This is the workshop contribution. Experiments DONE.
 Full sweeps done (fig: `mlgn/seqlgn/results/curves.png`, `plot.py`).
 
 **copy (synthetic recall), test acc:** gated **0.96 / 0.79 / 0.33** (L20/35/50, 3 seeds);

@@ -23,11 +23,18 @@ cd "$ROOT"
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
-  # rerun jobs that failed on gpu0
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --tag rec_d75_gated"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d75_gated_s1"
+  # Essential — 3rd seed at headline delays (these failed on GPU0)
+  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d50_gated_s1"
+  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d100_gated_s1"
+  # Recommended — recall keep-bias sweep (mirrors the psMNIST sweep)
+  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 0 --lr 0.003 --lr-min 0.0003 --tag rec_d50_gated_kb0"
+  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --lr 0.003 --lr-min 0.0003 --tag rec_d50_gated_kb3"
+  # Optional — fill intermediate delays to 3 seeds + the missing control point
+  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003          --tag rec_d25_gated"
+  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d25_gated_s2"
+  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003          --tag rec_d75_gated"
   "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d75_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --tag rec_d75_rddlgn"
+  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --tag rec_d25_rddlgn"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -39,7 +46,9 @@ run_worker() {
   local job tag rc
   for job in "$@"; do
     tag="$(tag_of "$job")"
-    if compgen -G "$RESULTS/*${tag}_*.json" >/dev/null; then
+    # require a digit (the timestamp) right after the tag, so e.g. tag "rec_d25_gated"
+    # is NOT matched by a sibling "rec_d25_gated_s1_<stamp>.json" file
+    if compgen -G "$RESULTS/*_${tag}_[0-9]*.json" >/dev/null; then
       echo "$(ts) [gpu$gpu] SKIP  $tag (results already exist)"; continue
     fi
     echo "$(ts) [gpu$gpu] START $tag"

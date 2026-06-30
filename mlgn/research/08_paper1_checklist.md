@@ -5,6 +5,38 @@ a logic-native gated cell (constant-error carousel via a Boolean MUX) that does 
 memory where the recompute-recurrence control (RDDLGN-style) fails. Pairs with
 [06_paper_plan.md](06_paper_plan.md) (3-paper arc) and [07_venues_timeline.md](07_venues_timeline.md)._
 
+---
+
+## CURRENT STATUS (2026-06-21) — experiments ~complete; venue = NeurIPS 2026 workshop
+
+**Result (scoped, honest):** the gated carousel enables long-range **recall** where
+concat-recurrence goes to chance — copy (0.96 vs dead) + **delayed-MNIST (control→chance at
+any delay, gated holds ~3× chance)**. **Gating does NOT help classification** (psMNIST equal
+gates: control 0.655 ≥ gated 0.632). keep-bias is **task-dependent** (high=hold/recall,
+low=absorb/integration). + training recipe (keep-bias vs vanishing; lr-decay/skip-step vs
+exploding). Mechanism ablation: GRU > LSTM/gru_cell (cold-start).
+
+**Venue decision: NeurIPS 2026 workshop** (~Aug 29 submit; pick workshop after the
+list drops ~Jul 11). NOT AAAI main — result is workshop-tier (scoped, toy/constructed
+benchmarks, a classification non-win) + AAAI Jul 28 is too tight. P1+P2 combined = the
+later main-track shot. See [07_venues_timeline.md](07_venues_timeline.md).
+
+**Draft:** `mlgn/paper/draft.md` (full-length skeleton; condense to ~4pp for workshop).
+**Figures:** `mlgn/seqlgn/results/curves.png`, `curves_bc.png` (gen `plot.py`).
+
+**REMAINING TO RUN (then done):**
+- [ ] delayed-MNIST **seeds 1,2** for gated at delays {0,50,100} — error bars on the
+  headline (control is at chance, ~0 variance; seed it only if you want bars on it too).
+- [ ] delayed-MNIST **keep-bias sweep** at delay 50: kb {0,3} (have kb6) — completes the
+  task-dependence story (recall needs HIGH kb; mirror of psMNIST needing LOW). Expect kb0
+  to cold-start.
+- [ ] (optional) intermediate delays {25,75} for a smoother recall curve.
+- Everything else DONE (copy 3-seed; psMNIST kb sweep + equal-gates; mechanism ablation).
+
+**THEN:** pick workshop (~Jul 11) → condense draft to 4pp + add seeds/citations → submit (~Aug 29).
+
+---
+
 ## Where we are (validated)
 - ✅ `gated` cell **solves copy-20 end-to-end: 100%, discretization gap = 0.**
 - ✅ Control `rddlgn` **dead at chance** on long-range (even with `--grad-factor 2`).
