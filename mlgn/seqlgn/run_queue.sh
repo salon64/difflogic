@@ -21,6 +21,11 @@ RESULTS="$ROOT/mlgn/seqlgn/results"
 mkdir -p "$LOGS"
 cd "$ROOT"
 
+# Physical GPUs to use (round-robin). GPU 0 is currently FAULTY — intermittent CUDA
+# error 700 (illegal memory access → exit 188). Route everything to GPU 1 for now;
+# restore GPUS=(0 1) once the admin fixes/replaces GPU 0.
+GPUS=(1)
+
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 JOBS=(
   # Essential — 3rd seed at headline delays (these failed on GPU0)
@@ -58,14 +63,13 @@ run_worker() {
   done
 }
 
-# deal jobs round-robin: even index → GPU0, odd index → GPU1
-g0=(); g1=()
-for i in "${!JOBS[@]}"; do
-  if (( i % 2 == 0 )); then g0+=("${JOBS[$i]}"); else g1+=("${JOBS[$i]}"); fi
+# deal jobs round-robin across GPUS, one worker per GPU
+n=${#GPUS[@]}
+echo "$(ts) queue start: ${#JOBS[@]} job(s) across GPU(s): ${GPUS[*]}"
+for k in "${!GPUS[@]}"; do
+  share=()
+  for ((i=k; i<${#JOBS[@]}; i+=n)); do share+=("${JOBS[$i]}"); done
+  run_worker "${GPUS[$k]}" "${share[@]}" &
 done
-
-echo "$(ts) queue start: ${#g0[@]} job(s) on GPU0, ${#g1[@]} on GPU1"
-run_worker 0 "${g0[@]}" &
-run_worker 1 "${g1[@]}" &
 wait
 echo "$(ts) ALL DONE"
