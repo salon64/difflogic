@@ -182,6 +182,13 @@ already occupied.**
 - **Additive residual *connections* were tried and reportedly didn't help** test performance
   (Light DLGN — [03_open_problems.md](03_open_problems.md) §A6). A standing negative result
   to overcome. (Nuance: that's a *generalization* finding, not necessarily *trainability*.)
+- **Also now occupied — Kim's "logical skip connections"** (cited in Kim 2026,
+  arXiv:2605.08657 ref [16], as a feedforward LGN generalization-gap fix; found in the
+  2026-07-01 deep read [14_recurrent_lgn_2026_deepread.md](14_recurrent_lgn_2026_deepread.md)).
+  A **third** skip/residual-for-LGN entrant beyond Petersen's residual init and Light DLGN's
+  additive-residual negative result. **Pull and read Kim's logical-skip-connections paper
+  before any Angle-#5 experiment** — the surviving sliver (a *learned gated* Highway skip) is
+  narrowing.
 - **Motivation is weak in the feedforward direction:** deep-LGN gradient decay is already
   largely handled (residual init + `grad_factor` + IWP) and nets aren't deep enough for it to
   bite — unlike recurrence, where the concat control is *genuinely dead* (4e-20 grad ratio).
@@ -217,4 +224,4 @@ does it beat residual-init-only as depth grows (CIFAR-10 or a deep-MNIST stress)
 | #2 Latch primitives | ✅ | **GO** (best moat) | execution |
 | #3 Fourier theory | partial | companion/cite (method layer occupied by 2601.13953) | — |
 | #4 Hard-attention / CAM | ❌ | reframe, then scout | novelty |
-| #5 Skip / Highway LGN | ❌ (future) | fast-follow after P1/P2; simple form = Petersen residual init (occupied); sliver = learned gated skip | novelty (weak motiv.) |
+| #5 Skip / Highway LGN | ❌ (future) | fast-follow after P1/P2; simple form = Petersen residual init + Kim logical skip connections (2605.08657) — occupied; sliver = learned gated skip | novelty (weak motiv.) |

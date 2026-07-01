@@ -55,7 +55,8 @@ ceiling** at hidden 2048 for copy-50. LR decay (§stability) is a keeper. The me
 already validated (seq-20 100%, seq-50 75% discrete / soft-solvable, control ~12.5%), so
 **recommend banking this and moving to §2–§4**; only return for STE/capacity if a clean
 seq-50 number is wanted. The gap is a *general difflogic* property, orthogonal to our
-contribution, and was **0 at seq-20**:
+contribution, and was **0 at seq-20** (precisely a *computation gap* that grows with length —
+see §Discretization-gap stance):
 - [ ] **1a. Capacity bump** — re-run copy-50 with bigger `--hidden` (e.g. 2048) and/or
   `--cell-layers 3`. If soft→confident-100% the discrete likely follows (as at seq-20).
 - [x] **1b. Gate-entropy regularizer** — BUILT. `--entropy-reg` (coeff, ramped via
@@ -107,6 +108,23 @@ is a known difflogic limitation; seq-20 shows our cell discretizes losslessly wh
 solves; for longer sequences we [bump capacity / apply an off-the-shelf gap-reducer] and
 note this is independent of the gating mechanism." Cite Mind the Gap. Do **not** present a
 gap method as a contribution.
+
+**Sharper, citable framing (Kim 2026, arXiv:2603.14157 — full read
+[14_recurrent_lgn_2026_deepread.md](14_recurrent_lgn_2026_deepread.md)).** Name the gap
+precisely instead of "general difflogic property." Kim splits the train/inference gap into a
+**selection gap** (which-gate; killed by *Hard-ST forward*, any backward temperature) + a
+**computation gap** (soft-vs-hard *values*; irreducible by training, =0 iff inputs binary).
+Our copy-50 gap is a **computation gap** — the evidence is that it *grows with sequence
+length* (0 at L20 → +0.50 at L50; a selection gap is length-independent for a shared cell):
+the recurrent state carries continuous values that drift toward the mushy 0.5 region. Payoffs:
+(a) makes P1's "orthogonal to gating" claim precise and falsifiable; (b) it is exactly the
+wall **P2's bistable latch closes architecturally** — P1 *states* the wall, P2 *closes* it, a
+clean P1→P2 handoff. **Consider adopting Hard-ST + CAGE** (Kim's recipe) over Gumbel/Mind-the-
+Gap: Kim documents a **47-pt Gumbel-ST accuracy collapse at low τ** and *challenges* the
+Hessian-regularization explanation of Mind-the-Gap (Yousefi/ETH) — so cite Mind-the-Gap's
+*mechanism* cautiously. Caveat: at copy-50 soft is 0.88 (not 1.0), so ~0.12 is
+capacity/under-solving and the +0.50 soft→hard is the computation gap — quantify the split
+(§1 capacity note; workmap §Pre-commit sanity check).
 
 ## Write-up framing — free wins (cost nothing, strengthen the paper)
 
