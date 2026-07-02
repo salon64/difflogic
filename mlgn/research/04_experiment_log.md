@@ -13,6 +13,33 @@ Template:
 
 ---
 
+## 2026-07-02 (v1) — hard-state STE latch: correct + C3 mechanism validated, but hard-from-scratch is fragile
+- **Hypothesis:** v1 = STE-round the latch STATE (bistable restore) closes the discretization gap (C3),
+  which v0's soft latch showed.
+- **Setup:** implemented `_ste_round(x) = x + (x.round()-x).detach()` + `hard_state`(default True)/
+  `hard_control` flags in `cells.py`/`models.py`. **Design locked by a 3-lens workflow panel**
+  (`scratchpad/v1_design.txt`): round the STATE only, identity STE = the workmap §D characteristic-eq
+  reduction realised in 2 lines (NOT the literal "NOR-settle", which would round control lines / risk
+  C2); preserves the carousel exactly, no fixed-point iteration. Validation `scratchpad/validate_v1*.py`,
+  **CPU**. Unit checks: STE identity ✓, char-eq Jacobian == analytic (dS=1-q+Rq, dR=-q(1-S), dQ=(1-R)(1-S)) ✓,
+  eval-state-binary ✓.
+- **Result** (gap-source decomposition: `gap_state` = acc[soft-gate,soft-state] − acc[soft-gate,HARD-state];
+  `gap_gate` = acc[soft-gate,HARD-state] − acc[hard-gate=discrete]):
+  - **The gap has TWO components** — `gap_state` (state drifts over time; v1 CLOSES it) + `gap_gate`
+    (softmax-mixture ≠ argmax-gate; needs entropy-reg/Gumbel, NOT v1).
+  - **copy-8 is 100% state-drift** (v0: gap_state +0.49, gap_gate ~0). **v1 improves discrete 0.51→0.76**
+    (kb=1) — the bistable restore works. BUT trainability is FRAGILE: only kb=1 trains; **kb=0 cold-starts,
+    kb≥2 plateaus** (hard round + hold-bias = decision-boundary plateau, as the panel predicted). STE-bias
+    residual leaves 0.76 not 1.0.
+  - **parity-8: v1 removes state-drift (gap_state→0) but EXPOSES a large gate-selection gap** (gap_gate +0.53);
+    net discrete drops 0.62→0.47. Parity's residual is bit-exact gate-selection (XOR near-tie gate) → entropy-reg.
+- **Read:** **v1 is correct and the C3 mechanism is validated** (bistable restore closes the state-drift half),
+  **but naive hard-from-scratch is fragile** (narrow keep_bias window + STE-bias residual) and does NOT touch
+  the gate-selection half. **Next: (1) soft→hard ANNEAL** (temperature-anneal the round / deterministic
+  annealing — the workmap §D anticipated this) for robust training; **(2) `--entropy-reg`** (already built)
+  for the gate-selection component; **(3) GPU/DUST**: copy-50 (v0 gap +0.50, long drift ⇒ v1 advantage should
+  be larger/cleaner) + proper width + multi-seed + the v0-vs-v1 ablation. CPU smoke only.
+
 ## 2026-07-02 (b) — T-FF solves PARITY (control can't); keep-bias is task-dependent; disc. gap reconfirmed
 - **Hypothesis:** M1 — a T flip-flop (`Q⁺ = T ⊕ Q`) solves parity (running XOR) that the recompute
   control (rddlgn) can't. Added `latch_kind='tff'` alongside `'sr'` in `cells.py` (+ `LATCH_KINDS`,

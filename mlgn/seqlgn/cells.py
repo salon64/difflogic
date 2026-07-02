@@ -91,6 +91,22 @@ def _or(a, b):
     return a + b - a * b
 
 
+def _ste_round(x):
+    """Straight-through round: forward = round(x) in {0,1}, backward = identity.
+
+    This is the **bistable restore** for the Paper-2 latch (v1). Applied to the latch's
+    next-state, it re-binarises the carried bit every timestep so the recurrent input to the
+    next step is exactly {0,1} (no soft-value drift over time) — the mechanism C3 claims closes
+    the long-sequence *computation* gap. Because ``d/dx round(x) ≡ 1`` under the STE, any
+    Jacobian factor multiplying ``x`` survives untouched: the latch carousel
+    ``∂Q'/∂Q = (1−R)(1−S)`` (=1 in hold) is **preserved exactly**, and the backward pass equals
+    v0's soft multilinear characteristic-equation Jacobian bit-for-bit. It performs NO
+    within-step fixed-point iteration, so it does not reintroduce the §C2 obstruction. (Design
+    locked 2026-07-02, `mlgn/research/` v1 design panel; = the workmap §D characteristic-eq
+    reduction realised as a 2-line STE rather than a custom autograd.Function.)"""
+    return x + (x.round() - x).detach()
+
+
 # Gate ids: 15 = TRUE (always 1), 0 = FALSE (always 0); see utils.GATE_NAMES / functional.
 _TRUE_GATE = 15
 _FALSE_GATE = 0
@@ -197,6 +213,8 @@ class LogicRecurrentCell(nn.Module):
         cell_layers: int = 2,
         keep_bias: float = 3.0,
         latch_kind: str = "sr",
+        hard_state: bool = True,
+        hard_control: bool = False,
         device: str = "cuda",
         grad_factor: float = 1.0,
         implementation: str | None = None,
@@ -211,6 +229,14 @@ class LogicRecurrentCell(nn.Module):
         self.cell_layers = cell_layers
         self.keep_bias = keep_bias
         self.latch_kind = latch_kind
+        # v1 (Paper 2): hard_state=True re-binarises the latch state each step via a
+        # straight-through round (the bistable restore that closes the long-sequence
+        # discretization gap; see _ste_round). hard_state=False reproduces the v0 soft latch
+        # (the ablation). hard_control (round the S/R/T lines too) is the fully-hard workmap
+        # variant — OFF by default: at eval the gates are already argmax-binary so it buys no
+        # eval correctness, and it adds STE bias + a decision-boundary plateau during training.
+        self.hard_state = hard_state
+        self.hard_control = hard_control
 
         cat_dim = input_dim + hidden_dim
         mlp_kwargs = dict(
@@ -327,17 +353,25 @@ class LogicRecurrentCell(nn.Module):
             if self.latch_kind == "sr":
                 S = self.set_net(z)            # set line, in [0,1]
                 R = self.reset_net(z)          # reset line, in [0,1]
+                if self.hard_control:          # fully-hard workmap variant (off by default)
+                    S, R = _ste_round(S), _ste_round(R)
                 # SR-latch characteristic next-state equation Q⁺ = S ∨ (R̄ ∧ Q), relaxed
                 # multilinearly: Q⁺ = S + (1−R)Q − S(1−R)Q. Exact at {0,1}: set (S=1)→1,
                 # reset (R=1,S=0)→0, hold (S=R=0)→Q. ∂Q⁺/∂Q = (1−R)(1−S) = 1 in hold (the
                 # bistable carousel), 0 at set/reset. Closed-form ⇒ no fixed-point iteration,
                 # so autograd differentiates it directly (the §C2-sidestepping reduction).
                 Rbar_Q = (1.0 - R) * h
-                return S + Rbar_Q - S * Rbar_Q
+                Q = S + Rbar_Q - S * Rbar_Q
+                # v1 bistable restore: re-binarise the held bit each step (identity STE) so the
+                # state never drifts off {0,1} across time — closes the long-sequence gap (C3).
+                return _ste_round(Q) if self.hard_state else Q
             # tff: T flip-flop Q⁺ = T ⊕ Q, relaxed multilinearly XOR(T,Q) = T + Q − 2TQ.
             # toggle (T=1) → 1−Q, hold (T=0) → Q. ∂Q⁺/∂Q = 1−2T (carousel at T=0).
             T = self.toggle_net(z)             # toggle line, in [0,1]
-            return T + h - 2.0 * T * h
+            if self.hard_control:
+                T = _ste_round(T)
+            Q = T + h - 2.0 * T * h
+            return _ste_round(Q) if self.hard_state else Q
 
         raise RuntimeError(f"unhandled mechanism {self.mechanism!r}")
 
@@ -361,7 +395,8 @@ class LogicRecurrentCell(nn.Module):
 
     def extra_repr(self) -> str:
         kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm", "gru_cell", "latch") else ""
-        lk = f", latch_kind={self.latch_kind!r}" if self.mechanism == "latch" else ""
+        lk = (f", latch_kind={self.latch_kind!r}, hard_state={self.hard_state}, "
+              f"hard_control={self.hard_control}") if self.mechanism == "latch" else ""
         return (
             f"input_dim={self.input_dim}, hidden_dim={self.hidden_dim}, "
             f"mechanism={self.mechanism!r}, cell_layers={self.cell_layers}{kb}{lk}"
