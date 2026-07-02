@@ -91,20 +91,28 @@ def _or(a, b):
     return a + b - a * b
 
 
-def _ste_round(x):
-    """Straight-through round: forward = round(x) in {0,1}, backward = identity.
+def _ste_round(x, alpha: float = 1.0):
+    """Straight-through (annealed) round: forward = ``(1−α)·x + α·round(x)``, backward = identity.
 
-    This is the **bistable restore** for the Paper-2 latch (v1). Applied to the latch's
-    next-state, it re-binarises the carried bit every timestep so the recurrent input to the
-    next step is exactly {0,1} (no soft-value drift over time) — the mechanism C3 claims closes
-    the long-sequence *computation* gap. Because ``d/dx round(x) ≡ 1`` under the STE, any
-    Jacobian factor multiplying ``x`` survives untouched: the latch carousel
-    ``∂Q'/∂Q = (1−R)(1−S)`` (=1 in hold) is **preserved exactly**, and the backward pass equals
-    v0's soft multilinear characteristic-equation Jacobian bit-for-bit. It performs NO
+    This is the **bistable restore** for the Paper-2 latch. Applied to the latch's next-state at
+    ``α=1`` it re-binarises the carried bit every timestep so the recurrent input to the next step
+    is exactly {0,1} (no soft-value drift over time) — the mechanism C3 claims closes the
+    long-sequence *computation* gap. Because the (α-scaled) correction is ``.detach()``-ed,
+    ``d/dx ≡ 1`` for **every** α, so any Jacobian factor multiplying ``x`` survives untouched: the
+    latch carousel ``∂Q'/∂Q = (1−R)(1−S)`` (=1 in hold) is **preserved exactly**, and the backward
+    equals v0's soft multilinear characteristic-equation Jacobian bit-for-bit. It performs NO
     within-step fixed-point iteration, so it does not reintroduce the §C2 obstruction. (Design
-    locked 2026-07-02, `mlgn/research/` v1 design panel; = the workmap §D characteristic-eq
-    reduction realised as a 2-line STE rather than a custom autograd.Function.)"""
-    return x + (x.round() - x).detach()
+    locked 2026-07-02 v1 design panel; = the workmap §D characteristic-eq reduction as a short STE.)
+
+    ``alpha`` in [0,1] **anneals** the restore (see ``utils.hard_anneal_alpha`` for the schedule):
+    α=1 → forward=round(x) (fully hard, v1); α=0 → forward=x (soft, v0); 0<α<1 → partially
+    restored. Annealing 0→1 over training lets the cell learn the soft solution first, then commit
+    the state to {0,1}, fixing the cold-start/plateau fragility of hard-from-step-0 (exp log v1)."""
+    if alpha >= 1.0:
+        return x + (x.round() - x).detach()
+    if alpha <= 0.0:
+        return x
+    return x + alpha * (x.round() - x).detach()
 
 
 # Gate ids: 15 = TRUE (always 1), 0 = FALSE (always 0); see utils.GATE_NAMES / functional.
@@ -237,6 +245,12 @@ class LogicRecurrentCell(nn.Module):
         # eval correctness, and it adds STE bias + a decision-boundary plateau during training.
         self.hard_state = hard_state
         self.hard_control = hard_control
+        # Bistable-restore anneal coefficient in [0,1], read live by the latch forward. Default
+        # 1.0 = fully hard (un-annealed v1). To anneal, the training loop sets this per-epoch from
+        # utils.hard_anneal_alpha(epoch/total) so the state hardens 0->1 gradually (fixes the
+        # hard-from-step-0 cold-start/plateau; see experiment log 2026-07-02 v1). Ignored unless
+        # hard_state=True. A plain attribute (not a Parameter/buffer) — set it like cell.hard_alpha=a.
+        self.hard_alpha = 1.0
 
         cat_dim = input_dim + hidden_dim
         mlp_kwargs = dict(
@@ -354,7 +368,7 @@ class LogicRecurrentCell(nn.Module):
                 S = self.set_net(z)            # set line, in [0,1]
                 R = self.reset_net(z)          # reset line, in [0,1]
                 if self.hard_control:          # fully-hard workmap variant (off by default)
-                    S, R = _ste_round(S), _ste_round(R)
+                    S, R = _ste_round(S, self.hard_alpha), _ste_round(R, self.hard_alpha)
                 # SR-latch characteristic next-state equation Q⁺ = S ∨ (R̄ ∧ Q), relaxed
                 # multilinearly: Q⁺ = S + (1−R)Q − S(1−R)Q. Exact at {0,1}: set (S=1)→1,
                 # reset (R=1,S=0)→0, hold (S=R=0)→Q. ∂Q⁺/∂Q = (1−R)(1−S) = 1 in hold (the
@@ -362,16 +376,17 @@ class LogicRecurrentCell(nn.Module):
                 # so autograd differentiates it directly (the §C2-sidestepping reduction).
                 Rbar_Q = (1.0 - R) * h
                 Q = S + Rbar_Q - S * Rbar_Q
-                # v1 bistable restore: re-binarise the held bit each step (identity STE) so the
-                # state never drifts off {0,1} across time — closes the long-sequence gap (C3).
-                return _ste_round(Q) if self.hard_state else Q
+                # v1 bistable restore (annealed by self.hard_alpha): re-binarise the held bit each
+                # step (identity STE) so the state stops drifting off {0,1} across time — closes the
+                # long-sequence gap (C3). alpha ramps 0->1 over training (utils.hard_anneal_alpha).
+                return _ste_round(Q, self.hard_alpha) if self.hard_state else Q
             # tff: T flip-flop Q⁺ = T ⊕ Q, relaxed multilinearly XOR(T,Q) = T + Q − 2TQ.
             # toggle (T=1) → 1−Q, hold (T=0) → Q. ∂Q⁺/∂Q = 1−2T (carousel at T=0).
             T = self.toggle_net(z)             # toggle line, in [0,1]
             if self.hard_control:
-                T = _ste_round(T)
+                T = _ste_round(T, self.hard_alpha)
             Q = T + h - 2.0 * T * h
-            return _ste_round(Q) if self.hard_state else Q
+            return _ste_round(Q, self.hard_alpha) if self.hard_state else Q
 
         raise RuntimeError(f"unhandled mechanism {self.mechanism!r}")
 

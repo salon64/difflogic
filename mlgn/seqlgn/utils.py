@@ -39,6 +39,23 @@ def get_device(prefer: str | None = None) -> str:
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def hard_anneal_alpha(progress: float, start: float = 0.1, end: float = 0.6) -> float:
+    """Anneal coefficient ``alpha`` in [0,1] for the Paper-2 latch **bistable restore**, as a
+    function of training ``progress`` in [0,1] (e.g. ``epoch / total_epochs``).
+
+    Ramps linearly 0 -> 1 over the window ``[start, end]``: ``alpha=0`` (pure soft state = the v0
+    latch) before ``start``, linearly to ``alpha=1`` (fully hard, the v1 bistable restore) by
+    ``end``, then held at 1. Set ``cell.hard_alpha`` to this each epoch so the carried bit hardens
+    *gradually*: the model learns the soft solution first (avoiding the cold-start / decision-
+    boundary plateau that made hard-from-step-0 fragile — see experiment log 2026-07-02 v1), then
+    commits the state to {0,1}. The straight-through backward of ``_ste_round`` is identity for ALL
+    alpha, so the carousel is preserved throughout the anneal. ``start=end=0`` -> hard from step 0
+    (the un-annealed v1); this is deterministic annealing (Rose 1998) on the state restore."""
+    if end <= start:
+        return 1.0 if progress >= end else 0.0
+    return float(min(1.0, max(0.0, (progress - start) / (end - start))))
+
+
 def count_gates(model: torch.nn.Module) -> int:
     """Total number of logic gates (= sum of out_dim over all LogicLayers)."""
     return sum(m.out_dim for m in model.modules() if isinstance(m, LogicLayer))

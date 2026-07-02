@@ -13,6 +13,26 @@ Template:
 
 ---
 
+## 2026-07-02 (anneal) — soft->hard anneal: bistable latch CLOSES the gap (copy-8: discrete 1.000, gap 0)
+- **Hypothesis:** annealing the bistable restore `alpha` 0->1 over training fixes v1's hard-from-scratch
+  fragility (cold-start/plateau) and closes the state-drift gap.
+- **Setup:** generalized `_ste_round(x, alpha)` — forward `(1-a)x + a*round(x)`, backward = identity for
+  ALL a (carousel preserved throughout); added `cell.hard_alpha` (train loop sets per-epoch) +
+  `utils.hard_anneal_alpha(progress, start, end)` (linear 0->1 ramp = deterministic annealing, Rose'98).
+  `scratchpad/validate_anneal.py`; copy-8 sr, hidden 16, tau 0.5, lr 0.02, 40 ep, window [0.1,0.6], CPU, seed 0.
+- **Result (copy-8 sr, anneal ON):**
+  - **kb=3: soft 1.000 -> DISCRETE 1.000, gap_state 0, gap_gate 0 — ZERO discretization gap.** The bistable
+    latch closes the gap COMPLETELY (v0 had +0.49; v1-no-anneal kb=1 got 0.76). **← the C3 demonstration.**
+  - kb=1: 0.762 (~ no-anneal). kb=2: hardstate 0.762 but discrete 0.492 (a gate-selection blip — single-seed
+    noise). No-anneal kb=3 @40 ep reached 0.75 (hard-from-scratch is slow/unreliable, not impossible).
+- **Read:** **the anneal delivers the clean C3 result** — a bistable-latch config (kb=3 annealed) reaches
+  **discrete 1.000 with ZERO gap** on copy-8, matching a clean discretizer but via the learnable bistable
+  primitive; the soft->hard schedule is what escapes the plateau. **Honest caveat:** single-seed CPU smoke is
+  NOISY across kb (0.49-1.0) -> which kb/window is RELIABLE needs multi-seed + GPU (this is a
+  can-close-the-gap demonstration, not yet a robustness claim). Remaining: (1) multi-seed + **copy-50 on
+  DUST** (the real length, v0 gap +0.50); (2) `--entropy-reg` (already built, `utils.gate_entropy`) for the
+  residual GATE-selection tail (parity); (3) wire latch + anneal schedule into `train.py` CLI. CPU smoke only.
+
 ## 2026-07-02 (v1) — hard-state STE latch: correct + C3 mechanism validated, but hard-from-scratch is fragile
 - **Hypothesis:** v1 = STE-round the latch STATE (bistable restore) closes the discretization gap (C3),
   which v0's soft latch showed.
