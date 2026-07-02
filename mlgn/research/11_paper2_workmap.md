@@ -263,6 +263,28 @@ cite, don't claim): **Kim 2026, arXiv:2605.08657**; **IWP/Rüttgers et al.** · 
 ternary, trajectory-distillation gap fix + Myhill–Nerode realizability bound + DFA-extraction/
 gated-variant future work (closest C3 neighbor, cite+distinguish): **arXiv:2605.24649**.
 
+**RL-scout refs (added 2026-07-01, see [15_rl_lgn_scout.md](15_rl_lgn_scout.md)):** LGN-as-RL-policy
+occupier — DWC "Differentiable Weightless Controllers" (Kresse & Lampert, ISTA, ICML'26,
+**arXiv:2512.01467**; feedforward/memoryless, SAC, Artix-7 ~2 nJ/action — cite as the predecessor of
+any LGN-RL-policy demo and distinguish P2's *clocked-sequential latch*) · Petersen's own early LGN-RL
+— **"Efficient RL Agents with DLGNs," CoRL'24 DiffOpt workshop** (behavioral cloning, feedforward —
+verify scope) · joint gate+wiring "adaptive resampling," beats connectivity SOTA — CompactLogic
+(Vechev/ETH-SRI, **arXiv:2602.05830**) · training-infra: Decoupled STE **arXiv:2410.13331** (rejects
+REINFORCE on DLGN); the pathwise-dominates-score-function result (Mohamed et al., JMLR 2020) is why
+RL-as-LGN-trainer is a NO-GO.
+
+**Cross-pollination / verification refs (added 2026-07-01, see [16_crosspollination_and_robotics.md](16_crosspollination_and_robotics.md)):**
+⚠ **ISTA feedforward LGN verification — "Logic Gate Neural Networks are Good for Verification"**
+(Kresse, Yu, Lampert, **Henzinger**, ISTA, NeuS'25 Disruptive-Idea award, **arXiv:2505.19932**):
+the base P2's *sequential/temporal* verification extends — and the **#1 scoop threat** (same lab as
+DWC + connectivity 2507.02585; sequential case = their obvious v2). Cite + distinguish
+feedforward-vs-clocked. · logic/LUT-net **bit-flip resilience** (DWN team, **arXiv:2603.22770**) —
+edge/drone robustness · **Crazyflie Artix-7 XC7A15T** learned-controller flight platform
+(**arXiv:2403.18703**) — the drone-capstone sim-to-real template · **"Illusion of State in SSMs"**
+(**arXiv:2404.08819**, ICML'24) — the TC⁰ theorem that kills the associative-scan/"O(log n) training"
+temptation (cite to explain why the Mamba-style scan sirens, incl. RDDLGN's own future-work
+direction, don't buy structured memory).
+
 ---
 
 ## E. Gates to include
@@ -341,12 +363,38 @@ alongside M2–M3 — it's analysis, not a run.
    fails" negative result? → **yes; cheap, and it's the moat.**
 3. **Benchmark scope** — add the **FSM induction task** (rec: yes) + build the
    adding-problem head (optional)? FPGA demo INTO P2 (per fpga-scout) or defer to P3?
+   **Optional capstone (2026-07-01, from [15_rl_lgn_scout.md](15_rl_lgn_scout.md)):** a
+   **memory-required POMDP "logic-DRQN" demo** — a tiny partially-observable task (T-maze /
+   memory-length / flickering-observation, **NOT** MuJoCo continuous control = DWC's turf) where a
+   *feedforward* logic controller (DWC-style, arXiv:2512.01467) provably fails and P2's stateful
+   latch provably fixes it, belief-state held in FPGA registers at ns/nJ. This is the single most
+   compelling "why a learnable sequential logic primitive must exist" argument and the P2→P3 bridge;
+   its novelty is 100% the latch (fold in, do not spin out — scoop-exposed to ISTA/ETH). **Gate it on
+   a trainability check first**: policy-gradient through the BPTT-unrolled discrete-relaxed latch
+   compounds the C2 feedback-training risk — prove on a tiny POMDP before making it the headline.
+   Pairs with an **execute-a-model-check verification demo** (the thing R-DTLGN & DWC only *named*).
+   **Physical embodiment — the Kyushu drone opportunity (2026-07-01, [16_crosspollination_and_robotics.md](16_crosspollination_and_robotics.md)):**
+   this same capstone can be grounded on a **real nano-drone** (Kyushu robotics group; advisor likely
+   Danilo V. Vargas). The novel angle is {P2 latch}×{real drone genuine partial-observability
+   (gust/dropout/occlusion)}×{belief-state in clocked FPGA registers} — where feedforward DWC provably
+   fails. Sim→real ladder, **distill from a PID/MPC teacher (never RL-on-a-real-drone)**: Rung0
+   feedforward stabilization (de-risk, now) → Rung1 FPGA-synth+measure → **Rung2 recurrent latch on a
+   hidden-state task = the publishable rung** → Rung3 model-check safety envelope → Rung4 fly on the
+   Crazyflie Artix-7 deck (2403.18703). Frame on **energy/verifiability, NOT speed** (W2 trap). Same
+   blocking gate as this capstone: **latch trainability first.**
+   **The `latch → clocked FSM → exact model-check` chain is P2's moat vs ISTA's feedforward-only
+   verification (2505.19932)** — make sequential/temporal verification an explicit P2 differentiator,
+   not just future work.
 4. **Scope vs P1** — P2 standalone main-track, or fold P1's gating in as the `combo` arm and
    ship one combined "Sequential Logic Gate Networks" paper? Notes lean **combined for the
    A\* shot**; the matrix in §E supports either.
 5. **Venue/timeline** — see [07_venues_timeline.md](07_venues_timeline.md) (ICLR 2027 main
    was the pencilled target for the latch paper). Race tripwire: Bührer/Wattenhofer arXiv
    feed (RDDLGN + BitLogic same lab; window 3–12 mo per [10_fpga_scout.md](10_fpga_scout.md)).
+   **⚠ ADD a second tripwire (2026-07-01): ISTA — Kresse / Lampert / Henzinger** (DWC control +
+   feedforward LGN-verification 2505.19932 + connectivity 2507.02585). They are now the front-runner
+   on the control+verification axis; the recurrent/sequential-verification result P2 targets is their
+   obvious next step. Time-to-publish matters — see [16_crosspollination_and_robotics.md](16_crosspollination_and_robotics.md) §B.
 
 ---
 

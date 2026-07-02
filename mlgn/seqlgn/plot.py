@@ -73,39 +73,53 @@ def main():
     plt.savefig(out, dpi=120)
     print("saved", out)
 
-    # --- second figure: B (keep-bias sweep) + C (real-data recall vs delay) ---
+    # --- second figure: keep-bias task-dependence (B) + real-data recall (C) ---
     fig2, (axb, axc) = plt.subplots(1, 2, figsize=(13, 5))
-    # B: psMNIST-28, gated, keep-bias sweep, vs rddlgn baseline
-    bg = sorted([(r["keep_bias"], r["test_acc"], r.get("test_soft"))
-                 for r in recs if r.get("task") == "psmnist" and r.get("seq_len") == 28
-                 and r["mechanism"] == "gated"])
-    # fair baseline = equal-gates rddlgn (hidden 2000 = 4000 gates = gated's count)
-    br = [r["test_acc"] for r in recs if r.get("task") == "psmnist" and r.get("seq_len") == 28
-          and r["mechanism"] == "rddlgn" and r.get("hidden") == 2000]
-    if bg:
-        axb.plot([x[0] for x in bg], [x[1] for x in bg], "-o", color="tab:blue", label="gated test")
-        axb.plot([x[0] for x in bg], [x[2] for x in bg], "--o", color="tab:blue", alpha=0.4, label="gated soft")
-    if br:
-        axb.axhline(br[0], color="tab:red", label="rddlgn test (equal gates)")
-    axb.axhline(0.1, ls=":", color="k", alpha=0.5)
-    axb.set_title("B: psMNIST-28 — accuracy vs keep-bias\n(low keep-bias → better integration)")
+
+    def _kbsweep(task, seqlen):
+        g = defaultdict(list)
+        for r in recs:
+            if r.get("task") == task and r.get("seq_len") == seqlen and r["mechanism"] == "gated":
+                g[r["keep_bias"]].append(r["test_acc"])
+        xs = sorted(g)
+        return xs, [sum(g[x]) / len(g[x]) for x in xs]
+
+    def _recall(mech, kb=None):
+        g = defaultdict(list)
+        for r in recs:
+            if r.get("task") == "smnist-pixel" and r["mechanism"] == mech:
+                if kb is not None and r.get("keep_bias") != kb:
+                    continue
+                g[r["seq_len"] - 1].append(r["test_acc"])
+        xs = sorted(g)
+        means = [sum(g[x]) / len(g[x]) for x in xs]
+        stds = [(sum((v - m) ** 2 for v in g[x]) / len(g[x])) ** 0.5 for x, m in zip(xs, means)]
+        return xs, means, stds, max((len(g[x]) for x in xs), default=0)
+
+    # B: keep-bias sweeps — psMNIST (integration) vs recall (delay-50): opposite slopes
+    xk, yk = _kbsweep("psmnist", 28)
+    if xk:
+        axb.plot(xk, yk, "-o", color="tab:orange", label="psMNIST-28 (integration)")
+    xr, yr = _kbsweep("smnist-pixel", 51)
+    if xr:
+        axb.plot(xr, yr, "-o", color="tab:blue", label="recall delay-50")
+    axb.axhline(0.1, ls=":", color="k", alpha=0.5, label="chance")
+    axb.set_title("keep-bias is task-dependent\n(integration wants LOW · recall wants HIGH)")
     axb.set_xlabel("keep-bias (init)")
-    axb.set_ylabel("accuracy")
+    axb.set_ylabel("test accuracy")
     axb.set_ylim(0, 1)
     axb.grid(alpha=0.2)
     axb.legend(fontsize=8)
-    # C: real-data recall — accuracy vs delay (smnist-pixel, 1-step encode + delay)
-    cre = [r for r in recs if r.get("task") == "smnist-pixel"]
-    for mech, col in [("gated", "tab:blue"), ("rddlgn", "tab:red")]:
-        pts = sorted([(r["seq_len"] - 1, r["test_acc"], r.get("test_soft"))
-                      for r in cre if r["mechanism"] == mech])
-        if pts:
-            axc.plot([p[0] for p in pts], [p[1] for p in pts], "-o", color=col, label=f"{mech} test")
-            axc.plot([p[0] for p in pts], [p[2] for p in pts], "--", color=col, alpha=0.4)
+
+    # C: real-data recall vs delay — gated (kb6, seed mean±std) vs control
+    xg, mg, sg, ng = _recall("gated", kb=6)
+    axc.errorbar(xg, mg, yerr=sg, fmt="-o", color="tab:blue", capsize=3, label=f"gated (n={ng})")
+    xrc, mr, sr, nr = _recall("rddlgn")
+    axc.errorbar(xrc, mr, yerr=sr, fmt="-o", color="tab:red", capsize=3, label=f"rddlgn (n={nr})")
     axc.axhline(0.1, ls=":", color="k", alpha=0.5, label="chance")
-    axc.set_title("C: real-data RECALL — accuracy vs delay\n(hold digit through blank steps)")
+    axc.set_title("real-data RECALL — accuracy vs delay\n(control collapses to chance · gated holds)")
     axc.set_xlabel("delay (blank steps after image)")
-    axc.set_ylabel("accuracy")
+    axc.set_ylabel("test accuracy")
     axc.set_ylim(0, 1)
     axc.grid(alpha=0.2)
     axc.legend(fontsize=8)
