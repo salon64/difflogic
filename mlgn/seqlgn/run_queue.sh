@@ -27,19 +27,28 @@ cd "$ROOT"
 GPUS=(1)
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
+# P2 FIRST SLICE — the copy-50 discretization-gap GO/NO-GO (see research/04_experiment_log
+# 2026-07-02 + workmap §F). Decisive question: does the bistable `latch` close the discrete
+# gap at L=50 where soft-multiply `gated` cannot? If latch DISCRETE (test_acc) >> gated
+# DISCRETE here, P2 is real → expand to the full length sweep {8,20,35,50} + Tier 2. Common:
+# copy alphabet 8 (chance .125), hidden 1024, 20k iters, lr 0.003→0.0003 cosine, kb 3 (copy =
+# hold/recall). NOTE: if the SOFT acc is capacity-bound (P1 saw copy-50 needs ~2048), bump
+# --hidden to 2048 and re-tag. ~10 runs × ~20-50 min on the one GPU ≈ an overnight queue.
+# (Prior P1 recall/delay runs are complete — results already in results/, so they'd SKIP.)
 JOBS=(
-  # Essential — 3rd seed at headline delays (these failed on GPU0)
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d50_gated_s1"
-  "--task smnist-pixel --chunk 784 --delay 100 --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 1 --tag rec_d100_gated_s1"
-  # Recommended — recall keep-bias sweep (mirrors the psMNIST sweep)
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 0 --lr 0.003 --lr-min 0.0003 --tag rec_d50_gated_kb0"
-  "--task smnist-pixel --chunk 784 --delay 50  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated --keep-bias 3 --lr 0.003 --lr-min 0.0003 --tag rec_d50_gated_kb3"
-  # Optional — fill intermediate delays to 3 seeds + the missing control point
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003          --tag rec_d25_gated"
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d25_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003          --tag rec_d75_gated"
-  "--task smnist-pixel --chunk 784 --delay 75  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism gated  --keep-bias 6 --lr 0.003 --lr-min 0.0003 --seed 2 --tag rec_d75_gated_s2"
-  "--task smnist-pixel --chunk 784 --delay 25  --hidden 1000 --iters 20000 --eval-freq 1000 --mechanism rddlgn --lr 0.003 --lr-min 0.0003 --tag rec_d25_rddlgn"
+  # Primary — the headline comparison, 3 seeds each
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3          --tag cp50_gated_s0"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --seed 1 --tag cp50_gated_s1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --seed 2 --tag cp50_gated_s2"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 3 --anneal 0.1,0.6          --tag cp50_latch_s0"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 3 --anneal 0.1,0.6 --seed 1 --tag cp50_latch_s1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 3 --anneal 0.1,0.6 --seed 2 --tag cp50_latch_s2"
+  # Control (recompute-recurrence — expect dead at chance on copy-50)
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism rddlgn --tag cp50_rddlgn"
+  # Ablations (1 seed) — isolate the mechanism
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 3 --soft-state  --tag cp50_latch_softstate"  # v0 (no bistable restore) → expect a gated-like gap
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 3               --tag cp50_latch_noanneal"   # hard-from-scratch (no --anneal) → tests anneal necessity
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 3 --anneal 0.1,0.6 --entropy-reg 0.02 --entropy-ramp 0.5 --tag cp50_latch_ent"  # + entropy-reg for the gate-selection tail
 )
 # ─────────────────────────────────────────────────────────────────────────────
 

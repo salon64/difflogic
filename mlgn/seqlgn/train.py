@@ -1,5 +1,5 @@
 """
-train.py — train & evaluate a recurrent Logic Gate Network on a sequential task.
+train.py - train & evaluate a recurrent Logic Gate Network on a sequential task.
 ================================================================================
 
 Run from the project root (the folder that contains the ``difflogic/`` package):
@@ -60,8 +60,8 @@ def cycle(loader):
 
 @torch.no_grad()
 def evaluate(model, loader, device, discrete: bool = True) -> float:
-    """Accuracy. discrete=True: eval mode (argmax gates) + binarised inputs — the REAL
-    logic-circuit accuracy. discrete=False: train mode (softmax gates), inputs unrounded —
+    """Accuracy. discrete=True: eval mode (argmax gates) + binarised inputs - the REAL
+    logic-circuit accuracy. discrete=False: train mode (softmax gates), inputs unrounded -
     the soft/relaxed model. The difference (soft - discrete) is the *discretization gap*."""
     was_training = model.training
     model.eval() if discrete else model.train()
@@ -81,27 +81,41 @@ def evaluate(model, loader, device, discrete: bool = True) -> float:
 def build_args():
     p = argparse.ArgumentParser(description="Train a recurrent Logic Gate Network.")
     p.add_argument("--task", default="psmnist", choices=AVAILABLE_TASKS)
-    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell"),
+    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch"),
                    help="memory mechanism: 'rddlgn' control, 'gated' (GRU-style, Paper #1), "
-                        "'lstm' (richer arm), 'gru_cell' (separate cell state + GRU MUX — "
-                        "the 2x2 ablation). 'latch' (Paper #2) is parked.")
+                        "'lstm' (richer arm), 'gru_cell' (separate cell state + GRU MUX - the 2x2 "
+                        "ablation), 'latch' (Paper #2 - bistable SR/T-FF primitive; see --latch-kind).")
+    p.add_argument("--latch-kind", default="sr", choices=("sr", "tff"),
+                   help="latch primitive when --mechanism latch: 'sr' (set/reset - hold/recall, e.g. "
+                        "copy) or 'tff' (T flip-flop - toggle/integrate, e.g. parity).")
+    p.add_argument("--soft-state", action="store_true",
+                   help="latch: DISABLE the bistable restore (the v0 soft latch, for the ablation). "
+                        "Default (off) = hard_state on = the v1 bistable latch.")
+    p.add_argument("--hard-control", action="store_true",
+                   help="latch: also round the S/R/T control lines (fully-hard workmap variant). "
+                        "Off by default - at eval the gates are already argmax-binary.")
+    p.add_argument("--anneal", default="",
+                   help="latch: soft->hard restore anneal window 'START,END' (fractions of training), "
+                        "e.g. '0.1,0.6' = soft until 10%%, ramp to fully-hard by 60%%. Empty = hard "
+                        "from step 0 (un-annealed v1). Fixes the hard-from-scratch cold-start/plateau.")
     p.add_argument("--hidden", type=int, default=2000, help="hidden_dim (must be >= input_dim and divisible by num_classes)")
     p.add_argument("--cell-layers", type=int, default=2, help="logic layers per candidate/gate/update network")
     p.add_argument("--keep-bias", type=float, default=3.0,
-                   help="keep-bias for the update/forget gate at init (logic forget-bias / "
-                        "residual init). Turns the carousel ON at start to avoid cold-start. "
-                        "0 disables it. Only affects 'gated'/'lstm'.")
+                   help="keep-bias at init (logic forget-bias / residual init): turns the carousel ON "
+                        "at start to avoid cold-start. 0 disables. Affects 'gated'/'lstm'/'gru_cell' "
+                        "and 'latch' (biases S/R or toggle toward HOLD). TASK-DEPENDENT: HIGH for "
+                        "hold/recall (copy), LOW for toggle/integrate (parity/psMNIST).")
     p.add_argument("--tau", type=float, default=30.0, help="GroupSum temperature")
     p.add_argument("--grad-factor", type=float, default=1.0, help="difflogic grad_factor (raise for deep/long unrolls)")
     p.add_argument("--grad-clip", type=float, default=1.0,
                    help="clip global grad norm to this value (RNN exploding-gradient fix). "
                         "0 disables. Keep-bias fixes vanishing but can over-correct into "
-                        "exploding gradients on long sequences (NaN) — clipping prevents it.")
+                        "exploding gradients on long sequences (NaN) - clipping prevents it.")
     p.add_argument("--seq-len", type=int, default=None, help="sequence length for synthetic tasks (parity/copy)")
     p.add_argument("--alphabet", type=int, default=8, help="alphabet size for the copy task")
     p.add_argument("--chunk", type=int, default=1,
                    help="pixels per timestep for pixel-MNIST tasks (smnist-pixel/psmnist); "
-                        "seq_len = 784//chunk. e.g. 14 → 56 steps, 8 → 98 steps.")
+                        "seq_len = 784//chunk. e.g. 14 -> 56 steps, 8 -> 98 steps.")
     p.add_argument("--delay", type=int, default=0,
                    help="append N blank steps after an MNIST image (RECALL test: hold the "
                         "digit through the delay, then classify). seq_len = image_steps + N.")
@@ -114,7 +128,7 @@ def build_args():
                    help="coefficient on a gate-entropy penalty pushing gates toward one-hot, "
                         "to shrink the discretization gap. 0 = off.")
     p.add_argument("--entropy-ramp", type=float, default=1.0,
-                   help="fraction of training over which --entropy-reg ramps 0→full (explore "
+                   help="fraction of training over which --entropy-reg ramps 0->full (explore "
                         "early, commit late). 1.0 = ramp across the whole run.")
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--iters", type=int, default=50_000)
@@ -144,6 +158,14 @@ def main():
     print(f"task={task.name}  seq_len={task.seq_len}  input_dim={task.input_dim}  "
           f"num_classes={task.num_classes}")
 
+    # latch bistable-restore anneal window (START,END fractions of training); None = hard from step 0.
+    anneal_window = None
+    if args.anneal:
+        parts = [float(v) for v in args.anneal.split(",")]
+        assert len(parts) == 2, "--anneal expects 'START,END', e.g. 0.1,0.6"
+        anneal_window = (parts[0], parts[1])
+    is_latch = args.mechanism == "latch"
+
     model = SequenceClassifier(
         input_dim=task.input_dim,
         hidden_dim=args.hidden,
@@ -151,6 +173,9 @@ def main():
         mechanism=args.mechanism,
         cell_layers=args.cell_layers,
         keep_bias=args.keep_bias,
+        latch_kind=args.latch_kind,
+        hard_state=not args.soft_state,
+        hard_control=args.hard_control,
         tau=args.tau,
         device=device,
         grad_factor=args.grad_factor,
@@ -162,7 +187,7 @@ def main():
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    # TODO(future): make the LR schedule a first-class, pluggable choice — an explicit
+    # TODO(future): make the LR schedule a first-class, pluggable choice - an explicit
     # `--lr-schedule {none,cosine,linear,step,...}` selected independently, rather than
     # inferring "cosine decay" from the presence of `--lr-min`. Coupling the schedule to
     # lr_min is a stopgap; a settable schedule (with its own params) is cleaner.
@@ -182,8 +207,13 @@ def main():
         if i >= args.iters:
             break
         x, y = x.to(device), y.to(device)
+        # latch bistable-restore anneal: ramp hard_alpha 0->1 over the window so the state
+        # hardens gradually (soft solution first, then commit to {0,1}); avoids the
+        # hard-from-scratch cold-start/plateau. No-op unless --mechanism latch --anneal set.
+        if is_latch and anneal_window is not None:
+            model.cell.hard_alpha = utils.hard_anneal_alpha(i / max(1, args.iters), *anneal_window)
         logits = model(x)
-        loss = loss_fn(logits, y)          # task (CE) loss — reported as `loss`
+        loss = loss_fn(logits, y)          # task (CE) loss - reported as `loss`
 
         # Optional gate-entropy penalty (ramped): pushes gates one-hot to shrink the gap.
         total_loss = loss
@@ -226,9 +256,9 @@ def main():
                 best_val = val
                 best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
             # Dead-weights early stop: if a whole eval window was skipped, the weights have
-            # gone non-finite and will never recover — stop instead of spinning for 30 min.
+            # gone non-finite and will never recover - stop instead of spinning for 30 min.
             if window_skips >= args.eval_freq:
-                print(f"[stop] all {args.eval_freq} steps this window skipped → weights are "
+                print(f"[stop] all {args.eval_freq} steps this window skipped -> weights are "
                       f"non-finite (dead). Best checkpoint kept. Prevent it with a lower "
                       f"--lr (e.g. 0.003) and/or --grad-factor 0.5.")
                 break
@@ -236,6 +266,8 @@ def main():
     # ---- final test on the best checkpoint (discrete-locked) -------------------------
     if best_state is not None:
         model.load_state_dict(best_state)
+    if is_latch:
+        model.cell.hard_alpha = 1.0  # report the fully-hardened (deployed-consistent) numbers
     test_acc = evaluate(model, task.test_loader, device, discrete=True)
     test_soft = evaluate(model, task.test_loader, device, discrete=False)
     train_minutes = (time.time() - t0) / 60
@@ -245,7 +277,7 @@ def main():
           f"train_time={train_minutes:.1f} min")
     if n_skipped > args.iters * 0.2:
         print(f"[note] {100 * n_skipped / args.iters:.0f}% of steps skipped (exploding grads) "
-              f"— consider a lower --lr (e.g. 0.003) and/or --grad-factor 0.5.")
+              f"- consider a lower --lr (e.g. 0.003) and/or --grad-factor 0.5.")
 
     # ---- optional analyses -----------------------------------------------------------
     grad_profile = None
@@ -270,6 +302,10 @@ def main():
     out = os.path.join(RESULTS_DIR, f"{task.name}_{args.mechanism}{tag}_{stamp}.json")
     record = {
         "task": task.name, "mechanism": args.mechanism, "seq_len": task.seq_len,
+        "latch_kind": args.latch_kind if is_latch else None,
+        "hard_state": (not args.soft_state) if is_latch else None,
+        "hard_control": args.hard_control if is_latch else None,
+        "anneal": args.anneal if is_latch else None,
         "hidden": args.hidden, "cell_layers": args.cell_layers, "keep_bias": args.keep_bias,
         "tau": args.tau,
         "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
