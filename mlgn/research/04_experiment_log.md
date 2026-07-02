@@ -13,6 +13,52 @@ Template:
 
 ---
 
+## 2026-07-02 (b) — T-FF solves PARITY (control can't); keep-bias is task-dependent; disc. gap reconfirmed
+- **Hypothesis:** M1 — a T flip-flop (`Q⁺ = T ⊕ Q`) solves parity (running XOR) that the recompute
+  control (rddlgn) can't. Added `latch_kind='tff'` alongside `'sr'` in `cells.py` (+ `LATCH_KINDS`,
+  threaded through `models.py`).
+- **Setup:** `scratchpad/smoke_parity{,2}.py`; parity L∈{4,8,16}, hidden 16–24, tau 0.5, Adam lr .02–.03,
+  cell_layers 2, seed 0, **CPU python impl** (laptop).
+- **Result:**
+  - *First run (L=16, kb=3): ALL mechanisms stuck at chance* (tff pinned at exactly ln2, zero movement).
+    Diagnosed: (i) parity is SGD-hard (flat plateau / no partial credit), L=16 too long for a cold start;
+    (ii) **kb=3 biases the toggle line toward HOLD → never toggles → ~0 gradient** (wrong bias for an
+    integrate task).
+  - *Retry (kb=0, length ladder, hidden 24): **T-FF SOLVES parity*** — L=4 in **2 ep**, L=8 in **7 ep**
+    (soft acc 1.000). **rddlgn control dead at chance (0.53)**. SR latch also stuck at chance (toggle is
+    not its native op).
+  - **Discretization gap: tff soft 1.0 → discrete val 0.53 @ L=8** (0.70 @ L=4) — hardened circuit does
+    NOT inherit the soft solution; parity is the most bit-sensitive task ⇒ worst-case gap.
+- **Read:** **M1 delivered — one toggle primitive does what recompute can't** (clean Figure-1), once the
+  hold-bias is removed. **keep-bias is TASK-DEPENDENT for latches too**: LOW for toggle/integrate (parity),
+  HIGH for hold/recall (copy) — same axis as P1's psMNIST finding; document as a gotcha. **Primitive↔task
+  fit:** T-FF↔parity, SR↔copy (SR didn't learn toggle). **The disc. gap now shows on copy AND parity ⇒
+  v1 = hard NOR-settle forward + STE is unambiguously the load-bearing next step** (v0's soft forward learns
+  the fn but the deployed circuit doesn't discretize — catastrophic on bit-exact parity). CPU smoke only;
+  real runs (width, length sweep, multi-seed, equal-gates) on DUST.
+
+## 2026-07-02 — P2 GATE 0 CLEARED (CPU smoke): the bistable SR-latch TRAINS
+- **Hypothesis:** the bistable SR-latch recurrence — the object C2 says has ill-posed
+  fixed-point gradients — can be trained under BPTT via the multilinear characteristic-equation
+  reduction. I.e. is the P2 primitive trainable at all? (The single blocking gate for P2 → ICML'27.)
+- **Setup:** new `mechanism='latch'` in `seqlgn/cells.py` (v0): `S=set_net(z)`, `R=reset_net(z)`,
+  `Q⁺ = S + (1−R)Q − S(1−R)Q` (soft multilinear SR characteristic eq.; autograd backward, **no
+  custom STE yet**). keep-bias analog = bias S,R → FALSE ("hold") so the carousel is on at init.
+  Smoke: `scratchpad/smoke_latch.py`; copy L=8, alphabet 4 (chance .25), hidden 16, cell_layers 2,
+  tau 0.5, kb 3.0, Adam lr .02, 25 ep, n_train 2048, seed 0, **CPU python impl** (laptop; NOT a real run).
+- **Result:** latch **trains — soft train_acc 1.000 by ep20** (loss 1.45→0.115), no NaN/instability.
+  Beats control: **rddlgn dead at chance (~0.25)**; gated reference solves by ep6. **Discretization
+  gap: latch discrete val_acc 0.512** (soft 1.0) vs **gated discrete 1.000** (zero gap at L=8).
+  [First tau run was flat — tau=30 (calibrated for hidden≈1024) squashed logits at hidden=16; tau=0.5 fixed it.]
+- **Read:** **GATE 0 PASSED — the SR primitive is trainable and the characteristic-equation reduction
+  works** (BPTT flows through the bistable recurrence; the `∂Q⁺/∂Q=(1−R)(1−S)` carousel does its job).
+  Beating the recompute control on a memory task = the core P2 thesis in miniature. The discretization
+  gap is EXPECTED for v0 (soft forward, no bistable restore) → **v1 = hard NOR-settle forward + STE
+  backward is load-bearing for C3, not polish.** Caveat: tiny CPU smoke (hidden 16, 1 seed, copy-8) =
+  green light only; the thesis lives at copy-50 on GPU/DUST (gated's gap opens, latch should close it).
+  **Next:** (a) v1 hard-settle+STE; (b) parity via T-FF (`S=T·Q̄, R=T·Q`); (c) DUST: width + copy-length
+  sweep + multi-seed + equal-gates control.
+
 ## 2026-06-21 — STORY FLIPS POSITIVE: keep-bias is task-dependent; gating wins recall AND classification
 B + C results (fig: `results/curves_bc.png`). The psMNIST "loss" was a keep-bias artifact.
 

@@ -38,10 +38,24 @@ Memory mechanisms
   flows backward through time un-attenuated — the mechanism that lets LSTMs/GRUs beat
   vanilla RNNs, here realised in pure logic.
 
-- ``"latch"``   — Paper #2 (PARKED). Will replace recomputed state with a *bistable
-  memory primitive* (D-flip-flop / gated D-latch / SR latch) plus a custom
-  straight-through gradient through the feedback. Stubbed here so the interface is ready;
-  see ``docs/design.md`` §"Paper 2".
+- ``"latch"``   — Paper #2's contribution. A **bistable SR-latch** memory primitive. Two
+  learned logic networks drive the *set* (``S``) and *reset* (``R``) lines; the state is
+  updated by the SR-latch **characteristic next-state equation** ``Q⁺ = S ∨ (R̄ ∧ Q)``,
+  relaxed multilinearly to ``Q⁺ = S + (1−R)Q − S(1−R)Q``:
+      S = LGN_set(z);  R = LGN_reset(z)
+      Q' = S + (1 - R) * Q - S * (1 - R) * Q       # set / reset / hold
+  ``∂Q'/∂Q = (1−R)(1−S)`` = **1 in hold** (S=R=0, the carousel) and **0 at set/reset**;
+  ``∂Q'/∂S = 1−Q+RQ`` gives a clean gradient to *learn* to set even from the held state.
+  Crucially this uses the *closed-form characteristic equation* rather than iterating the
+  cross-coupled NOR–NOR feedback to a fixed point — the "reduction" that turns the
+  fixed-point problem into a feedforward neuron and **sidesteps the memory-degeneracy /
+  singular-``(I−J)`` obstruction** (Paper 2 §C2). Distinct from ``gated``: ``gated`` is a
+  *soft multiply* hold (``s·h``, which bleeds the bit off {0,1} over time); the SR latch is
+  a *bistable* set/reset that restores to a clean bit. (v0 = soft multilinear training
+  forward; a hard NOR-settle forward + STE backward for exact-bit inference is v1.) The
+  trivial D-flip-flop (``Q⁺=D``) degenerates to ``rddlgn`` and the gated D-latch
+  (``Q⁺=e·D+(1−e)·Q``) to ``gated`` — so the SR latch is the genuinely new primitive. See
+  ``docs/design.md`` §"Paper 2".
 
 Notes on the difflogic API (see ``docs/api.md`` for the full list)
 ------------------------------------------------------------------
@@ -64,6 +78,8 @@ from difflogic import LogicLayer
 
 
 MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch")
+# Bistable primitives available under mechanism='latch' (see the latch docstring above).
+LATCH_KINDS = ("sr", "tff")
 # Mechanisms that carry a tuple state (h, C) — a separate cell state C from the output h.
 _TUPLE_STATE = ("lstm", "gru_cell")
 
@@ -180,6 +196,7 @@ class LogicRecurrentCell(nn.Module):
         mechanism: str = "gated",
         cell_layers: int = 2,
         keep_bias: float = 3.0,
+        latch_kind: str = "sr",
         device: str = "cuda",
         grad_factor: float = 1.0,
         implementation: str | None = None,
@@ -187,11 +204,13 @@ class LogicRecurrentCell(nn.Module):
     ):
         super().__init__()
         assert mechanism in MECHANISMS, f"mechanism must be one of {MECHANISMS}, got {mechanism!r}"
+        assert latch_kind in LATCH_KINDS, f"latch_kind must be one of {LATCH_KINDS}, got {latch_kind!r}"
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.mechanism = mechanism
         self.cell_layers = cell_layers
         self.keep_bias = keep_bias
+        self.latch_kind = latch_kind
 
         cat_dim = input_dim + hidden_dim
         mlp_kwargs = dict(
@@ -243,11 +262,28 @@ class LogicRecurrentCell(nn.Module):
             bias_gate_keep(self.gate, keep_bias)  # MUX carousel on C: ∂C'/∂C = s, no leak
 
         elif mechanism == "latch":
-            raise NotImplementedError(
-                "mechanism='latch' is Paper #2 and is currently PARKED. "
-                "The interface is reserved; see mlgn/seqlgn/docs/design.md (Paper 2) for "
-                "the planned D-flip-flop / gated-latch primitive with custom STE backprop."
-            )
+            # Paper #2: a bistable memory primitive. v0 uses a soft multilinear
+            # characteristic-equation forward — fully differentiable, so autograd handles the
+            # backward pass (the "reduction" that collapses the cross-coupled fixed point into
+            # a feedforward neuron and sidesteps the §C2 obstruction).
+            if latch_kind == "sr":
+                # SR latch: learned set (S) and reset (R) lines drive Q⁺ = S ∨ (R̄ ∧ Q).
+                self.set_net = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+                self.reset_net = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+                # keep-bias analog: bias BOTH lines toward 0 ("hold") so the carousel
+                # ∂Q'/∂Q = (1−R)(1−S) ≈ 1 at init, while ∂Q'/∂S = 1−Q still gives a clean
+                # gradient to LEARN to set. keep_bias=0 reproduces the unbiased cold-start.
+                bias_gate_closed(self.set_net, keep_bias)
+                bias_gate_closed(self.reset_net, keep_bias)
+            elif latch_kind == "tff":
+                # T flip-flop: a learned toggle line T drives Q⁺ = T ⊕ Q. One toggle bit
+                # computes a running XOR = parity — the M1 demonstrator ("one primitive solves
+                # what rddlgn can't"). ∂Q'/∂Q = 1−2T = 1 in hold (T=0, carousel), −1 on toggle
+                # (|grad|=1, still flows un-attenuated).
+                self.toggle_net = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
+                # keep-bias analog: bias T toward 0 ("hold / don't toggle") so the carousel is
+                # on at init; ∂Q'/∂T = 1−2Q still gives a clean gradient to LEARN to toggle.
+                bias_gate_closed(self.toggle_net, keep_bias)
 
     def forward(self, x_t: torch.Tensor, state):
         # Unpack the (possibly tuple) state into the hidden vector h used to form z.
@@ -287,6 +323,22 @@ class LogicRecurrentCell(nn.Module):
             h_new = self.readout(torch.cat([o, C_new], dim=-1))
             return (h_new, C_new)
 
+        if self.mechanism == "latch":
+            if self.latch_kind == "sr":
+                S = self.set_net(z)            # set line, in [0,1]
+                R = self.reset_net(z)          # reset line, in [0,1]
+                # SR-latch characteristic next-state equation Q⁺ = S ∨ (R̄ ∧ Q), relaxed
+                # multilinearly: Q⁺ = S + (1−R)Q − S(1−R)Q. Exact at {0,1}: set (S=1)→1,
+                # reset (R=1,S=0)→0, hold (S=R=0)→Q. ∂Q⁺/∂Q = (1−R)(1−S) = 1 in hold (the
+                # bistable carousel), 0 at set/reset. Closed-form ⇒ no fixed-point iteration,
+                # so autograd differentiates it directly (the §C2-sidestepping reduction).
+                Rbar_Q = (1.0 - R) * h
+                return S + Rbar_Q - S * Rbar_Q
+            # tff: T flip-flop Q⁺ = T ⊕ Q, relaxed multilinearly XOR(T,Q) = T + Q − 2TQ.
+            # toggle (T=1) → 1−Q, hold (T=0) → Q. ∂Q⁺/∂Q = 1−2T (carousel at T=0).
+            T = self.toggle_net(z)             # toggle line, in [0,1]
+            return T + h - 2.0 * T * h
+
         raise RuntimeError(f"unhandled mechanism {self.mechanism!r}")
 
     # --- state helpers (keep the model loop mechanism-agnostic) -----------------------
@@ -308,8 +360,9 @@ class LogicRecurrentCell(nn.Module):
         return state[1] if self.mechanism in _TUPLE_STATE else state
 
     def extra_repr(self) -> str:
-        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm") else ""
+        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm", "gru_cell", "latch") else ""
+        lk = f", latch_kind={self.latch_kind!r}" if self.mechanism == "latch" else ""
         return (
             f"input_dim={self.input_dim}, hidden_dim={self.hidden_dim}, "
-            f"mechanism={self.mechanism!r}, cell_layers={self.cell_layers}{kb}"
+            f"mechanism={self.mechanism!r}, cell_layers={self.cell_layers}{kb}{lk}"
         )
