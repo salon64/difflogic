@@ -13,6 +13,31 @@ Template:
 
 ---
 
+## 2026-07-03 (round 2) — `combo` ALSO fails at copy-50; gate tracking DIAGNOSES a "never-write collapse"
+- **Setup:** round-2 queue (combo copy-50 x3 + noanneal + latch-kb6) + round-1 re-run WITH gate tracking.
+- **Result:**
+  - **combo (gated write + bistable restore) ALSO dead/near-chance** — s0 0.126, s1 0.122, s2 0.252,
+    noanneal 0.246 — NOT gated's soft 0.83. So the go/no-go is **NEGATIVE for combo too**. gated baseline
+    reconfirmed (soft 0.83, disc 0.33, gap +0.50). latch all dead incl kb6.
+  - **Gate distributions diagnose it (the key finding, from malcolm's gate-tracking idea):** hard-state
+    causes a **"never-write collapse"**:
+    - latch: `set_net`/`reset_net` 2nd layer collapse to **FALSE** (74-82%; **kb6 -> FALSE 100%**) ->
+      S=R=0 -> holds 0 forever -> chance.
+    - combo: `gate` net collapses to **TRUE (84%)** -> s=1 -> MUX always keeps -> never writes -> chance.
+    - gated (WORKING) has a HEALTHY dist: `candidate`=identity/negation (B/A/!A, writing), `gate`=keep.
+      The contrast proves the collapse. **keep-bias DRIVES it** (kb6 -> FALSE 100%, worse than kb3).
+- **Read: the bistable restore closes the gap BY CONSTRUCTION but is in FUNDAMENTAL TENSION with
+  trainability at length.** Hard-rounding the recurrent state over 50 steps makes "never write / always
+  hold" the loss-minimizing attractor (a write near 0.5 gets round-flipped -> corrupts memory -> worse
+  than chance -> model retreats to hold-0), and keep-bias pushes it there. Copy-8 worked (8 steps don't
+  compound); copy-50 doesn't. Anneal + entropy did NOT rescue it. **C3-via-hard-state-training is not
+  demonstrated and looks structurally hard.** OPTIONS: (1) cheap justified test — hard-state + **LOW
+  keep-bias (kb0/1)** for combo & latch (does removing the collapse-driving bias let writes survive?),
+  + a much-slower/later anneal (soft until ~80%) and/or a **length curriculum** (short->long transfer);
+  (2) if those also collapse, **REFRAME** the paper around the OBSTRUCTION (why exact bistable memory is
+  untrainable at length -> connects to C2) + the gate-collapse diagnosis, NOT gap-closing. The gate
+  tracking turned a black-box failure into a crisp, figure-worthy mechanism.
+
 ## 2026-07-03 — COPY-50 GPU GO/NO-GO: pure SR latch FAILS to train at scale; `combo` is the fix
 - **Setup:** `run_queue.sh` copy-50 slice on DUST (1x2080Ti). copy alphabet 8 (chance .125), hidden
   1024, 20k iters, lr 0.003->0.0003 cosine, kb 3; gated vs latch:sr (annealed) x3 seeds + rddlgn +

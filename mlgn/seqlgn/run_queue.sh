@@ -59,6 +59,24 @@ JOBS=(
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 3 --anneal 0.1,0.6 --seed 2 --tag cp50_combo_s2"
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 3                        --tag cp50_combo_noanneal"  # does combo even need the anneal? (gated trains, so maybe not)
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 40000 --eval-freq 2000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 6 --anneal 0.1,0.6 --tag cp50_latch_kb6"  # pure-latch long shot: stronger hold-bias + 2x iters
+
+  # ── PATH A (2026-07-03): rescue attempts for the "never-write collapse" (round 2 diagnosis:
+  # hard-state -> latch set/reset collapse to FALSE, combo gate collapses to TRUE=always-keep;
+  # keep-bias DRIVES it, kb6->FALSE 100%). Two justified fixes: (A1) LOW keep-bias (kb0/1) +
+  # SLOW anneal (soft until 85%) so writes can form before hardening; (A2) LENGTH CURRICULUM
+  # (warm-start copy-8->20->35->50 — hard-state trains fine at L=8, so transfer the solution up).
+  # WIN = combo/latch reaches gated-like SOFT (~0.83) AND keeps DISCRETE high (gap closed).
+  # A1 — keep-bias x slow-anneal, direct at copy-50
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 0 --anneal 0.05,0.85 --tag cp50A_combo_kb0"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.05,0.85 --tag cp50A_combo_kb1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 0 --anneal 0.05,0.85 --tag cp50A_latch_kb0"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind sr --keep-bias 1 --anneal 0.05,0.85 --tag cp50A_latch_kb1"
+  # A2 — combo LENGTH CURRICULUM (must run in listed order; GPUS=(1) => sequential, so ordering holds).
+  #      each stage warm-starts from the previous ckpt (results/ckpt_<tag>.pt). Fresh 1st run only.
+  "--task copy --seq-len 8  --alphabet 8 --hidden 1024 --iters 10000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --save-model --tag cp50A_curr_c8"
+  "--task copy --seq-len 20 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --save-model --init-from mlgn/seqlgn/results/ckpt_cp50A_curr_c8.pt  --tag cp50A_curr_c20"
+  "--task copy --seq-len 35 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --save-model --init-from mlgn/seqlgn/results/ckpt_cp50A_curr_c20.pt --tag cp50A_curr_c35"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6              --init-from mlgn/seqlgn/results/ckpt_cp50A_curr_c35.pt --tag cp50A_curr_c50"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 

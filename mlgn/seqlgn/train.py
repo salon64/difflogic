@@ -141,6 +141,13 @@ def build_args():
     p.add_argument("--grad-analysis", action="store_true", help="measure gradient norm through time at the end")
     p.add_argument("--show-gates", action="store_true", help="print the learned gate distribution at the end")
     p.add_argument("--tag", default="", help="optional tag added to the results filename")
+    p.add_argument("--init-from", default="",
+                   help="warm-start: load a model state_dict from this .pt before training (length "
+                        "curriculum — the params don't depend on seq_len, so a shorter-copy checkpoint "
+                        "loads straight in). Missing path = fresh start (so a ladder is robust).")
+    p.add_argument("--save-model", action="store_true",
+                   help="save the best checkpoint's state_dict to results/ckpt_<tag>.pt (chain "
+                        "curriculum stages with --init-from).")
     return p.parse_args()
 
 
@@ -186,6 +193,13 @@ def main():
     print(model)
     print(f"mechanism={args.mechanism}  logic gates={utils.count_gates(model):,}  "
           f"params={sum(p.numel() for p in model.parameters()):,}")
+
+    if args.init_from:  # length-curriculum warm-start (same architecture across copy lengths)
+        if os.path.exists(args.init_from):
+            model.load_state_dict(torch.load(args.init_from, map_location=device))
+            print(f"[init] warm-started from {args.init_from}")
+        else:
+            print(f"[init] --init-from {args.init_from} not found -> fresh start")
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -310,6 +324,10 @@ def main():
 
     # ---- persist a results record ----------------------------------------------------
     os.makedirs(RESULTS_DIR, exist_ok=True)
+    if args.save_model:  # save best checkpoint for curriculum chaining (deterministic, tag-based path)
+        ckpt = os.path.join(RESULTS_DIR, f"ckpt_{args.tag or args.mechanism}.pt")
+        torch.save(best_state if best_state is not None else model.state_dict(), ckpt)
+        print(f"checkpoint -> {ckpt}")
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     tag = f"_{args.tag}" if args.tag else ""
     out = os.path.join(RESULTS_DIR, f"{task.name}_{args.mechanism}{tag}_{stamp}.json")
