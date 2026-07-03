@@ -77,7 +77,7 @@ import torch.nn as nn
 from difflogic import LogicLayer
 
 
-MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch")
+MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo")
 # Bistable primitives available under mechanism='latch' (see the latch docstring above).
 LATCH_KINDS = ("sr", "tff")
 # Mechanisms that carry a tuple state (h, C) — a separate cell state C from the output h.
@@ -265,9 +265,12 @@ class LogicRecurrentCell(nn.Module):
             # CONTROL: recompute the full state each step from [x_t ; h_t].
             self.update = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
 
-        elif mechanism == "gated":
-            # Paper #1: separate candidate and gate networks (mirrors GRU's separate
-            # weight matrices for the candidate and the update gate).
+        elif mechanism in ("gated", "combo"):
+            # Paper #1 ('gated'): separate candidate and gate networks (mirrors GRU's separate
+            # weight matrices for the candidate and the update gate). 'combo' (Paper #1 + #2) is
+            # the SAME cell but applies a bistable restore to the hold (see forward + hard_state):
+            # the MUX writes the candidate (why it trains, unlike the write-value/enable-entangled
+            # SR latch), the bistable restore re-binarises the held bit (why the gap closes).
             self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.gate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             # Keep-bias the update gate s so the carousel is ON at init (avoids cold-start).
@@ -333,13 +336,21 @@ class LogicRecurrentCell(nn.Module):
         if self.mechanism == "rddlgn":
             return self.update(z)
 
-        if self.mechanism == "gated":
+        if self.mechanism in ("gated", "combo"):
             c = self.candidate(z)              # candidate / "write" state, in [0,1]
             s = self.gate(z)                   # select bit per unit, in [0,1]
             # Soft 2:1 multiplexer == GRU update gate. At binary {0,1} values this is the
             # exact boolean MUX (s AND h) OR (NOT s AND c). The s*h branch is the
             # constant-error carousel: gradient ~1 through kept bits.
-            return s * h + (1.0 - s) * c
+            Q = s * h + (1.0 - s) * c
+            # combo (Paper #1 write-path + Paper #2 bistable hold): the MUX writes, then the
+            # bistable restore re-binarises the held bit each step (annealed by hard_alpha) so the
+            # gated hold stops drifting off {0,1} over time — closing the discretization gap that
+            # `gated` alone leaves at long sequences (the soft s*h bleeds the bit; the round cleans
+            # it). `gated` returns the soft MUX unchanged.
+            if self.mechanism == "combo" and self.hard_state:
+                return _ste_round(Q, self.hard_alpha)
+            return Q
 
         if self.mechanism == "lstm":
             _, C = state
@@ -409,9 +420,14 @@ class LogicRecurrentCell(nn.Module):
         return state[1] if self.mechanism in _TUPLE_STATE else state
 
     def extra_repr(self) -> str:
-        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm", "gru_cell", "latch") else ""
-        lk = (f", latch_kind={self.latch_kind!r}, hard_state={self.hard_state}, "
-              f"hard_control={self.hard_control}") if self.mechanism == "latch" else ""
+        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm", "gru_cell", "latch", "combo") else ""
+        if self.mechanism == "latch":
+            lk = (f", latch_kind={self.latch_kind!r}, hard_state={self.hard_state}, "
+                  f"hard_control={self.hard_control}")
+        elif self.mechanism == "combo":
+            lk = f", hard_state={self.hard_state}"
+        else:
+            lk = ""
         return (
             f"input_dim={self.input_dim}, hidden_dim={self.hidden_dim}, "
             f"mechanism={self.mechanism!r}, cell_layers={self.cell_layers}{kb}{lk}"

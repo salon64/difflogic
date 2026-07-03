@@ -81,10 +81,12 @@ def evaluate(model, loader, device, discrete: bool = True) -> float:
 def build_args():
     p = argparse.ArgumentParser(description="Train a recurrent Logic Gate Network.")
     p.add_argument("--task", default="psmnist", choices=AVAILABLE_TASKS)
-    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch"),
+    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo"),
                    help="memory mechanism: 'rddlgn' control, 'gated' (GRU-style, Paper #1), "
                         "'lstm' (richer arm), 'gru_cell' (separate cell state + GRU MUX - the 2x2 "
-                        "ablation), 'latch' (Paper #2 - bistable SR/T-FF primitive; see --latch-kind).")
+                        "ablation), 'latch' (Paper #2 - bistable SR/T-FF primitive; see --latch-kind), "
+                        "'combo' (Paper #1 gated write + Paper #2 bistable restore on the hold; uses "
+                        "--soft-state/--anneal like latch).")
     p.add_argument("--latch-kind", default="sr", choices=("sr", "tff"),
                    help="latch primitive when --mechanism latch: 'sr' (set/reset - hold/recall, e.g. "
                         "copy) or 'tff' (T flip-flop - toggle/integrate, e.g. parity).")
@@ -164,7 +166,7 @@ def main():
         parts = [float(v) for v in args.anneal.split(",")]
         assert len(parts) == 2, "--anneal expects 'START,END', e.g. 0.1,0.6"
         anneal_window = (parts[0], parts[1])
-    is_latch = args.mechanism == "latch"
+    is_restore = args.mechanism in ("latch", "combo")  # mechanisms that use the bistable restore
 
     model = SequenceClassifier(
         input_dim=task.input_dim,
@@ -210,7 +212,7 @@ def main():
         # latch bistable-restore anneal: ramp hard_alpha 0->1 over the window so the state
         # hardens gradually (soft solution first, then commit to {0,1}); avoids the
         # hard-from-scratch cold-start/plateau. No-op unless --mechanism latch --anneal set.
-        if is_latch and anneal_window is not None:
+        if is_restore and anneal_window is not None:
             model.cell.hard_alpha = utils.hard_anneal_alpha(i / max(1, args.iters), *anneal_window)
         logits = model(x)
         loss = loss_fn(logits, y)          # task (CE) loss - reported as `loss`
@@ -266,7 +268,7 @@ def main():
     # ---- final test on the best checkpoint (discrete-locked) -------------------------
     if best_state is not None:
         model.load_state_dict(best_state)
-    if is_latch:
+    if is_restore:
         model.cell.hard_alpha = 1.0  # report the fully-hardened (deployed-consistent) numbers
     test_acc = evaluate(model, task.test_loader, device, discrete=True)
     test_soft = evaluate(model, task.test_loader, device, discrete=False)
@@ -295,6 +297,17 @@ def main():
         print("\n--- learned gate distribution ---")
         print(utils.format_gate_distribution(utils.gate_distribution(model)))
 
+    # gate usage (which of the 16 gates each neuron settled on at the best checkpoint) — SAVED
+    # for every run so we can see which gates the latch/combo prefers (and diagnose failures,
+    # e.g. a collapse to constant FALSE/TRUE = "dead" gates that can't compute anything).
+    gate_dist = utils.gate_distribution(model)
+    gate_totals = [int(c) for c in sum(gate_dist.values())] if gate_dist else [0] * 16
+    if sum(gate_totals):
+        _tot = sum(gate_totals)
+        _top = sorted(range(16), key=lambda g: gate_totals[g], reverse=True)[:4]
+        print("--- gate usage (top 4/16): "
+              + ", ".join(f"{utils.GATE_NAMES[g]} {100 * gate_totals[g] / _tot:.0f}%" for g in _top))
+
     # ---- persist a results record ----------------------------------------------------
     os.makedirs(RESULTS_DIR, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -302,10 +315,10 @@ def main():
     out = os.path.join(RESULTS_DIR, f"{task.name}_{args.mechanism}{tag}_{stamp}.json")
     record = {
         "task": task.name, "mechanism": args.mechanism, "seq_len": task.seq_len,
-        "latch_kind": args.latch_kind if is_latch else None,
-        "hard_state": (not args.soft_state) if is_latch else None,
-        "hard_control": args.hard_control if is_latch else None,
-        "anneal": args.anneal if is_latch else None,
+        "latch_kind": args.latch_kind if args.mechanism == "latch" else None,
+        "hard_state": (not args.soft_state) if is_restore else None,
+        "hard_control": args.hard_control if args.mechanism == "latch" else None,
+        "anneal": args.anneal if is_restore else None,
         "hidden": args.hidden, "cell_layers": args.cell_layers, "keep_bias": args.keep_bias,
         "tau": args.tau,
         "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
@@ -317,6 +330,11 @@ def main():
         "discretization_gap": test_soft - test_acc, "n_skipped": n_skipped,
         "train_minutes": train_minutes,
         "grad_profile": grad_profile,
+        # gate usage: per-LogicLayer histograms over the 16 gates + the aggregate 16-vector.
+        # Map indices via utils.GATE_NAMES. Shows what the latch's set/reset (or combo's gate/
+        # candidate) nets prefer, and flags "dead" collapses to FALSE(0)/TRUE(15).
+        "gate_totals": gate_totals,
+        "gate_distribution": {name: [int(c) for c in counts] for name, counts in gate_dist.items()},
     }
     with open(out, "w") as f:
         json.dump(record, f, indent=2)

@@ -13,6 +13,34 @@ Template:
 
 ---
 
+## 2026-07-03 — COPY-50 GPU GO/NO-GO: pure SR latch FAILS to train at scale; `combo` is the fix
+- **Setup:** `run_queue.sh` copy-50 slice on DUST (1x2080Ti). copy alphabet 8 (chance .125), hidden
+  1024, 20k iters, lr 0.003->0.0003 cosine, kb 3; gated vs latch:sr (annealed) x3 seeds + rddlgn +
+  ablations (soft-state/no-anneal/+entropy). `train.py` wired for latch/anneal (this session).
+- **Result:**
+  - **gated (3 seeds): soft 0.83±0.06, discrete 0.33±0.07, gap +0.50.** Trains softly, big
+    discretization gap — exactly as P1 predicted. The working baseline WITH the gap.
+  - **latch:sr — DEAD AT CHANCE (soft = discrete ≈ 0.124 = 1/8) in ALL FOUR configs** (annealed,
+    no-anneal, v0 soft-state, +entropy). n_skipped=0 → *stuck/cold-start, not exploding*. Its
+    "gap≈0" is trivial (chance=chance), NOT a gap-close.
+  - rddlgn control ≈ chance (soft 0.12 / disc 0.26).
+- **Read: NEGATIVE — the copy-8 CPU-smoke success did NOT transfer to copy-50 at scale.** The pure
+  SR latch can't learn copy-50. Diagnosis (STRUCTURAL, not hyperparameter — all 4 configs fail
+  identically & stuck): the SR latch **entangles write-value + write-enable in its S/R lines**,
+  whereas gated cleanly separates `candidate`(value) + `gate`(enable). Copy = write-then-hold, so
+  gated's separation is *why it trains* and the SR latch can't learn the 8-way write at length 50.
+  **Fix = `combo`** (implemented in cells.py + train.py): gated's write path + the bistable restore
+  on the hold — `h' = ste_round(s·h + (1−s)·c)` — should train like gated AND close the gap like the
+  restore (the workmap's #1⊕#2 strategic synthesis). **Next:** queue `combo` copy-50 x3 as the new
+  go/no-go; a pure-latch kb=6 / more-iters retry as a long shot. **CORRECTION to the 2026-07-02
+  (v1)/(anneal) entries below: those copy-8 results are real but do NOT establish C3 at scale — the
+  pure latch does not reach copy-50, so C3 now rides on `combo` (or a fixed latch).**
+  Also added **per-layer gate-usage tracking** to every results JSON (`gate_totals` +
+  `gate_distribution`, via `utils.GATE_NAMES`) + a "top 4/16" log line. Early hint (tiny CPU run):
+  the SR latch's set/reset nets lean on the constant **FALSE** gate — a "dead-gate" collapse that
+  would explain the write failure; round-2 (`cp50_latch_kb6`, `cp50_combo_*`) will confirm it and
+  contrast a working cell's gate distribution (a real C1/interpretability ingredient).
+
 ## 2026-07-02 (anneal) — soft->hard anneal: bistable latch CLOSES the gap (copy-8: discrete 1.000, gap 0)
 - **Hypothesis:** annealing the bistable restore `alpha` 0->1 over training fixes v1's hard-from-scratch
   fragility (cold-start/plateau) and closes the state-drift gap.
