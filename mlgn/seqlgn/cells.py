@@ -77,7 +77,7 @@ import torch.nn as nn
 from difflogic import LogicLayer
 
 
-MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo")
+MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo", "clatch")
 # Bistable primitives available under mechanism='latch' (see the latch docstring above).
 LATCH_KINDS = ("sr", "tff")
 # Mechanisms that carry a tuple state (h, C) — a separate cell state C from the output h.
@@ -265,12 +265,14 @@ class LogicRecurrentCell(nn.Module):
             # CONTROL: recompute the full state each step from [x_t ; h_t].
             self.update = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
 
-        elif mechanism in ("gated", "combo"):
+        elif mechanism in ("gated", "combo", "clatch"):
             # Paper #1 ('gated'): separate candidate and gate networks (mirrors GRU's separate
             # weight matrices for the candidate and the update gate). 'combo' (Paper #1 + #2) is
-            # the SAME cell but applies a bistable restore to the hold (see forward + hard_state):
-            # the MUX writes the candidate (why it trains, unlike the write-value/enable-entangled
-            # SR latch), the bistable restore re-binarises the held bit (why the gap closes).
+            # the SAME cell but applies a bistable restore to the hold (see forward + hard_state).
+            # 'clatch' (INPUT-CLOCKED LATCH) rounds the write-ENABLE not the value = a learnable
+            # write-enabled clocked register: hold is EXACT identity (no drift), the written value
+            # is never rounded (no worse-than-chance "moat"), so it is exact-at-deploy AND trainable
+            # (the never-write collapse of hard-rounding the state is avoided). See forward.
             self.candidate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             self.gate = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
             # Keep-bias the update gate s so the carousel is ON at init (avoids cold-start).
@@ -336,9 +338,16 @@ class LogicRecurrentCell(nn.Module):
         if self.mechanism == "rddlgn":
             return self.update(z)
 
-        if self.mechanism in ("gated", "combo"):
-            c = self.candidate(z)              # candidate / "write" state, in [0,1]
-            s = self.gate(z)                   # select bit per unit, in [0,1]
+        if self.mechanism in ("gated", "combo", "clatch"):
+            c = self.candidate(z)              # candidate / "write" value, in [0,1]
+            s = self.gate(z)                   # select / write-enable bit per unit, in [0,1]
+            if self.mechanism == "clatch":
+                # INPUT-CLOCKED LATCH: round the write-ENABLE (not the value). hold (s->1) => Q=h
+                # EXACTLY (no drift, unit Jacobian); write (s->0) => Q=c (value never rounded, so an
+                # uncertain write just stores a soft value that argmaxes cleanly at eval — no moat,
+                # so no never-write collapse). The gap reduces to a single-step gate-SELECTION gap.
+                # Annealed by hard_alpha (alpha=0 => this IS gated; alpha=1 => fully hard enable).
+                s = _ste_round(s, self.hard_alpha)
             # Soft 2:1 multiplexer == GRU update gate. At binary {0,1} values this is the
             # exact boolean MUX (s AND h) OR (NOT s AND c). The s*h branch is the
             # constant-error carousel: gradient ~1 through kept bits.
@@ -420,7 +429,7 @@ class LogicRecurrentCell(nn.Module):
         return state[1] if self.mechanism in _TUPLE_STATE else state
 
     def extra_repr(self) -> str:
-        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm", "gru_cell", "latch", "combo") else ""
+        kb = f", keep_bias={self.keep_bias}" if self.mechanism in ("gated", "lstm", "gru_cell", "latch", "combo", "clatch") else ""
         if self.mechanism == "latch":
             lk = (f", latch_kind={self.latch_kind!r}, hard_state={self.hard_state}, "
                   f"hard_control={self.hard_control}")
