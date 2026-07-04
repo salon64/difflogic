@@ -13,6 +13,50 @@ Template:
 
 ---
 
+## 2026-07-04 (round 3 + Path-A RESULTS) — the gap IS closeable at copy-50; the fix is DEEP SUPERVISION, not the primitive
+- **Setup:** GPU/DUST. Round-3 head-to-head (`cpB_*`, the two arms from the 5-agent insight) + Path-A
+  rescues (`cp50A_*`). copy-50, alphabet 8 (chance 0.125), hidden 1024, 20k iters. gated baseline = disc
+  0.33 / soft 0.83 / gap +0.50.
+- **Result — THREE routes reach discrete 1.000; three fail:**
+
+  | config | disc | soft | gap | note |
+  |---|---|---|---|---|
+  | `gated + deep-sup + margin` s0/s1/s2 | **1.000 / 1.000 / 1.000** | 1.0/1.0/0.879 | ~0 | robust, 3 seeds |
+  | `gated + deep-sup ONLY` | **1.000** | 1.000 | 0 | deep-sup is the active ingredient |
+  | `clatch + deep-sup` | **1.000** | 0.754 | −0.25 | primitive works *with* deep-sup |
+  | `combo + length curriculum` c8→c20→c35→c50 | **1.000** all rungs | — | ~0 | 2nd independent route |
+  | `clatch` ALONE s0/s1/s2 | 0.126 / 0.247 / 0.248 | ~0.12 | — | **FAILED** — didn't train even softly |
+  | `gated + margin ONLY` | 0.126 | 0.126 | 0 | **DEAD — 903 skips** (margin exploded grads) |
+  | Path-A rounded `combo`/`latch` kb0/kb1 | 0.126–0.247 | ~0.12 | — | never-write collapse, unrescued |
+
+- **Read — the decision gate resolved, and NOT the way we bet:**
+  - **The failure was never the primitive or the round — it was CREDIT ASSIGNMENT over 50 steps.** copy-50
+    only supervises output-vs-input-50-steps-ago; the "write early, hold" signal is buried 49 steps deep and
+    the easy escape is "write nothing" (the collapse). **Deep per-timestep supervision** (supervise the state
+    at EVERY t) gives a local write/hold signal and dissolves the plateau. **Length curriculum** (learn
+    copy-8 first, extend) fixes the SAME problem a 2nd way. **Rounding the state fixes neither** → all Path-A
+    rounded variants stayed at chance.
+  - **`clatch` alone did NOT close the gap** (0.126/0.247/0.248 across all 3 seeds; soft ~0.12 — it didn't
+    even train softly). Our copy-8 clatch smoke did NOT scale. clatch only hit 1.000 *once we added deep-sup*
+    — and so did plain `gated` (no latch at all). **The primitive is not the trainability win; deep-sup is.**
+  - **`margin` loss alone is HARMFUL** (exploded, 903 skipped batches). The "margin+deep-sup" bundle is deep-sup
+    carrying it. Drop margin from the recipe.
+  - **Oracle:** gated best-ckpt state is barely mushy (mushy-fraction t0 0.008 / mid 0.031 / t−1 0.008), and no
+    FALSE/TRUE gate collapse (gate.1 TRUE 27%, diverse) — consistent with "gated already ~binary; the gap is a
+    small activation drift," which deep-sup removes.
+- **THE CATCH (what we're missing): copy-50 SATURATES — it cannot rank the methods.** Everything that trains
+  hits *exactly* 1.000, including plain gated+deep-sup with NO latch. So copy-50 accuracy CANNOT show clatch >
+  gated. To justify a "clatch primitive" headline we need a **discriminating axis**: (i) a harder memory task
+  where they separate (longer delay / distractors / a real POMDP-T-maze), or (ii) the **deployment axis** —
+  gate count, exact-hold-under-perturbation, verifiability — where clatch's register structure is provably
+  cleaner *regardless of the accuracy tie*. Copy-50 proved the gap is CLOSEABLE; it can't say by-what-is-best.
+- **Caveat:** the winners we care about (`clatch+ds`, `combo+curriculum`) are **single-seed**; only
+  `gated+deep-sup` is 3-seed-robust. → round-4 confirmation queue (below) before any headline lock.
+- **Headline implication:** the clean "clatch trains cleanly on its own" claim is **falsified**. Honest arc =
+  never-write collapse → gated-already-binary reframe → **deep supervision is what trains it** → clatch is the
+  clean *deployable register* (verification/hardware axis), not the trainability hero. Leans toward the
+  scoping panel's "obstruction-forward + deep-sup fix" fallback over the "primitive-as-hero" headline.
+
 ## 2026-07-03 (5-agent ideation) — the round was UNNECESSARY and CAUSED the collapse; escapable
 - Ran a 5-lens workflow (`scratchpad/collapse_{lenses,synth}.txt`) on the never-write collapse.
   **Verdict: ESCAPABLE, not fundamental.**

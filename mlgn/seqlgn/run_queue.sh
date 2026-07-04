@@ -98,6 +98,34 @@ JOBS=(
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --margin-reg 0.1 --state-hist --tag cpB_gated_marginonly"
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                --tag cpB_gated_dsonly"
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --tag cpB_clatch_ds"
+
+  # ── ROUND 4 (2026-07-04): CONFIRM the round-3 winners at MULTI-SEED before locking the headline.
+  # Round 3 showed the copy-50 gap IS closeable, but the only 3-seed-robust win was gated+deep-sup;
+  # the two configs we'd actually headline (clatch+deep-sup, combo+curriculum) were SINGLE-SEED. So:
+  #   (1) clatch + deep-sup  x3 seeds  — is the primitive+deep-sup route robust, or was s?=0 lucky?
+  #   (2) gated  + deep-sup  x3 seeds  — the FOIL, confirm 1.000 holds without --margin (drop margin: it
+  #       exploded standalone; cpB_gated_dsonly already =1.000 at s0, so this pins the deep-sup-only foil).
+  #   (3) combo  + curriculum x2 more seeds (c8->50 ladders) — is the warm-start route robust?
+  # WIN CRITERION IS NO LONGER "reach 1.000" (copy-50 saturates). It's: which route is 3-seed-STABLE at
+  # disc 1.000 with the fewest knobs. (Separating clatch>gated needs a HARDER task — queue that next,
+  # once we pick the surviving routes here.)
+  # (1) clatch + deep-sup, seeds 1-2 (seed 0 = cpB_clatch_ds above)
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --seed 1 --tag cp4_clatch_ds_s1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --seed 2 --tag cp4_clatch_ds_s2"
+  # (2) gated + deep-sup ONLY (no margin), seeds 1-2 (seed 0 = cpB_gated_dsonly above)
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --deep-sup 0.2 --seed 1 --tag cp4_gated_ds_s1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --deep-sup 0.2 --seed 2 --tag cp4_gated_ds_s2"
+  # (3) combo length curriculum, 2 more seeds. Each ladder must run in order (GPUS=(1) => sequential).
+  #     seed 1 ladder
+  "--task copy --seq-len 8  --alphabet 8 --hidden 1024 --iters 10000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 1 --save-model --tag cp4_curr_s1_c8"
+  "--task copy --seq-len 20 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 1 --save-model --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s1_c8.pt  --tag cp4_curr_s1_c20"
+  "--task copy --seq-len 35 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 1 --save-model --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s1_c20.pt --tag cp4_curr_s1_c35"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 1              --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s1_c35.pt --tag cp4_curr_s1_c50"
+  #     seed 2 ladder
+  "--task copy --seq-len 8  --alphabet 8 --hidden 1024 --iters 10000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2 --save-model --tag cp4_curr_s2_c8"
+  "--task copy --seq-len 20 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2 --save-model --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s2_c8.pt  --tag cp4_curr_s2_c20"
+  "--task copy --seq-len 35 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2 --save-model --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s2_c20.pt --tag cp4_curr_s2_c35"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2              --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s2_c35.pt --tag cp4_curr_s2_c50"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
