@@ -81,12 +81,14 @@ def evaluate(model, loader, device, discrete: bool = True) -> float:
 def build_args():
     p = argparse.ArgumentParser(description="Train a recurrent Logic Gate Network.")
     p.add_argument("--task", default="psmnist", choices=AVAILABLE_TASKS)
-    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo"),
+    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo", "clatch"),
                    help="memory mechanism: 'rddlgn' control, 'gated' (GRU-style, Paper #1), "
                         "'lstm' (richer arm), 'gru_cell' (separate cell state + GRU MUX - the 2x2 "
                         "ablation), 'latch' (Paper #2 - bistable SR/T-FF primitive; see --latch-kind), "
-                        "'combo' (Paper #1 gated write + Paper #2 bistable restore on the hold; uses "
-                        "--soft-state/--anneal like latch).")
+                        "'combo' (gated write + bistable restore on the hold), "
+                        "'clatch' (INPUT-CLOCKED LATCH - round the write-ENABLE not the value = a "
+                        "learnable write-enabled register; exact hold, no drift, no collapse; "
+                        "--anneal ramps the enable-hardening).")
     p.add_argument("--latch-kind", default="sr", choices=("sr", "tff"),
                    help="latch primitive when --mechanism latch: 'sr' (set/reset - hold/recall, e.g. "
                         "copy) or 'tff' (T flip-flop - toggle/integrate, e.g. parity).")
@@ -132,6 +134,20 @@ def build_args():
     p.add_argument("--entropy-ramp", type=float, default=1.0,
                    help="fraction of training over which --entropy-reg ramps 0->full (explore "
                         "early, commit late). 1.0 = ramp across the whole run.")
+    p.add_argument("--margin-reg", type=float, default=0.0,
+                   help="ACTIVATION-margin penalty: coeff on mean h*(1-h) over the recurrent state, "
+                        "pushing state VALUES toward {0,1} to close the COMPUTATION (drift) gap that "
+                        "the plain gated cell leaves (its deployed state is already binary; this "
+                        "aligns the soft training trajectory). 0 = off. Ramped by --entropy-ramp.")
+    p.add_argument("--deep-sup", type=float, default=0.0,
+                   help="DEEP per-timestep supervision: coeff on mean_t CE(head(state_t), y) over all "
+                        "timesteps (valid when the target is time-invariant, e.g. copy/parity). "
+                        "Removes the flat never-write plateau + shortens delayed credit. 0 = off. "
+                        "(Single-state mechanisms only: gated/clatch/latch/combo.)")
+    p.add_argument("--state-hist", action="store_true",
+                   help="ORACLE: at the end, histogram the SOFT recurrent-state values per timestep "
+                        "(fraction in the mushy band [0.4,0.6]) to decide DRIFT (grows with t = the "
+                        "gap is escapable via --margin-reg) vs analog reliance. Saved to the record.")
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--iters", type=int, default=50_000)
     p.add_argument("--eval-freq", type=int, default=2_000)
@@ -173,7 +189,7 @@ def main():
         parts = [float(v) for v in args.anneal.split(",")]
         assert len(parts) == 2, "--anneal expects 'START,END', e.g. 0.1,0.6"
         anneal_window = (parts[0], parts[1])
-    is_restore = args.mechanism in ("latch", "combo")  # mechanisms that use the bistable restore
+    is_restore = args.mechanism in ("latch", "combo", "clatch")  # mechanisms that use the round anneal (state or enable)
 
     model = SequenceClassifier(
         input_dim=task.input_dim,
@@ -228,16 +244,31 @@ def main():
         # hard-from-scratch cold-start/plateau. No-op unless --mechanism latch --anneal set.
         if is_restore and anneal_window is not None:
             model.cell.hard_alpha = utils.hard_anneal_alpha(i / max(1, args.iters), *anneal_window)
-        logits = model(x)
+        need_states = args.margin_reg > 0 or args.deep_sup > 0
+        if need_states:
+            logits, states = model(x, return_hidden=True)   # states = per-t carousel/hidden states
+        else:
+            logits = model(x)
         loss = loss_fn(logits, y)          # task (CE) loss - reported as `loss`
-
-        # Optional gate-entropy penalty (ramped): pushes gates one-hot to shrink the gap.
         total_loss = loss
+
+        # Optional gate-entropy penalty (ramped): pushes gates one-hot (SELECTION gap).
         if args.entropy_reg > 0:
             ramp = min(1.0, (i + 1) / max(1, args.entropy_ramp * args.iters))
             ent = utils.gate_entropy(model)
             ent_val = ent.item()
-            total_loss = loss + (args.entropy_reg * ramp) * ent
+            total_loss = total_loss + (args.entropy_reg * ramp) * ent
+        # Activation-margin (ramped): push state VALUES to {0,1} (COMPUTATION/drift gap) — closes
+        # the gap the plain gated cell leaves without ever destructively rounding a write.
+        if args.margin_reg > 0:
+            ramp = min(1.0, (i + 1) / max(1, args.entropy_ramp * args.iters))
+            margin = torch.stack([(h * (1.0 - h)).mean() for h in states]).mean()
+            total_loss = total_loss + (args.margin_reg * ramp) * margin
+        # Deep per-timestep supervision: readout each state against the (time-invariant) label —
+        # dissolves the flat never-write plateau + shortens the delayed-credit path to length 1.
+        if args.deep_sup > 0:
+            ds = torch.stack([loss_fn(model.head(h), y) for h in states]).mean()
+            total_loss = total_loss + args.deep_sup * ds
 
         optimizer.zero_grad()
         total_loss.backward()
@@ -296,6 +327,21 @@ def main():
               f"- consider a lower --lr (e.g. 0.003) and/or --grad-factor 0.5.")
 
     # ---- optional analyses -----------------------------------------------------------
+    state_mushy = None
+    if args.state_hist:
+        # ORACLE: per-timestep fraction of SOFT state values in the mushy band [0.4,0.6]. If this
+        # GROWS with t, the state DRIFTS off {0,1} over time -> the gap is a computation/drift gap,
+        # closable by --margin-reg (escapable). If it stays low/flat, the eval-argmax state is clean
+        # and any gap is gate-SELECTION. (Run on the trained soft model, one val batch.)
+        model.train()
+        xb, _ = next(iter(task.val_loader))
+        logits_h, hstates = model(xb.to(device), return_hidden=True)  # grad on (no backward)
+        state_mushy = [float(((h > 0.4) & (h < 0.6)).float().mean().item()) for h in hstates]
+        if state_mushy:
+            print("\n--- state-drift oracle: mushy-fraction (|h in [0.4,0.6]|) by timestep ---")
+            print(f"  t=0: {state_mushy[0]:.3f}   t=mid: {state_mushy[len(state_mushy)//2]:.3f}   "
+                  f"t=-1: {state_mushy[-1]:.3f}   (rising = DRIFT = margin-reg should help)")
+
     grad_profile = None
     if args.grad_analysis:
         xb, yb = next(iter(task.val_loader))
@@ -341,6 +387,8 @@ def main():
         "tau": args.tau,
         "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
         "lr": args.lr, "lr_min": args.lr_min, "entropy_reg": args.entropy_reg,
+        "margin_reg": args.margin_reg, "deep_sup": args.deep_sup,
+        "state_mushy_by_t": state_mushy,
         "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,
         "logic_gates": utils.count_gates(model),

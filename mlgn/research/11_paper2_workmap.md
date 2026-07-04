@@ -12,7 +12,49 @@ codebase audit + a differentiable-feedback math sweep + a curated non-paper reso
 
 ---
 
-## A. The thesis, sharpened — READ FIRST (it changes the framing)
+## A0. REFRAME 2026-07-03 — READ FIRST (supersedes A/§B latch framing; 3-lens scoping panel, unanimous)
+
+The copy-50 GPU runs + a 5-agent obstruction workflow + a 3-lens paper-scoping panel changed the plan.
+Full trail in [04_experiment_log.md](04_experiment_log.md) (2026-07-03 entries) + `scratchpad/collapse_*`,
+`scoping_out.txt`. Net:
+
+- **The bistable-SR-latch / hard-round-the-STATE approach FAILS at scale** (copy-50: dead at chance) via
+  a **never-write collapse** — hard-rounding the state makes "never write / always hold" the loss
+  attractor (partial-write moat + `(1-s)` candidate-starvation valve + keep-bias driver); write nets
+  collapse to constant FALSE/TRUE (gate-distribution evidence). This is a **FORWARD loss-landscape**
+  obstruction — BPTT gradients flow — **explicitly NOT the C2 (I-J)-singularity story.**
+- **KEY INSIGHT (verified in source): plain `gated` ALREADY deploys an exactly-binary state** (argmax
+  gate + MUX-of-binaries), so the exact-binary/FPGA-register goal was met **without any state rounding**;
+  the round was unneeded and CAUSED the collapse. The residual gap is Kim's **computation gap** (activation
+  drift), untouched by entropy-reg (which only fixes gate SELECTION).
+- **NEW C1 primitive = the INPUT-CLOCKED LATCH** (`clatch` in cells.py): **round the write-ENABLE, hold the
+  value EXACTLY** = a learnable write-enabled clocked register — exact-by-construction, zero drift, no
+  collapse, trainable, a truer flip-flop/FPGA mapping than the SR latch. Replaces the SR/D/T-FF latch as
+  the headline primitive (SR/T-FF stay as ablations/the collapse evidence).
+
+**PAPER PORTFOLIO (unanimous panel):** P2 stays **ONE paper**, headline **"Clock the enable, not the
+value: exact-binary recurrent memory for logic gate networks"**, as a 4-beat arc: (1) never-write
+collapse [why the obvious approaches fail] → (2) reframe [gated already deploys binary; the round caused
+the collapse; the gap is the computation gap] → (3) the input-clocked latch [the C1 fix] with the
+activation-margin-loss + deep-supervision as its **dominated foil (internal only, NEVER a headline — it's
+ETH's saturated Mind-the-Gap lane)** → (4) payoff [FPGA register-mapping + a compact clocked-verification
+DEMO]. **C2 → demoted to a one-paragraph footnote; the C2 negative experiment CUT** (pre-existing
+Laydevant Ising-EqProp 2024; it was red-teamed shaky + the easiest reviewer kill). Training recipe →
+**P1**. Full sequential-verification framework → **P3a** (the direct ISTA competitor + PhD-app centerpiece,
+move the instant P2 is submitted). FPGA RTL emitter + Kyushu POMDP nano-drone → **P3b** (Apr-Sep'27 thesis).
+
+**THE ONE DECISION GATE:** does `clatch` TRAIN and close the gap at **copy-50, multi-seed** (DUST)? The
+`cpB_clatch_s0/1/2` jobs in `run_queue.sh` are exactly this test. **YES → lock the "Clock the enable"
+primitive headline.** STALL → fall back to obstruction-forward (collapse + reframe + margin-fix on gated),
+still ICML-submittable; NeurIPS'27 (~May) is the slip valve. **Either way: post the arXiv preprint the
+moment the register result is solid — that timestamp, not the venue date, beats the ETH/ISTA clock.**
+
+The §A/§B/§E/§F material below is the OLD SR-latch plan — kept for the collapse evidence + the ablation
+vocabulary, but the headline is now the input-clocked latch per this section.
+
+---
+
+## A. The thesis, sharpened — (SUPERSEDED by A0 for the headline; kept for context/ablations)
 
 The prior framing ([06_paper_plan.md](06_paper_plan.md)) asks *"does **holding** state in a
 latch beat **recomputing** it (RDDLGN)?"* — the right floor, but it undersells the paper.

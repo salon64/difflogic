@@ -77,6 +77,27 @@ JOBS=(
   "--task copy --seq-len 20 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --save-model --init-from mlgn/seqlgn/results/ckpt_cp50A_curr_c8.pt  --tag cp50A_curr_c20"
   "--task copy --seq-len 35 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --save-model --init-from mlgn/seqlgn/results/ckpt_cp50A_curr_c20.pt --tag cp50A_curr_c35"
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6              --init-from mlgn/seqlgn/results/ckpt_cp50A_curr_c35.pt --tag cp50A_curr_c50"
+
+  # ── ROUND 3 (2026-07-03, workflow-informed): the KEY INSIGHT — plain `gated` ALREADY deploys an
+  # exactly-binary state; hard-rounding the STATE was unneeded and CAUSED the collapse. Two arms
+  # HEAD-TO-HEAD (keep whichever closes the gap): (1) `clatch` = round the write-ENABLE not the value
+  # (learnable write-enabled register: exact hold, no moat, no collapse — and PRESERVES the latch
+  # primitive C1); (2) DROP the round, close the drift gap on plain gated with --margin-reg (push state
+  # values to {0,1}) + --deep-sup (per-step recall loss). WIN = discrete test_acc >> gated's 0.33.
+  # First run the ORACLE (state-drift histogram + saves a gated ckpt).
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --state-hist --save-model --tag cpB_gated_oracle"
+  # Arm 1 — input-clocked latch (round the enable), 3 seeds
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6          --state-hist --tag cpB_clatch_s0"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 1 --tag cpB_clatch_s1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 2 --tag cpB_clatch_s2"
+  # Arm 2 — drop-round: margin + deep-sup on gated, 3 seeds
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --margin-reg 0.1 --deep-sup 0.2          --tag cpB_gated_md_s0"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --margin-reg 0.1 --deep-sup 0.2 --seed 1 --tag cpB_gated_md_s1"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated --keep-bias 3 --margin-reg 0.1 --deep-sup 0.2 --seed 2 --tag cpB_gated_md_s2"
+  # Ablations (1 seed) — isolate margin vs deep-sup, + clatch+deep-sup booster
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --margin-reg 0.1 --state-hist --tag cpB_gated_marginonly"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                --tag cpB_gated_dsonly"
+  "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --tag cpB_clatch_ds"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 

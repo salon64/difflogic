@@ -13,6 +13,33 @@ Template:
 
 ---
 
+## 2026-07-03 (5-agent ideation) — the round was UNNECESSARY and CAUSED the collapse; escapable
+- Ran a 5-lens workflow (`scratchpad/collapse_{lenses,synth}.txt`) on the never-write collapse.
+  **Verdict: ESCAPABLE, not fundamental.**
+- **The angle we missed (agents verified in difflogic.py): plain `gated` ALREADY deploys an
+  exactly-binary state** — argmax->one-hot gate, MUX-of-binaries is binary, copy inputs binary,
+  h_0=0. So the exact-binary / FPGA-flip-flop goal is met BY CONSTRUCTION **without `_ste_round`**.
+  `_ste_round` was added only to force the SOFT TRAINING trajectory binary (deployment never needed
+  it) — and that hard-forward is what MANUFACTURES the collapse. So `gated`'s gap (0.83->0.33) is a
+  train->eval TRAJECTORY drift = Kim's COMPUTATION gap, attacked at the ACTIVATION level by nobody
+  (entropy-reg only touches the gate-SELECTION gap).
+- **Root cause (cross-lens, code-verified): the `(1-s)` candidate-starvation valve** — keep_bias
+  forces s~=1 => dQ/dc=(1-s)~=0 starves the write net; init sits INSIDE the never-write attractor;
+  partial writes punished below chance = a "moat". **CORRECTION to our own story:** the STE-round
+  HOLD is error-CORRECTING (a super-attracting fixed point) — holds do NOT drift; the barrier is the
+  partial-WRITE moat + flat plateau, not compounding drift.
+- **Top fixes:** (0) FREE oracle — histogram h_t vs t on a gated checkpoint (drift => escapable);
+  (1) **activation-margin loss `h*(1-h)` on plain gated (no round)** — closes drift without ever
+  rounding a write; (2) **deep per-timestep supervision** (GroupSum head at every t vs the
+  time-invariant copy label) + candidate-gradient bypass — kills the flat plateau + the 49-step
+  delayed credit; (3) **stochastic (Bernoulli) state rounding** if a rounded state is truly needed;
+  (4) **input-clocked latch: round the ENABLE not the VALUE** = a write-enabled register,
+  exact-by-construction, no moat.
+- **STRATEGIC FORK:** #1/#2 (drop the round) may DISSOLVE the latch primitive C1 => P2 becomes a
+  training-method paper (novelty vs ETH Mind-the-Gap = TBD). **#3 (round-the-enable) PRESERVES C1**
+  (a learnable write-enabled clocked register — a *cleaner* latch story than SR; a write-enable IS
+  what real flip-flops have) AND is trainable — likely the best strategic answer. Decision pending.
+
 ## 2026-07-03 (round 2) — `combo` ALSO fails at copy-50; gate tracking DIAGNOSES a "never-write collapse"
 - **Setup:** round-2 queue (combo copy-50 x3 + noanneal + latch-kb6) + round-1 re-run WITH gate tracking.
 - **Result:**
