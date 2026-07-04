@@ -49,6 +49,21 @@ primitive headline.** STALL → fall back to obstruction-forward (collapse + ref
 still ICML-submittable; NeurIPS'27 (~May) is the slip valve. **Either way: post the arXiv preprint the
 moment the register result is solid — that timestamp, not the venue date, beats the ETH/ISTA clock.**
 
+**FUTURE WORK — a LEARNED sequential-primitive vocabulary (vs today's architectural choice).** Right now
+the memory primitive is a GLOBAL choice (`--mechanism`: the whole cell is `clatch`, or SR, etc.) and only
+the *control logic* is learned. The natural generalization: extend the per-neuron softmax — the same
+mechanism by which each LogicLayer neuron picks 1 of the 16 COMBINATIONAL gates — to ALSO include
+STATEFUL primitives {plain-combinational, write-enabled register (`clatch`), gated-D-latch, D-FF, SR, T-FF},
+so **each hidden BIT LEARNS which memory element it is** (a single net mixes combinational / held / toggling
+bits per the task) instead of us hand-fixing one cell type. This is the fully-general form of the P2
+primitive and matches malcolm's original intuition ("latches in the pool you pick from"). **Deferred, not
+in P2**, because: (a) the clean P2 headline is the single `clatch` primitive — a mixed vocabulary dilutes
+it; (b) the never-write-collapse lesson says hard-state primitives are fragile to train, so a heterogeneous
+stateful vocabulary would need the enable-rounding (`clatch`) trick to hold per-primitive, and relaxing over
+stateful-vs-combinational choices (state feedback makes the vocabulary heterogeneous) is an open
+design+stability problem; (c) exact deploy needs each primitive to argmax to an exact hardware element.
+Good P2.5 / P3 / thesis-chapter direction. (Concept explainer: [17_concepts_and_journey.md](17_concepts_and_journey.md) §2b.)
+
 The §A/§B/§E/§F material below is the OLD SR-latch plan — kept for the collapse evidence + the ablation
 vocabulary, but the headline is now the input-clocked latch per this section.
 
