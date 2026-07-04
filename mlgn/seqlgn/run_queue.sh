@@ -126,6 +126,55 @@ JOBS=(
   "--task copy --seq-len 20 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2 --save-model --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s2_c8.pt  --tag cp4_curr_s2_c20"
   "--task copy --seq-len 35 --alphabet 8 --hidden 1024 --iters 15000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2 --save-model --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s2_c20.pt --tag cp4_curr_s2_c35"
   "--task copy --seq-len 50 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 1 --anneal 0.1,0.6 --seed 2              --init-from mlgn/seqlgn/results/ckpt_cp4_curr_s2_c35.pt --tag cp4_curr_s2_c50"
+
+  # ── BENCHMARK-HUNT FOLLOW-UPS (2026-07-04, see research/18_sequential_benchmarks.md). copy-50
+  # SATURATES (all routes -> disc 1.000) so it cannot rank clatch vs gated. Two tasks that CAN:
+  #  (1) PARITY = a self-referential recurrence (state = state XOR bit). An exact T flip-flop / register
+  #      should beat the soft-MUX as L grows; this is the IN-DISTRIBUTION length probe (find where gated
+  #      cracks and tff/clatch hold). keep-bias 0 (parity TOGGLES -- a hold-bias is wrong here).
+  #      NB: the true train-short/test-long length-GENERALIZATION eval (the money figure) needs a small
+  #      train.py change (--test-seq-len, build test loader at a different L); this block is the precursor.
+  #  (2) psMNIST = an integration/recall task (NOT a separator -- expect clatch ~= gated = "no regression
+  #      on a real hard sequential benchmark"). Credibility row, matched to the existing psm28 runs
+  #      (hidden 1000, 20k iters, chunk 28); gated/rddlgn psm28 already in results/ for the head-to-head.
+  # (1) parity in-distribution length probe: gated (foil) / tff (exact toggle primitive) / clatch, L in {32,128}
+  "--task parity --seq-len 32  --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0                                 --tag bh_parity_gated_L32"
+  "--task parity --seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0                                 --tag bh_parity_gated_L128"
+  "--task parity --seq-len 32  --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --tag bh_parity_tff_L32"
+  "--task parity --seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --tag bh_parity_tff_L128"
+  "--task parity --seq-len 32  --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6                 --tag bh_parity_clatch_L32"
+  "--task parity --seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6                 --tag bh_parity_clatch_L128"
+  "--task parity --seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism rddlgn                                               --tag bh_parity_rddlgn_L128"  # control, expect chance
+  # (2) psMNIST credibility rows (chunk 28 => 28 steps, matched to existing psm28 gated/rddlgn)
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6                 --tag bh_psm28_clatch_kb1"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 1 --anneal 0.1,0.6 --tag bh_psm28_tff_kb1"
+
+  # ── PARITY LENGTH-GENERALIZATION (the money figure; needs the --test-seq-len support just added).
+  # Train SHORT (L=32) where every mechanism can learn parity, then eval the SAME model on LONGER test
+  # sequences. Model selection stays on train-length (L=32) val; test_acc is the length-gen number.
+  # Together with bh_parity_*_L32 above (test=train=32) this gives a curve test in {32,128,256}: an exact
+  # T flip-flop / register (tff/clatch) should stay flat; the soft-MUX (gated) should ROLL OFF as it drifts.
+  # (If a mechanism can't even learn parity in-dist at L=32 -- see bh_parity_*_L32 -- its curve is chance
+  # at every length, which is itself the finding: bump --hidden/--iters and re-tag.)
+  "--task parity --seq-len 32 --test-seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0                                 --tag bh_pargen_gated_t128"
+  "--task parity --seq-len 32 --test-seq-len 256 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0                                 --tag bh_pargen_gated_t256"
+  "--task parity --seq-len 32 --test-seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --tag bh_pargen_tff_t128"
+  "--task parity --seq-len 32 --test-seq-len 256 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --tag bh_pargen_tff_t256"
+  "--task parity --seq-len 32 --test-seq-len 128 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6                 --tag bh_pargen_clatch_t128"
+  "--task parity --seq-len 32 --test-seq-len 256 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6                 --tag bh_pargen_clatch_t256"
+
+  # ── SELECTIVE COPY (the HEADLINE separator, research/18). One data symbol at a random early position
+  # among blanks, NO cue bit (content-based) -> must detect-and-hold across a variable gap. copy saturated
+  # for both; this should SEPARATE (soft-MUX leaks per blank step, rounded write-enable register holds).
+  # Uses --deep-sup 0.2 (length needs it, per cp4/round-3). Head-to-head gated(kb3) vs clatch(kb1,anneal)
+  # at L=50 (copy-matched) and L=100 (longer gap -> sharper leak). WIN = clatch discrete >> gated discrete.
+  # Plus the flag ablation: --sel-flag re-adds the cue bit -> expect gated to re-saturate (proves the gap
+  # is created by content-selection, not the mechanism alone).
+  "--task selcopy --seq-len 50  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                 --tag bh_selcopy_gated_L50"
+  "--task selcopy --seq-len 50  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --tag bh_selcopy_clatch_L50"
+  "--task selcopy --seq-len 100 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                 --tag bh_selcopy_gated_L100"
+  "--task selcopy --seq-len 100 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --tag bh_selcopy_clatch_L100"
+  "--task selcopy --seq-len 50  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2 --sel-flag       --tag bh_selcopy_gated_L50_flag"  # ablation: flag -> expect re-saturation
 )
 # ─────────────────────────────────────────────────────────────────────────────
 

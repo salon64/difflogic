@@ -98,10 +98,12 @@ stays flat — the exact plot copy-50 could not produce.
    test L∈{128,256}) → the gated-rolls-off-while-tff/clatch-stay-flat curve. Least-effort credibility-match.
 
 **Low-build — the headline separator:**
-2. **Selective Copying generator** — ~20-line extension of `_make_copy`: sample K real-symbol positions in
-   L steps, fill the rest with a noise/blank token, build the ordered recall target, register a
-   `selective_copy` task. **Default to NO explicit write-flag (content-based selection)**; add the flag
-   only as an ablation. Reuse the deep-sup/curriculum harness unchanged. Sweep gap length × K for the crossover.
+2. **Selective Copying generator** — ✅ DONE (2026-07-04): `_make_selective_copy` + `selcopy` task in
+   `data.py`, `--sel-flag` ablation in `train.py`. Implemented as the **K=1** variant (one data symbol at a
+   random early position among blanks, output at the end) to fit the single-label GroupSum head; **no cue
+   bit by default** (content-based). Gets `--test-seq-len` length-gen for free. Queued: `bh_selcopy_*` —
+   gated(kb3) vs clatch(kb1,anneal), both +deep-sup, at L∈{50,100}, plus the `_flag` ablation. WIN = clatch
+   discrete >> gated discrete. (K>1 multi-symbol would need a per-position output head — future work.)
 3. **(Insurance) n-bit memorization** — same harness family: emit k value symbols, then T blanks, then a
    cue; target = the k symbols. Main added work = long-T support in the BPTT loop + sweep T. Pure long-hold
    separator if selective-copy's content-selection turns out too hard for the LGN to learn.
