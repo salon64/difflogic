@@ -116,7 +116,16 @@ def build_args():
                         "0 disables. Keep-bias fixes vanishing but can over-correct into "
                         "exploding gradients on long sequences (NaN) - clipping prevents it.")
     p.add_argument("--seq-len", type=int, default=None, help="sequence length for synthetic tasks (parity/copy)")
-    p.add_argument("--alphabet", type=int, default=8, help="alphabet size for the copy task")
+    p.add_argument("--test-seq-len", type=int, default=None,
+                   help="LENGTH-GENERALIZATION eval (synthetic tasks only): generate the TEST set at "
+                        "this length while training at --seq-len. train-short/test-long is where an "
+                        "exact register (clatch/tff) beats a soft-MUX (gated) that drifts. Model "
+                        "selection stays on train-length val; test_acc is then the length-gen number.")
+    p.add_argument("--alphabet", type=int, default=8, help="alphabet size for the copy/selcopy tasks")
+    p.add_argument("--sel-flag", action="store_true",
+                   help="selcopy ABLATION: re-add the cue bit marking the data step (default off = "
+                        "content-based selection). Expect it to let gated re-saturate — the point of "
+                        "the ablation is to show the gap only opens without the flag.")
     p.add_argument("--chunk", type=int, default=1,
                    help="pixels per timestep for pixel-MNIST tasks (smnist-pixel/psmnist); "
                         "seq_len = 784//chunk. e.g. 14 -> 56 steps, 8 -> 98 steps.")
@@ -178,10 +187,13 @@ def main():
 
     task = get_task(
         args.task, batch_size=args.batch_size, seq_len=args.seq_len,
-        alphabet=args.alphabet, chunk=args.chunk, delay=args.delay, seed=args.seed,
+        test_seq_len=args.test_seq_len,
+        alphabet=args.alphabet, chunk=args.chunk, delay=args.delay,
+        write_flag=args.sel_flag, seed=args.seed,
     )
+    lg = f"  test_seq_len={task.test_seq_len} (LENGTH-GEN)" if task.test_seq_len != task.seq_len else ""
     print(f"task={task.name}  seq_len={task.seq_len}  input_dim={task.input_dim}  "
-          f"num_classes={task.num_classes}")
+          f"num_classes={task.num_classes}{lg}")
 
     # latch bistable-restore anneal window (START,END fractions of training); None = hard from step 0.
     anneal_window = None
@@ -319,9 +331,10 @@ def main():
     test_soft = evaluate(model, task.test_loader, device, discrete=False)
     train_minutes = (time.time() - t0) / 60
     print("\n--- final ---")
+    lg = f"  (train L={task.seq_len} -> test L={task.test_seq_len})" if task.test_seq_len != task.seq_len else ""
     print(f"best_val={best_val:.4f}  test={test_acc:.4f}  test_soft={test_soft:.4f}  "
           f"gap={test_soft - test_acc:+.4f}  skipped={n_skipped}/{args.iters}  "
-          f"train_time={train_minutes:.1f} min")
+          f"train_time={train_minutes:.1f} min{lg}")
     if n_skipped > args.iters * 0.2:
         print(f"[note] {100 * n_skipped / args.iters:.0f}% of steps skipped (exploding grads) "
               f"- consider a lower --lr (e.g. 0.003) and/or --grad-factor 0.5.")
@@ -379,6 +392,7 @@ def main():
     out = os.path.join(RESULTS_DIR, f"{task.name}_{args.mechanism}{tag}_{stamp}.json")
     record = {
         "task": task.name, "mechanism": args.mechanism, "seq_len": task.seq_len,
+        "test_seq_len": task.test_seq_len,
         "latch_kind": args.latch_kind if args.mechanism == "latch" else None,
         "hard_state": (not args.soft_state) if is_restore else None,
         "hard_control": args.hard_control if args.mechanism == "latch" else None,

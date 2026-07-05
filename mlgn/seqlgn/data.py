@@ -22,6 +22,11 @@ Tasks
   direct tie-in to Paper #2. Difficulty scales with L.
 - ``copy``    — present a one-hot symbol at t=0 (with a cue bit), then L-1 blank steps;
   label = the original symbol. Pure long-range recall; difficulty scales with the delay L.
+- ``selcopy`` — selective copy (K=1): one data symbol at a RANDOM early position among blanks, NO cue
+  bit by default (content-based selection); label = that symbol. Unlike ``copy`` (fixed t=0, flagged),
+  the write is a per-step content decision at an unknown time, and the value must be HELD bit-exact
+  across a variable gap — the separator where a rounded write-enable register (clatch) should beat a
+  leaky soft-MUX (gated). ``--sel-flag`` re-adds the cue bit (ablation). See research/18.
 
 Adding-problem (regression) is intentionally omitted for now: it needs a regression head
 instead of GroupSum+cross-entropy. See ``docs/benchmarks.md`` (TODO).
@@ -47,6 +52,8 @@ class TaskSpec:
     train_loader: DataLoader
     val_loader: DataLoader
     test_loader: DataLoader
+    test_seq_len: int | None = None   # length of the TEST sequences (differs from seq_len for
+                                      # the train-short/test-long length-generalization eval)
 
 
 # --------------------------------------------------------------------------------------
@@ -68,6 +75,32 @@ def _make_copy(n: int, seq_len: int, alphabet: int, gen: torch.Generator):
     return x, y
 
 
+def _make_selective_copy(n: int, seq_len: int, alphabet: int, gen: torch.Generator,
+                         write_flag: bool = False):
+    """Selective copy (K=1), the Mamba-style content-selection separator (see research/18).
+
+    ONE data symbol is placed at a RANDOM position in the first half of the sequence; every other
+    step is a blank (all-zero). The label is that symbol, read from the final state — so the cell must
+    (a) detect the data token by CONTENT (no cue bit by default) and (b) HOLD it bit-exact across the
+    variable-length blank gap to the end. Unlike ``copy`` (symbol always at t=0, cue-flagged), the
+    write is a per-step content decision at an unknown time — which is why ``copy`` saturated for both
+    mechanisms but this should SEPARATE: a soft-MUX (gated) leaks a fraction of each blank into the
+    held value every step (decay over the gap), while a rounded write-enable register (clatch) holds
+    exactly. Placing the symbol in the first half guarantees a hold gap of >= floor(L/2); at test
+    length L' the gap grows with L' (the length-gen dial). ``write_flag`` (ablation only) re-adds the
+    cue bit at the data step — expect it to let gated re-saturate, which is the point of the ablation."""
+    symbols = torch.randint(0, alphabet, (n,), generator=gen)
+    hi = max(1, seq_len // 2)                     # data token in [0, L/2) => gap >= floor(L/2)
+    pos = torch.randint(0, hi, (n,), generator=gen)
+    x = torch.zeros(n, seq_len, alphabet + 1)    # last channel = OPTIONAL write-flag (off by default)
+    idx = torch.arange(n)
+    x[idx, pos, symbols] = 1.0                   # one-hot data symbol at a random early position
+    if write_flag:
+        x[idx, pos, alphabet] = 1.0              # ablation: cue bit marks the data step (else all-zero)
+    y = symbols.long()
+    return x, y
+
+
 def _synthetic_task(
     name: str,
     seq_len: int,
@@ -79,11 +112,17 @@ def _synthetic_task(
     n_val: int,
     n_test: int,
     seed: int,
+    test_maker=None,
+    test_seq_len: int | None = None,
 ) -> TaskSpec:
+    # train + val stay at `seq_len` (model selection is on train-length val); the TEST set can be
+    # generated at a DIFFERENT length via `test_maker` for a train-short/test-long generalization
+    # eval — the recurrent cell is length-agnostic (params don't depend on seq_len), so a model
+    # trained at L runs unchanged at any test length with the same input_dim.
     g = torch.Generator().manual_seed(seed)
     xtr, ytr = maker(n_train, g)
     xva, yva = maker(n_val, g)
-    xte, yte = maker(n_test, g)
+    xte, yte = (test_maker or maker)(n_test, g)
 
     def loader(x, y, shuffle):
         return DataLoader(TensorDataset(x, y), batch_size=batch_size, shuffle=shuffle, drop_last=shuffle)
@@ -96,6 +135,7 @@ def _synthetic_task(
         train_loader=loader(xtr, ytr, True),
         val_loader=loader(xva, yva, False),
         test_loader=loader(xte, yte, False),
+        test_seq_len=test_seq_len or seq_len,
     )
 
 
@@ -180,9 +220,11 @@ def get_task(
     name: str,
     batch_size: int = 128,
     seq_len: int | None = None,
+    test_seq_len: int | None = None,
     alphabet: int = 8,
     chunk: int = 1,
     delay: int = 0,
+    write_flag: bool = False,
     val_frac: float = 0.1,
     n_train: int = 50_000,
     n_val: int = 5_000,
@@ -190,8 +232,12 @@ def get_task(
     seed: int = 0,
 ) -> TaskSpec:
     """Build a :class:`TaskSpec`. ``seq_len`` overrides synthetic-task length; ``chunk``
-    sets pixels-per-step for the pixel-MNIST tasks (seq_len = 784//chunk)."""
+    sets pixels-per-step for the pixel-MNIST tasks (seq_len = 784//chunk). ``test_seq_len``
+    (synthetic tasks only) generates the TEST set at a different length than train/val — the
+    train-short/test-long length-generalization eval where an exact register beats a soft-MUX."""
     name = name.lower()
+    if test_seq_len is not None and name not in ("parity", "copy", "selcopy", "selective_copy", "selective-copy"):
+        raise ValueError(f"--test-seq-len is only supported for synthetic tasks (parity/copy/selcopy), not {name!r}")
 
     if name in ("smnist", "smnist-row"):
         return _mnist_task("smnist", "row", batch_size, val_frac, seed, delay=delay)
@@ -202,22 +248,38 @@ def get_task(
 
     if name == "parity":
         L = seq_len or 64
+        tL = test_seq_len or L
         return _synthetic_task(
             "parity", L, num_classes=2, input_dim=1,
             maker=lambda n, g: _make_parity(n, L, g),
             batch_size=batch_size, n_train=n_train, n_val=n_val, n_test=n_test, seed=seed,
+            test_maker=(lambda n, g: _make_parity(n, tL, g)) if tL != L else None,
+            test_seq_len=tL,
         )
     if name == "copy":
         L = seq_len or 64
+        tL = test_seq_len or L
         return _synthetic_task(
             "copy", L, num_classes=alphabet, input_dim=alphabet + 1,
             maker=lambda n, g: _make_copy(n, L, alphabet, g),
             batch_size=batch_size, n_train=n_train, n_val=n_val, n_test=n_test, seed=seed,
+            test_maker=(lambda n, g: _make_copy(n, tL, alphabet, g)) if tL != L else None,
+            test_seq_len=tL,
+        )
+    if name in ("selcopy", "selective_copy", "selective-copy"):
+        L = seq_len or 64
+        tL = test_seq_len or L
+        return _synthetic_task(
+            "selcopy", L, num_classes=alphabet, input_dim=alphabet + 1,
+            maker=lambda n, g: _make_selective_copy(n, L, alphabet, g, write_flag),
+            batch_size=batch_size, n_train=n_train, n_val=n_val, n_test=n_test, seed=seed,
+            test_maker=(lambda n, g: _make_selective_copy(n, tL, alphabet, g, write_flag)) if tL != L else None,
+            test_seq_len=tL,
         )
 
     raise ValueError(
-        f"unknown task {name!r}. options: smnist, smnist-pixel, psmnist, parity, copy"
+        f"unknown task {name!r}. options: smnist, smnist-pixel, psmnist, parity, copy, selcopy"
     )
 
 
-AVAILABLE_TASKS = ("smnist", "smnist-pixel", "psmnist", "parity", "copy")
+AVAILABLE_TASKS = ("smnist", "smnist-pixel", "psmnist", "parity", "copy", "selcopy")
