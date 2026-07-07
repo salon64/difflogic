@@ -21,10 +21,10 @@ RESULTS="$ROOT/mlgn/seqlgn/results"
 mkdir -p "$LOGS"
 cd "$ROOT"
 
-# Physical GPUs to use (round-robin). GPU 0 is currently FAULTY — intermittent CUDA
-# error 700 (illegal memory access → exit 188). Route everything to GPU 1 for now;
-# restore GPUS=(0 1) once the admin fixes/replaces GPU 0.
-GPUS=(1)
+# Physical GPUs to use (round-robin). Both cards healthy as of 2026-07-07 (fresh
+# GPUs, bus 1A/1B). If one starts throwing CUDA error 700 / exit 188 again, drop the
+# bad index here (e.g. GPUS=(1)) to route around it.
+GPUS=(0 1)
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
 # P2 FIRST SLICE — the copy-50 discretization-gap GO/NO-GO (see research/04_experiment_log
