@@ -13,6 +13,46 @@ Template:
 
 ---
 
+## 2026-07-07 (cp4 confirm + BOTH separators) — no clean clatch>gated on ANY task; separators broke on fixable+structural bugs
+- **Setup:** GPU. Multi-seed copy-50 confirmations (`cp4_*`) + the two purpose-built SEPARATORS (parity
+  length-gen `bh_parity*`/`bh_pargen*`, selective-copy `bh_selcopy*`) + psMNIST credibility (`bh_psm28*`).
+  Analyzed by a 42-agent workflow with adversarial verification (21 confirmed / 14 partial / 0 refuted).
+- **Result:**
+  - **copy-50 CONFIRMS (but saturates, cannot rank):** clatch+deep-sup **3/3 disc=1.000**, gated+deep-sup
+    **2/3** (s1=0.882), combo+curriculum 3/3. Caveat: clatch's 3/3 is disc-only (seed-0 soft 0.754,
+    gap -0.246 — soft not tracking discrete). **deep-sup, not the primitive, closes the gap** (both need it).
+  - **PARITY = DEAD for ALL mechanisms** (gated/tff/clatch/rddlgn all ~0.50 chance at L32 AND L128) — incl.
+    **tff which computes parity by construction.** Length-gen runs are MOOT (byte-identical gate_totals =
+    same untrained L32 model re-evaluated long). Cause (verified): **final-timestep-only supervision on the
+    flat/deceptive XOR gradient** (every proper prefix-XOR is uncorrelated with the final label). NOT a
+    GroupSum/fan-out wall (that story was refuted; fan-out is easy for a logic net).
+  - **SELECTIVE-COPY = confounded AND structurally wrong:** gated L50 disc **0.626** > clatch **0.494**;
+    gated wins L100 too. Three verified confounds, all favoring gated: (1) **mismatched keep-bias** (gated=3
+    vs clatch=1 on a HOLD task where kb helps → clatch handicapped on hold); (2) **--deep-sup ill-posed**
+    (~24% of steps t<pos demand an impossible target since the symbol sits at a random pos in [0,L/2));
+    (3) **K=1 selcopy is OR-solvable** — one nonzero token among blanks never exercises hold-vs-overwrite,
+    so it CANNOT test the thesis. Also: gated L50 shows **~0 discretization gap** (it did NOT leak),
+    against the core "soft-MUX decays" prediction (caveat: 0.626 is a lossy partial solve, not a proven hold).
+  - **psMNIST (clean, trained, goes AGAINST clatch):** clatch kb1 disc **0.570** (gap 0.041, tightest of any
+    variant) vs gated kb0 **0.632**, rddlgn 0.62-0.66. At each mechanism's best config gated wins; clatch's
+    shortfall is soft-CEILING (0.611 vs 0.709) not discretization. tff kb1 = 0.200 (partial collapse). Use
+    psMNIST as a **no-collapse sanity check**, not a separator (integration task structurally favors the MUX).
+- **Read (VERIFIED, honest):** we have **ZERO tasks where clatch beats gated on accuracy.** The one surviving
+  asymmetry is **training STABILITY** (clatch n_skipped=0 everywhere; gated explodes — 2082/20000 skips at
+  selcopy-L100, +0.50 gap at copy-50 w/o deep-sup). The stronger "clatch neg-gap holds / gated pos-gap leaks"
+  claim was **REFUTED** (clatch shows +gaps on selcopy-L100 +0.112 and psMNIST +0.041) → defensible axis is
+  STABILITY, not gap-sign. Separator failures are **mixed, leaning (B) the primitive doesn't separate** — with
+  parity-dense the one unexhausted shot at (A).
+- **FIXES BUILT (this session):** (1) **`--running-target`** (train.py) = per-step running-XOR deep-sup for
+  parity (the dense-gradient fix); (2) **`distcopy`** task (data.py) = the CORRECTED hold separator (cued
+  target at t=0 + `--distractors` non-cued tokens to hold THROUGH; deep-sup stays valid; not OR-solvable).
+- **FORK (recommendation):** run 2 decisive corrected experiments this week — `parity-dense` (does tff/clatch
+  cleanly beat gated with ~0 gap? = the Track-A gate) + `distcopy` (does clatch hold through distractors where
+  gated leaks?). **Start writing Track B (obstruction-forward: never-write collapse + gated-already-binary
+  reframe + deep-supervision as the training method + clatch as a stable, gap-tight, DEPLOYABLE register on
+  the verification/hardware axis) in parallel — it's already supported by existing JSONs and is the honest
+  default if the two reruns don't separate.** ICML'27 (~Jan/Feb'27) has months of buffer.
+
 ## 2026-07-04 (round 3 + Path-A RESULTS) — the gap IS closeable at copy-50; the fix is DEEP SUPERVISION, not the primitive
 - **Setup:** GPU/DUST. Round-3 head-to-head (`cpB_*`, the two arms from the 5-agent insight) + Path-A
   rescues (`cp50A_*`). copy-50, alphabet 8 (chance 0.125), hidden 1024, 20k iters. gated baseline = disc
