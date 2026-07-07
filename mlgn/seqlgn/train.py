@@ -126,6 +126,10 @@ def build_args():
                    help="selcopy ABLATION: re-add the cue bit marking the data step (default off = "
                         "content-based selection). Expect it to let gated re-saturate — the point of "
                         "the ablation is to show the gap only opens without the flag.")
+    p.add_argument("--distractors", type=int, default=8,
+                   help="distcopy: number of non-cued distractor symbol tokens scattered after the t=0 "
+                        "target that the cell must HOLD its value through without overwriting (the "
+                        "hold-vs-overwrite dial; more = more leak pressure on a soft-MUX).")
     p.add_argument("--chunk", type=int, default=1,
                    help="pixels per timestep for pixel-MNIST tasks (smnist-pixel/psmnist); "
                         "seq_len = 784//chunk. e.g. 14 -> 56 steps, 8 -> 98 steps.")
@@ -150,9 +154,16 @@ def build_args():
                         "aligns the soft training trajectory). 0 = off. Ramped by --entropy-ramp.")
     p.add_argument("--deep-sup", type=float, default=0.0,
                    help="DEEP per-timestep supervision: coeff on mean_t CE(head(state_t), y) over all "
-                        "timesteps (valid when the target is time-invariant, e.g. copy/parity). "
+                        "timesteps (valid when the target is time-invariant, e.g. copy). "
                         "Removes the flat never-write plateau + shortens delayed credit. 0 = off. "
                         "(Single-state mechanisms only: gated/clatch/latch/combo.)")
+    p.add_argument("--running-target", action="store_true",
+                   help="PARITY-ONLY: make --deep-sup supervise each state against the RUNNING target "
+                        "(cumulative XOR of the bits seen so far, ytar[:,t]=(x[:,:1].cumsum%%2)) instead "
+                        "of the final label. Parity's final-only loss is flat/deceptive (every proper "
+                        "prefix XOR is uncorrelated with the final label) so nothing trains; the dense "
+                        "running target gives a per-step gradient and makes the toggle learnable. "
+                        "Requires --deep-sup > 0. Uses input channel 0 as the bit stream.")
     p.add_argument("--state-hist", action="store_true",
                    help="ORACLE: at the end, histogram the SOFT recurrent-state values per timestep "
                         "(fraction in the mushy band [0.4,0.6]) to decide DRIFT (grows with t = the "
@@ -189,7 +200,7 @@ def main():
         args.task, batch_size=args.batch_size, seq_len=args.seq_len,
         test_seq_len=args.test_seq_len,
         alphabet=args.alphabet, chunk=args.chunk, delay=args.delay,
-        write_flag=args.sel_flag, seed=args.seed,
+        write_flag=args.sel_flag, n_distractors=args.distractors, seed=args.seed,
     )
     lg = f"  test_seq_len={task.test_seq_len} (LENGTH-GEN)" if task.test_seq_len != task.seq_len else ""
     print(f"task={task.name}  seq_len={task.seq_len}  input_dim={task.input_dim}  "
@@ -276,10 +287,19 @@ def main():
             ramp = min(1.0, (i + 1) / max(1, args.entropy_ramp * args.iters))
             margin = torch.stack([(h * (1.0 - h)).mean() for h in states]).mean()
             total_loss = total_loss + (args.margin_reg * ramp) * margin
-        # Deep per-timestep supervision: readout each state against the (time-invariant) label —
-        # dissolves the flat never-write plateau + shortens the delayed-credit path to length 1.
+        # Deep per-timestep supervision: readout each state against the target.
+        #  - default: the time-invariant final label y (valid for copy: symbol known from t=0).
+        #  - --running-target (parity): the per-step RUNNING label ytar[:,t] = cumulative XOR of the
+        #    bits so far. Parity's final-only loss is flat (every prefix XOR is uncorrelated with the
+        #    final answer) so it never trains; the dense running target gives a real per-step gradient.
         if args.deep_sup > 0:
-            ds = torch.stack([loss_fn(model.head(h), y) for h in states]).mean()
+            if args.running_target:
+                bits = x[:, :, 0]                                   # [B, L] the parity bit stream
+                ytar = (bits.cumsum(dim=1) % 2).long()             # [B, L] running XOR, aligned to state_t
+                ds = torch.stack([loss_fn(model.head(states[t]), ytar[:, t])
+                                  for t in range(len(states))]).mean()
+            else:
+                ds = torch.stack([loss_fn(model.head(h), y) for h in states]).mean()
             total_loss = total_loss + args.deep_sup * ds
 
         optimizer.zero_grad()
@@ -402,6 +422,7 @@ def main():
         "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
         "lr": args.lr, "lr_min": args.lr_min, "entropy_reg": args.entropy_reg,
         "margin_reg": args.margin_reg, "deep_sup": args.deep_sup,
+        "running_target": args.running_target,
         "state_mushy_by_t": state_mushy,
         "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,

@@ -23,10 +23,13 @@ Tasks
 - ``copy``    — present a one-hot symbol at t=0 (with a cue bit), then L-1 blank steps;
   label = the original symbol. Pure long-range recall; difficulty scales with the delay L.
 - ``selcopy`` — selective copy (K=1): one data symbol at a RANDOM early position among blanks, NO cue
-  bit by default (content-based selection); label = that symbol. Unlike ``copy`` (fixed t=0, flagged),
-  the write is a per-step content decision at an unknown time, and the value must be HELD bit-exact
-  across a variable gap — the separator where a rounded write-enable register (clatch) should beat a
-  leaky soft-MUX (gated). ``--sel-flag`` re-adds the cue bit (ablation). See research/18.
+  bit by default (content-based selection); label = that symbol. NOTE (2026-07-07): with a single nonzero
+  token among all-zero blanks this is OR-solvable and does NOT exercise hold-vs-overwrite — use ``distcopy``
+  as the real hold separator. ``--sel-flag`` re-adds the cue bit (ablation). See research/18.
+- ``distcopy`` — distractor copy: cued target at t=0 (deep-sup stays valid) + ``--distractors`` random
+  NON-cued symbol tokens scattered later that the cell must HOLD its value THROUGH (not overwrite). The
+  corrected hold-vs-overwrite separator: a soft-MUX leaks each distractor into the register; a rounded
+  write-enable register holds exact. Dials: ``--distractors`` and ``--seq-len``. See research/18.
 
 Adding-problem (regression) is intentionally omitted for now: it needs a regression head
 instead of GroupSum+cross-entropy. See ``docs/benchmarks.md`` (TODO).
@@ -97,6 +100,34 @@ def _make_selective_copy(n: int, seq_len: int, alphabet: int, gen: torch.Generat
     x[idx, pos, symbols] = 1.0                   # one-hot data symbol at a random early position
     if write_flag:
         x[idx, pos, alphabet] = 1.0              # ablation: cue bit marks the data step (else all-zero)
+    y = symbols.long()
+    return x, y
+
+
+def _make_distractor_copy(n: int, seq_len: int, alphabet: int, gen: torch.Generator,
+                          n_distractors: int = 8):
+    """Distractor copy — the HOLD-vs-overwrite separator (research/18, corrected 2026-07-07).
+
+    Like ``copy`` (target symbol one-hot at t=0 WITH the cue bit, label read from the final state) but
+    ``n_distractors`` random NON-cued symbol tokens are scattered at later positions. The cell must WRITE
+    the cued target at t=0 and HOLD it bit-exact to the end **while ignoring the later nonzero distractor
+    tokens** — i.e. it must NOT overwrite the register when a tempting symbol arrives with cue=0. This is
+    the hold-vs-overwrite tension the ``selcopy`` K=1 task lacked (one nonzero token among blanks is
+    OR-solvable). A soft-MUX (gated) blends a fraction of each distractor into the held value every step
+    (leak grows with #distractors); a rounded write-enable register (clatch) holds exactly. Because the
+    target is at t=0 the label is known from the first step, so ``--deep-sup`` stays VALID. Difficulty
+    dials: ``n_distractors`` (overwrite pressure) and ``seq_len`` (hold length)."""
+    symbols = torch.randint(0, alphabet, (n,), generator=gen)
+    x = torch.zeros(n, seq_len, alphabet + 1)        # last channel = cue bit (only on the target)
+    idx = torch.arange(n)
+    x[idx, 0, symbols] = 1.0                          # cued target one-hot at t=0 (same as copy)
+    x[:, 0, alphabet] = 1.0
+    k = max(0, min(n_distractors, seq_len - 1))
+    if k > 0:
+        # k distinct later positions per sample (argsort of noise over steps 1..L-1), random symbols, cue=0
+        pos = torch.rand(n, seq_len - 1, generator=gen).argsort(dim=1)[:, :k] + 1   # [n, k] in [1, L-1]
+        dsym = torch.randint(0, alphabet, (n, k), generator=gen)                     # [n, k]
+        x[idx.unsqueeze(1), pos, dsym] = 1.0          # distractor symbol tokens (cue bit stays 0)
     y = symbols.long()
     return x, y
 
@@ -225,6 +256,7 @@ def get_task(
     chunk: int = 1,
     delay: int = 0,
     write_flag: bool = False,
+    n_distractors: int = 8,
     val_frac: float = 0.1,
     n_train: int = 50_000,
     n_val: int = 5_000,
@@ -236,8 +268,9 @@ def get_task(
     (synthetic tasks only) generates the TEST set at a different length than train/val — the
     train-short/test-long length-generalization eval where an exact register beats a soft-MUX."""
     name = name.lower()
-    if test_seq_len is not None and name not in ("parity", "copy", "selcopy", "selective_copy", "selective-copy"):
-        raise ValueError(f"--test-seq-len is only supported for synthetic tasks (parity/copy/selcopy), not {name!r}")
+    _synthetic = ("parity", "copy", "selcopy", "selective_copy", "selective-copy", "distcopy", "distractor-copy")
+    if test_seq_len is not None and name not in _synthetic:
+        raise ValueError(f"--test-seq-len is only supported for synthetic tasks (parity/copy/selcopy/distcopy), not {name!r}")
 
     if name in ("smnist", "smnist-row"):
         return _mnist_task("smnist", "row", batch_size, val_frac, seed, delay=delay)
@@ -276,10 +309,20 @@ def get_task(
             test_maker=(lambda n, g: _make_selective_copy(n, tL, alphabet, g, write_flag)) if tL != L else None,
             test_seq_len=tL,
         )
+    if name in ("distcopy", "distractor-copy"):
+        L = seq_len or 64
+        tL = test_seq_len or L
+        return _synthetic_task(
+            "distcopy", L, num_classes=alphabet, input_dim=alphabet + 1,
+            maker=lambda n, g: _make_distractor_copy(n, L, alphabet, g, n_distractors),
+            batch_size=batch_size, n_train=n_train, n_val=n_val, n_test=n_test, seed=seed,
+            test_maker=(lambda n, g: _make_distractor_copy(n, tL, alphabet, g, n_distractors)) if tL != L else None,
+            test_seq_len=tL,
+        )
 
     raise ValueError(
-        f"unknown task {name!r}. options: smnist, smnist-pixel, psmnist, parity, copy, selcopy"
+        f"unknown task {name!r}. options: smnist, smnist-pixel, psmnist, parity, copy, selcopy, distcopy"
     )
 
 
-AVAILABLE_TASKS = ("smnist", "smnist-pixel", "psmnist", "parity", "copy", "selcopy")
+AVAILABLE_TASKS = ("smnist", "smnist-pixel", "psmnist", "parity", "copy", "selcopy", "distcopy")

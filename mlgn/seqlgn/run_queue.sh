@@ -175,6 +175,47 @@ JOBS=(
   "--task selcopy --seq-len 100 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                 --tag bh_selcopy_gated_L100"
   "--task selcopy --seq-len 100 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --deep-sup 0.2 --tag bh_selcopy_clatch_L100"
   "--task selcopy --seq-len 50  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2 --sel-flag       --tag bh_selcopy_gated_L50_flag"  # ablation: flag -> expect re-saturation
+
+  # ── ROUND 5 (2026-07-07, workflow-verified): the two prior separators BROKE (parity dead = final-only
+  # supervision on the flat XOR gradient; selcopy K=1 = OR-solvable, never tests hold-vs-overwrite). Two
+  # CORRECTED experiments decide the P2 headline. See research/04_experiment_log 2026-07-07 + doc 18.
+  #
+  # (1) PARITY-DENSE = the TRACK-A GATE. --running-target makes deep-sup supervise the per-step running-XOR
+  #     (dense gradient) -> breaks the flat-parity wall (CPU-smoke validated: tff soft 0.50->0.75, XOR gates
+  #     emerge). WIN = tff and/or clatch reach >0.9 disc with ~0 gap while gated LAGS/leaks => a clean,
+  #     mechanistically-motivated separator (parity is the toggle primitive's home turf). If gated matches =>
+  #     Track A exhausted, pivot to Track B. L=32, kb0, hidden 512, 20k, deep-sup 0.3, 3 seeds each.
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --deep-sup 0.3 --running-target          --tag pd_tff_s0"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --deep-sup 0.3 --running-target --seed 1 --tag pd_tff_s1"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism latch --latch-kind tff --keep-bias 0 --anneal 0.1,0.6 --deep-sup 0.3 --running-target --seed 2 --tag pd_tff_s2"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6 --deep-sup 0.3 --running-target          --tag pd_clatch_s0"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6 --deep-sup 0.3 --running-target --seed 1 --tag pd_clatch_s1"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6 --deep-sup 0.3 --running-target --seed 2 --tag pd_clatch_s2"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --deep-sup 0.3 --running-target          --tag pd_gated_s0"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --deep-sup 0.3 --running-target --seed 1 --tag pd_gated_s1"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --deep-sup 0.3 --running-target --seed 2 --tag pd_gated_s2"
+  "--task parity --seq-len 32 --hidden 512 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism rddlgn --deep-sup 0.3 --running-target --tag pd_rddlgn_ctrl"  # memoryless control: should stay low
+
+  # (2) DISTCOPY = the CORRECTED HOLD SEPARATOR. cued target at t=0 (deep-sup valid) + N non-cued distractor
+  #     tokens to hold THROUGH (not OR-solvable). MATCHED keep-bias (both kb3, a hold task) removes the selcopy
+  #     confound. WIN = clatch disc > gated disc AND clatch gap < gated gap, and the gap GROWS with #distractors
+  #     for gated only (leak) but not clatch (exact hold). L=50, deep-sup 0.2, distractors in {8,20}, 2 seeds.
+  "--task distcopy --seq-len 50 --distractors 8  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                 --tag dc_gated_d8_s0"
+  "--task distcopy --seq-len 50 --distractors 8  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2 --seed 1        --tag dc_gated_d8_s1"
+  "--task distcopy --seq-len 50 --distractors 8  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 3 --anneal 0.1,0.6 --deep-sup 0.2          --tag dc_clatch_d8_s0"
+  "--task distcopy --seq-len 50 --distractors 8  --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 3 --anneal 0.1,0.6 --deep-sup 0.2 --seed 1 --tag dc_clatch_d8_s1"
+  "--task distcopy --seq-len 50 --distractors 20 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2                 --tag dc_gated_d20_s0"
+  "--task distcopy --seq-len 50 --distractors 20 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 3 --deep-sup 0.2 --seed 1        --tag dc_gated_d20_s1"
+  "--task distcopy --seq-len 50 --distractors 20 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 3 --anneal 0.1,0.6 --deep-sup 0.2          --tag dc_clatch_d20_s0"
+  "--task distcopy --seq-len 50 --distractors 20 --alphabet 8 --hidden 1024 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 3 --anneal 0.1,0.6 --deep-sup 0.2 --seed 1 --tag dc_clatch_d20_s1"
+
+  # (3) psMNIST FAIR credibility match (kb0 = gated's best; clatch was only run at kb1). Sanity/no-regression,
+  #     NOT a separator. clatch kb0 x3 + gated kb0 x2 more (s0 exists: disc 0.632). Win = clatch within ~1-2pt.
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6          --tag psm_clatch_kb0_s0"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6 --seed 1 --tag psm_clatch_kb0_s1"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6 --seed 2 --tag psm_clatch_kb0_s2"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --seed 1 --tag psm_gated_kb0_s1"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --seed 2 --tag psm_gated_kb0_s2"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
