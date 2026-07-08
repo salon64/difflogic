@@ -216,6 +216,15 @@ JOBS=(
   "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism clatch --keep-bias 0 --anneal 0.1,0.6 --seed 2 --tag psm_clatch_kb0_s2"
   "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --seed 1 --tag psm_gated_kb0_s1"
   "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism gated  --keep-bias 0 --seed 2 --tag psm_gated_kb0_s2"
+
+  # (4) psMNIST `combo` (= gated + hard-STATE bistable restore; the copy-50 collapse mechanism) x3, matched to
+  #     the gated/clatch kb0 rows -> completes the mechanism table (gated/clatch/combo/rddlgn). NB: `combo` is
+  #     NOT gated+clatch; the true gated(+)clatch per-bit LEARNED hybrid is logged as post-P2 future work
+  #     ("latches as trainable params, not architectural"; see research/17 §2b). Insight: does the bistable
+  #     restore survive at psm28's short length (28 steps) where the never-write collapse may not bite?
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 0 --anneal 0.1,0.6          --tag psm_combo_kb0_s0"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 0 --anneal 0.1,0.6 --seed 1 --tag psm_combo_kb0_s1"
+  "--task psmnist --chunk 28 --hidden 1000 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --mechanism combo --keep-bias 0 --anneal 0.1,0.6 --seed 2 --tag psm_combo_kb0_s2"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
