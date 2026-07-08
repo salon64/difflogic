@@ -68,6 +68,17 @@ than us fixing one cell type. Deferred (dilutes the P2 headline; hard-state prim
 train per §5; relaxing over stateful-vs-combinational choices is an open design/stability problem). See
 workmap §A0 "FUTURE WORK".)
 
+> **FUTURE WORK (malcolm's framing, 2026-07-08): "Adding latches as TRAINABLE PARAMETERS instead of treating
+> them architecturally."** Right now the memory type is a GLOBAL architectural choice (`--mechanism`: the whole
+> cell is `gated`, or `clatch`, or `combo`…). The natural next step is a **per-bit LEARNED blend/selection**
+> between the soft-gated MUX and the hard-clatch register (a true `gated⊕clatch` hybrid) — each neuron learns,
+> via a relaxed selection like the 16-gate softmax, whether it wants gated's higher soft ceiling or clatch's
+> clean/exact discretization. This is the concrete "best-of-both" question behind the psMNIST gated-vs-clatch
+> tie (gated leads soft, clatch discretizes tighter). **This is a distinct post-P2 direction** (its own paper/
+> section), NOT part of the Track-B P2 (see workmap §A0'), because a learned stateful-vs-combinational
+> relaxation is an open design+stability problem and would dilute P2's now-locked deploy-a-verifiable-register
+> story. The existing `combo` mechanism is NOT this — it is gated + a fixed hard-state restore.
+
 ## 3. "Clocked" — there is no separate clock we added
 A **combinational** circuit is memoryless (`out = f(in)`). A **clocked sequential** circuit has
 **registers (flip-flops)** that update once per **clock tick** and hold their value between ticks.
