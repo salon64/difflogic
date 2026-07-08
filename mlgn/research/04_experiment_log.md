@@ -13,6 +13,37 @@ Template:
 
 ---
 
+## 2026-07-08 (DECIDER: corrected separators RAN) — Track A DEAD; P2 headline LOCKED to Track B
+- **Setup:** GPU. The two CORRECTED separators + fair psMNIST (round-5): `pd_*` parity-dense (--running-target),
+  `dc_*` distcopy (matched kb3), `psm_*_kb0`. Analyzed by a 31-agent workflow w/ adversarial verification
+  (22 confirmed / 3 partial / 0 refuted). See workmap **§A0'** for the locked plan.
+- **Result (all verified):**
+  - **PARITY-DENSE:** the running-XOR supervision WORKS (breaks the flat-gradient wall) but only **tff** moves
+    off chance (disc 0.572/0.582/0.586, soft up to 0.828) — the toggle primitive on its home task. **clatch &
+    gated stay at CHANCE** (0.50), rddlgn chance. **Misses the 0.9 win bar by ~0.32.** Not a clean separator;
+    and the sole mover is tff, not the clatch the headline rested on.
+  - **DISTCOPY (corrected hold separator):** **accuracy TIE at d20** (gated 0.8734 vs clatch 0.8739), gated
+    AHEAD at d8 (0.936 vs 0.877; clatch s1 collapsed to 0.754). A faint gap-trend (gated gap 0.000→+0.067 with
+    distractors, clatch ≤0) — but **single-seed & the gap-sign axis was REFUTED** (clatch's neg gaps = a worse
+    soft optimum rounding recovers at tied disc). No primitive accuracy win.
+  - **psMNIST kb0 (fair, matched keep-bias):** **accuracy TIE** (clatch 0.634 vs gated 0.602, the edge is a
+    gated-s2 outlier 0.519) — REVERSES the earlier "clatch loses psMNIST" (that was a kb artifact). AND clatch's
+    discretization gap is **tighter & non-overlapping** across 3 seeds (max clatch +0.027 < min gated +0.038,
+    ~4.4× tighter) at equal accuracy.
+- **VERDICT (VERIFIED): Track A ("the primitive wins on accuracy") is DEAD — zero tasks where clatch beats
+  gated on accuracy.** P2 pivots to **Track B**: deep-supervision = the training method that closes the
+  recurrent-LGN discretization gap; `clatch` = a **stable, cleanly-discretizing, verifiable deployable register,
+  COMPETITIVE not superior on accuracy** (integrity spine). Two surviving edges carry it: (1) numerical
+  **stability** (register family 0/72 non-finite steps; matched selcopy-L100 gated 2082 vs clatch 0 — scope it
+  honestly, NOT "gated always explodes"); (2) **tighter discretization at matched psMNIST kb0** (non-overlapping).
+- **CORRECTIONS to my own earlier reads (important):** length-generalization is **DROPPED** as a load-bearing
+  edge — the only GPU length-gen runs are parity (all chance); the "distcopy L20→L40 gap-0" was a **single
+  un-reproduced CPU smoke**, no GPU JSON (I over-leaned on it 07-07). Gap-SIGN axis **refuted**. copy-50 3/3 =
+  **method** evidence (deep-sup), not a primitive carry.
+- **NEXT: LOCK TRACK B, WRITE. No GPU runs needed** — all figures/tables have JSONs (copy_* method; psmnist_*_kb0
+  discretization; distcopy_*/selcopy_*_L100 stability census; parity_*_pd_* mechanism panel). Optional nice-to-have:
+  one L=16 parity mechanism-panel sweep (tff sole mover); skippable. Do NOT run distcopy-d40. ICML'27 buffer intact.
+
 ## 2026-07-07 (cp4 confirm + BOTH separators) — no clean clatch>gated on ANY task; separators broke on fixable+structural bugs
 - **Setup:** GPU. Multi-seed copy-50 confirmations (`cp4_*`) + the two purpose-built SEPARATORS (parity
   length-gen `bh_parity*`/`bh_pargen*`, selective-copy `bh_selcopy*`) + psMNIST credibility (`bh_psm28*`).

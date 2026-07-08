@@ -12,7 +12,53 @@ codebase audit + a differentiable-feedback math sweep + a curated non-paper reso
 
 ---
 
-## A0. REFRAME 2026-07-03 — READ FIRST (supersedes A/§B latch framing; 3-lens scoping panel, unanimous)
+## A0'. DECISION GATE RESOLVED 2026-07-08 — READ FIRST (supersedes A0's headline; verified by two workflows)
+
+**The decision gate below (A0) is CLOSED, and it went to the FALLBACK. Track A ("Clock the enable, the
+primitive WINS on accuracy") is DEAD; P2's headline is now Track B (obstruction-forward + deep-supervision
+method + deployable-register).** Full trail: [04_experiment_log.md](04_experiment_log.md) 2026-07-04 & 07 & 08.
+
+- **`clatch` TRAINS and closes the copy-50 gap (3/3 disc=1.000)** — but only WITH deep-supervision, which
+  ALSO closes it on plain gated (2/3). copy-50 **saturates** → cannot rank the primitives. So the gate's
+  "YES" is really "yes it trains, no it doesn't separate."
+- **Two purpose-built CORRECTED separators both came back NULL on accuracy** (42- then 31-agent workflows,
+  adversarial verification, 0 refuted): (1) **parity-dense** (running-XOR supervision) — only `tff` moves off
+  chance (~0.58, bar was 0.9); clatch & gated at chance. (2) **distcopy** (cued target + distractors to hold
+  through, matched keep-bias) — **accuracy TIE at d20** (gated 0.8734 vs clatch 0.8739), gated AHEAD at d8.
+  (3) **psMNIST kb0** (fair) — TIE (clatch 0.634 vs gated 0.602, edge is one gated outlier).
+- **We have ZERO tasks where clatch beats gated on ACCURACY.** The primitive-separator headline is unsupported.
+- **VERIFIED corrections to earlier hopeful reads:** length-generalization is **DROPPED** as an edge (the only
+  GPU length-gen runs are parity, all at chance; the "distcopy L20→L40 gap-0" was a single un-reproduced CPU
+  smoke — no GPU JSON). The **gap-SIGN axis is REFUTED** (distcopy negative gaps are single-seed, and come from
+  a *worse* soft optimum that rounding recovers at tied accuracy). copy-50 3/3 is **method** evidence (deep-sup),
+  not a primitive carry (gated+margin+ds is also 3/3).
+
+**LOCKED HEADLINE (Track B):** *Deep supervision is the training method that closes the recurrent-LGN
+discretization gap; the clocked write-enabled register (`clatch`) is a **stable, cleanly-discretizing,
+verifiable deployable** primitive — **competitive, not superior, on accuracy** (say so — it's the integrity
+spine).* The two edges that survived adversarial verification and carry the paper:
+1. **Numerical stability** — the register family (clatch/latch/combo) triggered a non-finite step in **0 of 72**
+   runs; gated is the only mechanism that ever explodes (matched selcopy-L100 pair: gated skipped 2082/20000,
+   clatch 0). HONEST SCOPE: "the register family never destabilized across the sweep incl. a matched L100 pair,"
+   NOT "gated always explodes at length" (gated is fine at L=101/112/128 elsewhere; instability clusters at high
+   lr / margin-reg / hard-long).
+2. **Bounded/tighter discretization gap at matched config** — psMNIST kb0: clatch gap mean +0.020 vs gated
+   +0.087, **non-overlapping across 3 seeds at equal accuracy** (~4.4× tighter). Caveat: a matched-kb-psMNIST
+   effect; on distcopy the clatch gap *magnitude* is looser — support elsewhere is via SIGN (clatch never leaks
+   upward), partly by construction (hard_state=true). Do NOT claim a universal "tighter gap" law.
+
+**NEXT STEP: LOCK TRACK B, WRITE. No more separator hunts, no GPU runs required before writing.** All figures/
+tables have JSONs already (copy_* method; psmnist_*_kb0 discretization; distcopy_* + selcopy_*_L100 stability
+census; parity_*_pd_* mechanism panel). OPTIONAL nice-to-have (not required, ~15 min/run): one short-L parity
+sweep (L=16, tff/gated/clatch, 3 seeds) as a Track-B *mechanism* figure ("the primitive whose inductive bias
+matches the task is the sole mover; deep-sup enables it") — but it's about `tff` on its home task, cannot
+resurrect Track A, and is skippable. **Do NOT run distcopy-d40** (accuracy already tied, gap-sign refuted).
+ISTA/ETH-DISCO fit: the register discretizes to exact synthesizable/checkable hardware with a bounded deploy
+gap and zero training instability — the property that matters for verified sequential-LGN-on-FPGA (→ P3a/P3b).
+
+---
+
+## A0. REFRAME 2026-07-03 — READ FIRST (superseded by A0' for the headline; kept for the obstruction/reframe trail)
 
 The copy-50 GPU runs + a 5-agent obstruction workflow + a 3-lens paper-scoping panel changed the plan.
 Full trail in [04_experiment_log.md](04_experiment_log.md) (2026-07-03 entries) + `scratchpad/collapse_*`,
