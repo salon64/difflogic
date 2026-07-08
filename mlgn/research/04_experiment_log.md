@@ -13,6 +13,22 @@ Template:
 
 ---
 
+## 2026-07-08 (combo completes the psMNIST table) — restore family viable off the long-hold regime; discretization edge is partly by-construction
+- **Setup:** `psm_combo_kb0_s0/1/2` (combo = gated + hard-STATE restore), matched to the gated/clatch/rddlgn kb0 rows.
+- **4-way psMNIST kb0 (chunk28, hidden1000, 20k; chance 0.10):** clatch mean **0.634** (gaps +0.009..+0.027),
+  combo **0.624** (gaps −0.025..+0.021), rddlgn ~0.63, gated **0.602** (gaps +0.038..+0.146; s2 outlier 0.519).
+- **Read:** (1) **combo does NOT collapse here** (0.624, no skips, healthy writing gates — no FALSE/TRUE collapse),
+  despite dying at copy-50 via the never-write collapse. Honest cause = **task- not just length-dependent**:
+  psMNIST is integration/classify-at-end, so the "never-write/hold-zero" attractor that killed combo on the
+  copy-50 HOLD task doesn't exist here. ⇒ the bistable restore is a **viable mechanism on a real integration task**;
+  the copy-50 failure was specific to long hold/recall (+ high keep-bias), not the restore per se.
+  (2) **Discretization-cleanliness holds across the whole restore family** (clatch AND combo gaps ~±0.02, some
+  negative; gated leaks +0.04..+0.15) — corroborates Track-B claim #2 for Table 2, **BUT partly BY CONSTRUCTION**
+  (both round during training, so disc≈soft is baked in; NOT independent evidence, and NOT the refuted gap-sign axis).
+- **Net:** doesn't change the Track-B verdict (accuracy still a wash: clatch≈combo≈rddlgn≥gated, no separation).
+  Adds a clean 4th column for the psMNIST mechanism table + the "restore viable outside the pathological long-hold
+  regime" point. No new runs prompted.
+
 ## 2026-07-08 (DECIDER: corrected separators RAN) — Track A DEAD; P2 headline LOCKED to Track B
 - **Setup:** GPU. The two CORRECTED separators + fair psMNIST (round-5): `pd_*` parity-dense (--running-target),
   `dc_*` distcopy (matched kb3), `psm_*_kb0`. Analyzed by a 31-agent workflow w/ adversarial verification
