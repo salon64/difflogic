@@ -78,6 +78,13 @@ workmap §A0 "FUTURE WORK".)
 > section), NOT part of the Track-B P2 (see workmap §A0'), because a learned stateful-vs-combinational
 > relaxation is an open design+stability problem and would dilute P2's now-locked deploy-a-verifiable-register
 > story. The existing `combo` mechanism is NOT this — it is gated + a fixed hard-state restore.
+>
+> **SCOUTED 2026-07-08 → CONDITIONAL, park as P4 (see [19_learnable_latch_scout.md](19_learnable_latch_scout.md)).**
+> Gap is real but the MECHANISM is occupied (DARTS + MuFuRU'16 = learned per-unit memory-op selection), and the
+> gated≈clatch accuracy tie means it can't lead on accuracy. Only carriers = a synthesis-measured FF/LUT Pareto
+> (gated on P3b RTL tooling not yet built; ~30-40% odds; FPGA free-FF caveat) OR a workshop-tier interpretability
+> paper ("first LGN that learns its own memory allocation"). **NOT a P2 section; a P4 gated on P3b. ETH-DISCO can
+> bolt this onto RDDLGN cheaply → only worth a defensive workshop paper AFTER P2 is arXiv'd.**
 
 ## 3. "Clocked" — there is no separate clock we added
 A **combinational** circuit is memoryless (`out = f(in)`). A **clocked sequential** circuit has
