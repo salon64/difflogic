@@ -14,6 +14,18 @@ codebase audit + a differentiable-feedback math sweep + a curated non-paper reso
 
 ## A0'. DECISION GATE RESOLVED 2026-07-08 — READ FIRST (supersedes A0's headline; verified by two workflows)
 
+> **⚠ CORRECTION 2026-07-09 (backfill queue ran — see [04_experiment_log.md](04_experiment_log.md) 2026-07-09):**
+> **Edge #1 below (numerical stability) is REFUTED.** The kb-matched selcopy-L100 pair shows `clatch`@kb3
+> destabilizing (8,044/20k skips) while `gated`@kb1 is clean (0 skips, best-ever selcopy disc 0.609) —
+> instability follows **keep-bias × horizon, not mechanism**. Keep it as a *diagnosis*, not an edge.
+> **Edge #2 (bounded gap at matched config) HARDENED** at 5 seeds/arm (non-overlap holds, 3.9×; accuracy tie
+> stands). **Accuracy wording:** distcopy n=3 makes the outliers symmetric (gated ahead d8 0.955-vs-0.875,
+> clatch ahead d20 0.916-vs-0.874, each on one seed) → say "no consistent separation in either direction,"
+> no longer "zero tasks where clatch beats gated." Also new: deep-sup on psMNIST-28 *costs* 6.8pt (bounds the
+> method claim to holds); rddlgn equal-gates is the most accurate psMNIST-28 model (0.674, n=3). The draft
+> (`mlgn/paper/p2/p2_draft1.md`) carries the corrected claim structure; the paragraphs below are kept for the
+> decision trail.
+
 **The decision gate below (A0) is CLOSED, and it went to the FALLBACK. Track A ("Clock the enable, the
 primitive WINS on accuracy") is DEAD; P2's headline is now Track B (obstruction-forward + deep-supervision
 method + deployable-register).** Full trail: [04_experiment_log.md](04_experiment_log.md) 2026-07-04 & 07 & 08.

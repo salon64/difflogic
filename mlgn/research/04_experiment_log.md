@@ -13,6 +13,37 @@ Template:
 
 ---
 
+## 2026-07-09 — P2 backfill queue RAN (all 27): stability edge REFUTED by the matched pair; gap edge HARDENED at 5 seeds
+- **Setup:** `mlgn/paper/p2/run_queue_p2.sh` on DUST (both GPUs; logs in `mlgn/paper/p2/logs/`; results commit 9e52847):
+  distcopy s2 ×4, selcopy-L100 kb-MATCHED pair ×2, psMNIST kb0 s3/s4 ×6 + rddlgn-eqgates s1/s2 + gated+ds probe ×3,
+  parity-L16 panel ×10. Archive now 218 JSONs.
+- **(1) THE PAIR FLIPPED THE STABILITY STORY (headline):** `sc_clatch_L100_kb3` destabilized — **8,044/20,000 skips**
+  (disc 0.497) — while `sc_gated_L100_kb1` was CLEAN (0 skips) and set the best selcopy-L100 disc ever (**0.609**).
+  ⇒ instability follows **keep-bias × horizon, NOT mechanism**; the hard-identity hold does not protect (the
+  enable/candidate nets still get kb-shaped gradients over the unroll). **A0'/Track-B edge #1 (register stability)
+  is DEAD as an edge** — kept as a *diagnosis*. Census now: gated 5/93 destabilized, clatch 1/31, latch 0/28,
+  combo 0/29, rddlgn 0/27; every destabilization (either mechanism) at high kb / aggressive config on long horizon.
+  (Validation report A2.1/A2.2 called this confound; the controlled pair confirmed it was real, not cosmetic.)
+- **(2) Gap edge HARDENED:** psMNIST-28 kb0 @ 5 seeds/arm — clatch gaps +.009..+.027 (mean +.020) vs gated
+  +.038..+.146 (mean +.079): **non-overlap HOLDS** (margin .011), ratio 3.9× (3.1× excl. gated-s2). Accuracy tie
+  stands (clatch .643 vs gated .616, Welch t≈0.97; excl-s2 .643 vs .641). combo gaps ±.025 (mean −.005).
+- **(3) distcopy n=3 — the outliers are SYMMETRIC:** d8 gated mean **0.955** > clatch 0.875 (clatch-s1 0.754);
+  d20 clatch mean **0.916** > gated 0.874 (clatch-s2 hit 1.000); all other seed pairs tie to 3 decimals.
+  ⇒ "ZERO tasks where clatch beats gated" is superseded by "**no consistent separation in EITHER direction**."
+  Gap-sign story fully dead both ways (gated d8-s2 gap −0.120).
+- **(4) ds HURTS integration (new negative control for the method scope):** psMNIST gated kb0 +ds(0.2) =
+  **0.549** (3 seeds) vs 0.616 without — **−6.8pt**, as §6.1's scoping predicted (per-step final-label supervision
+  is wrong off hold tasks). Strengthens, not weakens, the deep-sup claim by bounding it.
+- **(5) parity-L16 panel:** same shape as L32 — **tff sole mover** (disc 0.576/0.607/0.607, soft up to 0.936),
+  gated/clatch/rddlgn at chance. FIG-5 material (L∈{16,32}).
+- **(6) rddlgn equal-gates control seeded (n=3): disc mean 0.674** — the concat-recurrence control is the MOST
+  ACCURATE psMNIST-28 model (mirrors P1's equal-gates finding; gaps +.030..+.038). Honest Table-3 row.
+- **Net:** the draft (`mlgn/paper/p2/p2_draft1.md`) was rewritten to the corrected claim structure — register's
+  one verified edge = deploy-consistency (by construction, 5-seed non-overlap); stability = corrected finding
+  (kb×horizon, mechanism-independent); accuracy = symmetric no-separation. The integrity spine got STRONGER: we
+  ran the controlled test our own census implied and report the refutation. No further GPU runs planned; remaining
+  pre-arXiv items are code/figures (FIG 1–3, exporter decision, float-GRU baseline).
+
 ## 2026-07-08 (combo completes the psMNIST table) — restore family viable off the long-hold regime; discretization edge is partly by-construction
 - **Setup:** `psm_combo_kb0_s0/1/2` (combo = gated + hard-STATE restore), matched to the gated/clatch/rddlgn kb0 rows.
 - **4-way psMNIST kb0 (chunk28, hidden1000, 20k; chance 0.10):** clatch mean **0.634** (gaps +0.009..+0.027),
