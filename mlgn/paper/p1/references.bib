@@ -1,0 +1,203 @@
+% references.bib — Paper 1 ("Gating Enables Long-Range Recall in Recurrent Logic Gate Networks")
+% Keys match the pandoc-style [@key] citations in p1_draft1.md.
+%
+% VERIFY BEFORE SUBMISSION: entries marked "TODO(names)" have author given names taken from
+% partial notes (mlgn/research/02_papers.md, 14_recurrent_lgn_2026_deepread.md) — check each
+% against the arXiv page. Venue strings for 2025/2026 arXiv papers should be re-checked for
+% acceptance updates.
+
+% ---------------------------------------------------------------------------
+% Logic Gate Networks — core
+% ---------------------------------------------------------------------------
+
+@inproceedings{petersen2022deep,
+  title     = {Deep Differentiable Logic Gate Networks},
+  author    = {Petersen, Felix and Borgelt, Christian and Kuehne, Hilde and Deussen, Oliver},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {35},
+  year      = {2022},
+  eprint    = {2210.08277},
+  archivePrefix = {arXiv},
+}
+
+@inproceedings{petersen2024convolutional,
+  title     = {Convolutional Differentiable Logic Gate Networks},
+  author    = {Petersen, Felix and Kuehne, Hilde and Borgelt, Christian and Welzel, Julian and Ermon, Stefano},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {37},
+  year      = {2024},
+  note      = {Oral},
+  eprint    = {2411.04732},
+  archivePrefix = {arXiv},
+}
+
+% ---------------------------------------------------------------------------
+% Recurrent / stateful LGNs (the prior art this paper extends)
+% ---------------------------------------------------------------------------
+
+@inproceedings{buehrer2025recurrent,
+  title     = {Recurrent Deep Differentiable Logic Gate Networks},
+  author    = {B{\"u}hrer, ... and Plesner, Andreas and Aczel, Till and Wattenhofer, Roger},
+  booktitle = {Proceedings of the Workshop on Edge and Mobile Foundation Models (EdgeFM), ACM MobiCom},
+  year      = {2025},
+  doi       = {10.1145/3737902.3768357},
+  eprint    = {2508.06097},
+  archivePrefix = {arXiv},
+  note      = {TODO(names): first author given name},
+}
+
+@inproceedings{miotti2025difflogic,
+  title     = {Differentiable Logic Cellular Automata},
+  author    = {Miotti, Pietro and Niklasson, Eyvind and Randazzo, Ettore and Mordvintsev, Alexander},
+  booktitle = {Proceedings of the Artificial Life Conference (ALIFE)},
+  year      = {2025},
+  eprint    = {2506.04912},
+  archivePrefix = {arXiv},
+  note      = {TODO(names): verify author list and exact title against arXiv:2506.04912},
+}
+
+@article{damera2026rdtlgn,
+  title     = {On the Stability and Realizability of Recurrent Polynomial Surrogate Ternary Logic Gate Networks},
+  author    = {Damera, ... and Matheu, ... and Puranic, Aniruddh G. and Baras, John S. and Belta, Calin},
+  journal   = {arXiv preprint},
+  year      = {2026},
+  eprint    = {2605.24649},
+  archivePrefix = {arXiv},
+  note      = {TODO(names): first two authors' given names},
+}
+
+@article{yue2025dlnts,
+  title     = {Differentiable Logic Networks for Time-Series Classification},
+  author    = {Yue, Chang and Jha, Niraj K.},
+  journal   = {arXiv preprint},
+  year      = {2025},
+  eprint    = {2508.17512},
+  archivePrefix = {arXiv},
+  note      = {TODO: verify exact title},
+}
+
+% ---------------------------------------------------------------------------
+% LGN training methods / discretization gap
+% ---------------------------------------------------------------------------
+
+@inproceedings{yousefi2025mindthegap,
+  title     = {Mind the Gap: Removing the Discretization Gap in Differentiable Logic Gate Networks},
+  author    = {Yousefi, ... and Plesner, Andreas and Aczel, Till and Wattenhofer, Roger},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2025},
+  eprint    = {2506.07500},
+  archivePrefix = {arXiv},
+  note      = {TODO(names): first author given name},
+}
+
+@article{kim2026align,
+  title     = {Align Forward, Adapt Backward: Closing the Discretization Gap in Logic Gate Networks},
+  author    = {Kim, Youngsung},
+  journal   = {arXiv preprint},
+  year      = {2026},
+  eprint    = {2603.14157},
+  archivePrefix = {arXiv},
+}
+
+@article{kim2026multilinear,
+  title     = {Fitting Multilinear Polynomials for Logic Gate Networks},
+  author    = {Kim, Youngsung},
+  journal   = {arXiv preprint},
+  year      = {2026},
+  eprint    = {2605.08657},
+  archivePrefix = {arXiv},
+}
+
+@article{ruettgers2025light,
+  title     = {Light Differentiable Logic Gate Networks},
+  author    = {R{\"u}ttgers, ... and Aczel, Till and Plesner, Andreas and Wattenhofer, Roger},
+  journal   = {arXiv preprint},
+  year      = {2025},
+  eprint    = {2510.03250},
+  archivePrefix = {arXiv},
+  note      = {TODO(names): first author given name},
+}
+
+% ---------------------------------------------------------------------------
+% Adjacent deploy-as-logic paradigm
+% ---------------------------------------------------------------------------
+
+@inproceedings{bacellar2024dwn,
+  title     = {Differentiable Weightless Neural Networks},
+  author    = {Bacellar, Alan T. L. and Susskind, Zachary and Breternitz Jr., Mauricio and John, Eugene and Lima, Priscila M. V. and Fran{\c{c}}a, Felipe M. G.},
+  booktitle = {Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  year      = {2024},
+  eprint    = {2410.11112},
+  archivePrefix = {arXiv},
+}
+
+% ---------------------------------------------------------------------------
+% RNN classics: gating, carousel, pathologies, benchmarks
+% ---------------------------------------------------------------------------
+
+@article{hochreiter1997long,
+  title     = {Long Short-Term Memory},
+  author    = {Hochreiter, Sepp and Schmidhuber, J{\"u}rgen},
+  journal   = {Neural Computation},
+  volume    = {9},
+  number    = {8},
+  pages     = {1735--1780},
+  year      = {1997},
+}
+
+@article{gers2000learning,
+  title     = {Learning to Forget: Continual Prediction with {LSTM}},
+  author    = {Gers, Felix A. and Schmidhuber, J{\"u}rgen and Cummins, Fred},
+  journal   = {Neural Computation},
+  volume    = {12},
+  number    = {10},
+  pages     = {2451--2471},
+  year      = {2000},
+}
+
+@inproceedings{cho2014learning,
+  title     = {Learning Phrase Representations using {RNN} Encoder--Decoder for Statistical Machine Translation},
+  author    = {Cho, Kyunghyun and van Merri{\"e}nboer, Bart and Gulcehre, Caglar and Bahdanau, Dzmitry and Bougares, Fethi and Schwenk, Holger and Bengio, Yoshua},
+  booktitle = {Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages     = {1724--1734},
+  year      = {2014},
+}
+
+@article{bengio1994learning,
+  title     = {Learning Long-Term Dependencies with Gradient Descent is Difficult},
+  author    = {Bengio, Yoshua and Simard, Patrice and Frasconi, Paolo},
+  journal   = {IEEE Transactions on Neural Networks},
+  volume    = {5},
+  number    = {2},
+  pages     = {157--166},
+  year      = {1994},
+}
+
+@inproceedings{pascanu2013difficulty,
+  title     = {On the Difficulty of Training Recurrent Neural Networks},
+  author    = {Pascanu, Razvan and Mikolov, Tomas and Bengio, Yoshua},
+  booktitle = {Proceedings of the 30th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {28},
+  pages     = {1310--1318},
+  year      = {2013},
+}
+
+@article{le2015simple,
+  title     = {A Simple Way to Initialize Recurrent Networks of Rectified Linear Units},
+  author    = {Le, Quoc V. and Jaitly, Navdeep and Hinton, Geoffrey E.},
+  journal   = {arXiv preprint},
+  year      = {2015},
+  eprint    = {1504.00941},
+  archivePrefix = {arXiv},
+}
+
+@inproceedings{arjovsky2016unitary,
+  title     = {Unitary Evolution Recurrent Neural Networks},
+  author    = {Arjovsky, Martin and Shah, Amar and Bengio, Yoshua},
+  booktitle = {Proceedings of the 33rd International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {48},
+  pages     = {1120--1128},
+  year      = {2016},
+}
