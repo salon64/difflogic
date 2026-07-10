@@ -1,0 +1,34 @@
+{
+  "circuit": "combo",
+  "written_symbol": 3,
+  "decoded_as": 5,
+  "witness_tokens_after_settle": [
+    "sym2",
+    "sym4",
+    "blank",
+    "blank",
+    "blank",
+    "blank",
+    "blank",
+    "blank",
+    "blank",
+    "sym5",
+    "blank",
+    "blank",
+    "blank",
+    "blank",
+    "sym6",
+    "sym0"
+  ],
+  "n_distractor_tokens": 16,
+  "protocol": "WRITE sym3 @t=0, blanks t=1..15, then tokens",
+  "property_bad_frames_fs0": [
+    32
+  ],
+  "property_bad_frames_fs1": [
+    32
+  ],
+  "confirmed_fs0": true,
+  "confirmed_fs1": true,
+  "seconds": 76.8
+}

@@ -1,0 +1,9 @@
+======== ABC command line "read_blif protocol_decode.blif; strash; print_stats; tempor -F 24; scorr; dc2; print_stats; pdr -T 600; write_cex protocol_decode.tempor_pdr.cex"
+[1;37mprotocol_decode               :[0m i/o =    9/    1  lat = 1055  and =  18472  lev = 49
+Using user-given frame number (24).
+Output 0 of miter "protocol_decode" was asserted in frame 22. Time =     0.08 sec
+A cex found in the first 24 frames.
+[1;37mprotocol_decode               :[0m i/o =    9/    1  lat =  448  and =   5357  lev = 43
+Reached timeout (600 seconds) in frame 22.
+Property UNDECIDED.  Time =   600.26 sec
+Counter-example is not available.

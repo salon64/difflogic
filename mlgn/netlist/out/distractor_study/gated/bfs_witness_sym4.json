@@ -1,0 +1,23 @@
+{
+  "circuit": "gated",
+  "written_symbol": 4,
+  "decoded_as": 2,
+  "witness_tokens_after_settle": [
+    "sym0"
+  ],
+  "n_distractor_tokens": 1,
+  "protocol": "WRITE sym4 @t=0, blanks t=1..21, then tokens",
+  "property_bad_frames_fs0": [
+    22,
+    23,
+    24
+  ],
+  "property_bad_frames_fs1": [
+    22,
+    23,
+    24
+  ],
+  "confirmed_fs0": true,
+  "confirmed_fs1": true,
+  "seconds": 1.2
+}

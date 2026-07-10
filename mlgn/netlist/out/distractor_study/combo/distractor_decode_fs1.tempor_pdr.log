@@ -1,0 +1,9 @@
+======== ABC command line "read_blif distractor_decode_fs1.blif; strash; print_stats; tempor -F 18; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs1.tempor_pdr.cex"
+[1;37mdistractor_decode_fs1         :[0m i/o =    9/    1  lat = 1049  and =  19190  lev = 49
+Using user-given frame number (18).
+Output 0 of miter "distractor_decode_fs1" was asserted in frame 16. Time =     0.17 sec
+A cex found in the first 18 frames.
+[1;37mdistractor_decode_fs1         :[0m i/o =    9/    1  lat =  846  and =  10534  lev = 44
+Reached timeout (600 seconds) in frame 16.
+Property UNDECIDED.  Time =   600.03 sec
+Counter-example is not available.

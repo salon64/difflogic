@@ -1,0 +1,2 @@
+======== ABC command line "read_blif distractor_decode_fs0.blif; strash; bmc3 -T 900 -F 40; write_cex distractor_decode_fs0.bmc3deep.cex"
+Output 0 of miter "distractor_decode_fs0" was asserted in frame 30. Time =   276.13 sec

@@ -1,0 +1,114 @@
+[combo] 1/4 rebuild + replay gate
+    acc(8 batches)=1.0000 recorded=1.0 |diff|=0.0000 tol=1e-09 -> passed=True
+    netlist 9 PI / 1024 latches / 7168 gates; fixpoints decode 8/8
+[combo] 2/4 BFS closures (cap 200000 states/symbol)
+    sym 0: settle=14 fp_decode=0 closure=2 wrong_decode=0 movers=['sym0'] (0.0s)
+    sym 1: settle=14 fp_decode=1 closure=1522 wrong_decode=953 movers=['sym0', 'sym2'] (0.5s)
+    sym 2: settle= 9 fp_decode=2 closure=1867 wrong_decode=0 movers=['sym2', 'sym3', 'sym4', 'sym6', 'sym7'] (1.7s)
+    sym 3: settle=14 fp_decode=3 closure=87391 wrong_decode=183 movers=['sym0', 'sym2', 'sym4', 'sym5'] (104.9s)
+    sym 4: settle=13 fp_decode=4 closure=1240 wrong_decode=0 movers=['sym1', 'sym3', 'sym4', 'sym6', 'sym7'] (0.5s)
+    sym 5: settle= 9 fp_decode=5 closure=200001 ESCAPED-CAP wrong_decode=0 movers=['sym1', 'sym2', 'sym3', 'sym4', 'sym5', 'sym7'] (178.0s)
+    sym 6: settle= 9 fp_decode=6 closure=13376 wrong_decode=0 movers=['sym1', 'sym2', 'sym3', 'sym4', 'sym6', 'sym7'] (15.3s)
+    sym 7: settle=15 fp_decode=7 closure=22 wrong_decode=0 movers=['sym3', 'sym7'] (0.0s)
+    BFS case: closures escape the 200000-state cap for symbols [5]: the reachable set is too large to enumerate — the model checker is doing genuinely new work
+[combo] 3/4 model checking (settle K=16, tempor -F 18)
+  protocol_decode:
+    [bmc3      ] BOUNDED_CLEAN  (187.0s)  no cex within explored bound (148 frames)
+    [tempor_pdr] PROVED         (14.9s)  invariant holds on all reachable states
+    => final: PROVED
+  distractor_hold_fs0:
+    [bmc3      ] CEX            (0.6s)  counterexample at frame 16
+===== RESUME Fri, Jul 10, 2026  3:57:10 PM =====
+[combo] resume: found circuit_report.json (bfs=8/8 syms, props done=['protocol_decode'])
+[combo] 1/4 rebuild + replay gate
+    acc(8 batches)=1.0000 recorded=1.0 |diff|=0.0000 tol=1e-09 -> passed=True
+    netlist 9 PI / 1024 latches / 7168 gates; fixpoints decode 8/8
+[combo] 2/4 BFS closures: reusing the 8 completed closures from the previous run
+    BFS case: closures escape the 200000-state cap for symbols [5]: the reachable set is too large to enumerate — the model checker is doing genuinely new work
+[combo] 3/4 model checking (settle K=16, tempor -F 18)
+  protocol_decode: reusing previous final=PROVED
+  distractor_hold_fs0:
+    [bmc3      ] CEX            (5.9s)  counterexample at frame 16  replay_confirmed=True
+    [tempor_pdr] CEX            (601.5s)  counterexample at frame 16
+    => final: CEX
+  distractor_hold_fs1:
+    [bmc3      ] CEX            (0.4s)  counterexample at frame 16  replay_confirmed=True
+    [tempor_pdr] CEX            (601.2s)  counterexample at frame 16
+    => final: CEX
+  distractor_decode_fs0:
+    [bmc3      ] BOUNDED_CLEAN  (180.4s)  no cex within explored bound (29 frames)
+    [tempor_pdr] BOUNDED_CLEAN  (635.9s)  no cex within explored bound (17 frames)
+    => final: UNDECIDED
+  distractor_decode_fs1:
+    [bmc3      ] CEX            (0.4s)  counterexample at frame 16  replay_confirmed=True
+    [tempor_pdr] CEX            (611.5s)  counterexample at frame 16
+    => final: CEX
+[combo] 4/4 cross-validation
+    contradictions: none
+    anchor deviations: none
+[gated] 1/4 rebuild + replay gate
+    acc(8 batches)=0.3750 recorded=0.3803 |diff|=0.0053 tol=0.06 -> passed=True
+    netlist 9 PI / 1024 latches / 7168 gates; fixpoints decode 3/8
+[gated] 2/4 BFS closures (cap 200000 states/symbol)
+    sym 0: settle=13 fp_decode=0 closure=555 wrong_decode=512 movers=['sym2', 'sym3', 'sym6', 'sym7'] (0.3s)
+    sym 1: settle=21 fp_decode=6 (WRONG) closure=382 wrong_decode=382 movers=['sym0', 'sym2', 'sym3', 'sym6', 'sym7'] (0.2s)
+    sym 2: settle=10 fp_decode=2 closure=80 wrong_decode=0 movers=['sym0', 'sym3', 'sym4', 'sym6'] (0.0s)
+    sym 3: settle=21 fp_decode=6 (WRONG) closure=382 wrong_decode=382 movers=['sym0', 'sym2', 'sym3', 'sym6', 'sym7'] (0.2s)
+    sym 4: settle= 9 fp_decode=2 (WRONG) closure=73049 wrong_decode=73049 movers=['sym0', 'sym2', 'sym3', 'sym6'] (88.8s)
+    sym 5: settle=21 fp_decode=6 (WRONG) closure=382 wrong_decode=382 movers=['sym0', 'sym2', 'sym3', 'sym6', 'sym7'] (0.1s)
+    sym 6: settle=10 fp_decode=6 closure=1768 wrong_decode=1580 movers=['sym0', 'sym2', 'sym3', 'sym4', 'sym6'] (1.1s)
+    sym 7: settle=21 fp_decode=6 (WRONG) closure=382 wrong_decode=382 movers=['sym0', 'sym2', 'sym3', 'sym6', 'sym7'] (0.1s)
+    BFS case: closures are finite but non-trivial (sizes [555, 382, 80, 382, 73049, 382, 1768, 382]): distractors move the state; exhaustive enumeration closes the from_start=False envelope in simulation, MC must close from_start=True
+[gated] 3/4 model checking (settle K=22, tempor -F 24)
+  protocol_decode:
+    [bmc3      ] CEX            (5.7s)  counterexample at frame 22  replay_confirmed=True
+    [tempor_pdr] CEX            (603.7s)  counterexample at frame 22
+    => final: CEX
+  distractor_hold_fs0:
+    [bmc3      ] CEX            (0.2s)  counterexample at frame 22  replay_confirmed=True
+===== RESUME2 Fri, Jul 10, 2026  5:05:57 PM =====
+[combo] resume: found circuit_report.json (bfs=8/8 syms, props done=['distractor_decode_fs0', 'distractor_decode_fs1', 'distractor_hold_fs0', 'distractor_hold_fs1', 'protocol_decode'])
+[combo] 1/4 rebuild + replay gate
+    acc(8 batches)=1.0000 recorded=1.0 |diff|=0.0000 tol=1e-09 -> passed=True
+    netlist 9 PI / 1024 latches / 7168 gates; fixpoints decode 8/8
+[combo] 2/4 BFS closures: reusing the 8 completed closures from the previous run
+    BFS case: closures escape the 200000-state cap for symbols [5]: the reachable set is too large to enumerate — the model checker is doing genuinely new work
+[combo] 3/4 model checking (settle K=16, tempor -F 18)
+  protocol_decode: reusing previous final=PROVED
+  distractor_hold_fs0: reusing previous final=CEX
+  distractor_hold_fs1: reusing previous final=CEX
+  distractor_decode_fs0: reusing previous final=CEX
+  distractor_decode_fs1: reusing previous final=CEX
+[combo] 4/4 cross-validation
+    contradictions: none
+    anchor deviations: none
+[gated] resume: found circuit_report.json (bfs=8/8 syms, props done=['protocol_decode'])
+[gated] 1/4 rebuild + replay gate
+    acc(8 batches)=0.3750 recorded=0.3803 |diff|=0.0053 tol=0.06 -> passed=True
+    netlist 9 PI / 1024 latches / 7168 gates; fixpoints decode 3/8
+[gated] 2/4 BFS closures: reusing the 8 completed closures from the previous run
+    BFS case: closures are finite but non-trivial (sizes [555, 382, 80, 382, 73049, 382, 1768, 382]): distractors move the state; exhaustive enumeration closes the from_start=False envelope in simulation, MC must close from_start=True
+[gated] 3/4 model checking (settle K=22, tempor -F 24)
+  protocol_decode: reusing previous final=CEX
+  distractor_hold_fs0:
+    [bmc3      ] CEX            (7.2s)  counterexample at frame 22  replay_confirmed=True
+    [tempor_pdr] CEX            (600.9s)  counterexample at frame 22
+    => final: CEX
+  distractor_hold_fs1:
+    [bmc3      ] CEX            (0.3s)  counterexample at frame 22  replay_confirmed=True
+    [tempor_pdr] CEX            (0.7s)  counterexample at frame 22
+    => final: CEX
+  distractor_decode_fs0:
+    [bmc3      ] CEX            (0.3s)  counterexample at frame 22  replay_confirmed=True
+    [tempor_pdr] CEX            (604.0s)  counterexample at frame 22
+    => final: CEX
+  distractor_decode_fs1:
+    [bmc3      ] CEX            (0.4s)  counterexample at frame 22  replay_confirmed=True
+    [tempor_pdr] CEX            (603.6s)  counterexample at frame 22
+    => final: CEX
+[gated] 4/4 cross-validation
+    contradictions: none
+    anchor deviations: none
+
+report -> C:\Users\malco\projects\difflogic\mlgn\netlist\out\distractor_study\report.json (exit 0)
+EXIT=0

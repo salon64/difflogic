@@ -1,0 +1,7 @@
+======== ABC command line "read_blif distractor_hold_fs1.blif; strash; print_stats; tempor -F 24; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs1.tempor_pdr.cex"
+[1;37mdistractor_hold_fs1           :[0m i/o =    9/    1  lat = 1047  and =   7144  lev = 27
+Using user-given frame number (24).
+Output 0 of miter "distractor_hold_fs1" was asserted in frame 22. Time =     0.07 sec
+A cex found in the first 24 frames.
+[1;37mdistractor_hold_fs1           :[0m i/o =    9/    1  lat =  447  and =   2682  lev = 21
+Output 0 of miter "distractor_hold_fs1" was asserted in frame 22.  Time =     0.15 sec
