@@ -1,0 +1,4 @@
+======== ABC command line "read_blif protocol_hold.blif; strash; print_stats; bmc3 -T 240"
+[1;37mckpt_cpB_gated_oracle_protocol_hold:[0m i/o =    9/    1  lat = 1047  and =   7129  lev = 19
+Reached timeout (240 seconds).
+No output asserted in 620 frames. Resource limit reached (timeout 240 sec). Time =   240.83 sec

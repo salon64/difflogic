@@ -1,0 +1,3 @@
+======== ABC command line "read_blif seq_hold.blif; strash; print_stats; pdr -T 900"
+[1;37mckpt_cp50A_curr_c35_seq_hold  :[0m i/o =    9/    1  lat = 1024  and =   8099  lev = 19
+Output 0 of miter "ckpt_cp50A_curr_c35_seq_hold" was asserted in frame 0.  Time =     0.05 sec

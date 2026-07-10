@@ -1,0 +1,4 @@
+======== ABC command line "read_blif protocol_hold_anyx0.blif; strash; print_stats; pdr -T 600"
+[1;37mckpt_cpB_gated_oracle_protocol_hold_anyx0:[0m i/o =    9/    1  lat = 1047  and =   7064  lev = 19
+Reached timeout (600 seconds) in frame 22.
+Property UNDECIDED.  Time =   600.06 sec

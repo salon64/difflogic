@@ -24,13 +24,24 @@ RESULTS = os.path.join(os.path.dirname(__file__), "results")
 COL = {"rddlgn": "tab:red", "gated": "tab:blue", "lstm": "tab:green", "gru_cell": "tab:purple"}
 
 
+P1_MECHS = set(COL)  # rddlgn / gated / lstm / gru_cell — the P1 comparison set
+
+
 def load():
+    """P1-scoped records only: later-project runs (latch/clatch/combo mechanisms, or gated
+    runs trained with --deep-sup / --margin-reg / --anneal) share the P1 configs and would
+    silently pollute the seed averages (see paper/p1/p1_draft1.md App. A.3)."""
     recs = []
     for f in glob.glob(os.path.join(RESULTS, "*.json")):
         try:
-            recs.append(json.load(open(f)))
+            r = json.load(open(f))
         except Exception:
-            pass
+            continue
+        if r.get("mechanism") not in P1_MECHS:
+            continue
+        if r.get("deep_sup") or r.get("margin_reg") or r.get("anneal"):
+            continue
+        recs.append(r)
     return recs
 
 

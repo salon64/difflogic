@@ -1,0 +1,4 @@
+======== ABC command line "read_blif protocol_hold_anyx0.blif; strash; print_stats; pdr -T 900"
+[1;37mckpt_cp50A_curr_c35_protocol_hold_anyx0:[0m i/o =    9/    1  lat = 1044  and =   8121  lev = 19
+Reached timeout (900 seconds) in frame 19.
+Property UNDECIDED.  Time =   900.08 sec

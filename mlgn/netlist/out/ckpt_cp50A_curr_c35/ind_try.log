@@ -1,0 +1,22 @@
+======== ABC command line "read_blif protocol_hold.blif; strash; ind -v -F 24 -T 300"
+Induction parameters: FramesMax =    24. ConflictMax =      0.
+Frame    0 : PI = 1038. PO =    1. AIG = 8116. Var =   3381. Clau =  11318. Conf =      1. Time =     0.04 sec
+Frame    1 : PI = 1038. PO = 1030. AIG = 8183. Var =   7904. Clau =  27248. Conf =      0. Time =     0.02 sec
+Frame    2 : PI = 1038. PO = 1030. AIG = 8183. Var =  12427. Clau =  43178. Conf =      1. Time =     0.03 sec
+Frame    3 : PI = 1038. PO = 1030. AIG = 8183. Var =  16950. Clau =  59108. Conf =      0. Time =     0.04 sec
+Frame    4 : PI = 1038. PO = 1030. AIG = 8183. Var =  21473. Clau =  75038. Conf =      4. Time =     0.04 sec
+Frame    5 : PI = 1038. PO = 1030. AIG = 8183. Var =  25996. Clau =  90968. Conf =     78. Time =     0.13 sec
+Frame    6 : PI = 1038. PO = 1030. AIG = 8183. Var =  30519. Clau = 106898. Conf =    256. Time =     0.28 sec
+Frame    7 : PI = 1038. PO = 1030. AIG = 8183. Var =  35042. Clau = 122828. Conf =    352. Time =     0.34 sec
+Frame    8 : PI = 1038. PO = 1030. AIG = 8183. Var =  39565. Clau = 138758. Conf =    885. Time =     0.93 sec
+Frame    9 : PI = 1038. PO = 1030. AIG = 8183. Var =  44088. Clau = 154688. Conf =   1123. Time =     1.32 sec
+Frame   10 : PI = 1038. PO = 1030. AIG = 8183. Var =  48611. Clau = 170618. Conf =   1960. Time =     2.47 sec
+Frame   11 : PI = 1038. PO = 1030. AIG = 8183. Var =  53134. Clau = 186548. Conf =   3037. Time =     3.22 sec
+Frame   12 : PI = 1038. PO = 1030. AIG = 8183. Var =  57657. Clau = 202478. Conf =    796. Time =     0.93 sec
+Frame   13 : PI = 1038. PO = 1030. AIG = 8183. Var =  62180. Clau = 218408. Conf =   5256. Time =     8.15 sec
+Frame   14 : PI = 1038. PO = 1030. AIG = 8183. Var =  66703. Clau = 234338. Conf =   2989. Time =     4.48 sec
+Frame   15 : PI = 1038. PO = 1030. AIG = 8183. Var =  71226. Clau = 250268. Conf =   7181. Time =     9.64 sec
+Frame   16 : PI = 1038. PO = 1030. AIG = 8183. Var =  75749. Clau = 266198. Conf =   4951. Time =     6.94 sec
+Frame   17 : PI = 1038. PO = 1030. AIG = 8183. Var =  80272. Clau = 282128. Conf = 204474. Time =   261.03 sec
+Timeout (300 sec) was reached during iteration 18.
+Networks are UNDECIDED.  Time =   300.06 sec
