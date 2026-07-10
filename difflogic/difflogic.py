@@ -54,22 +54,75 @@ class LogicLayer(torch.nn.Module):
         self.indices = self.get_connections(self.connections, device)
 
         if self.implementation == 'cuda':
-            """
-            Defining additional indices for improving the efficiency of the backward of the CUDA implementation.
-            """
-            given_x_indices_of_y = [[] for _ in range(in_dim)]
-            indices_0_np = self.indices[0].cpu().numpy()
-            indices_1_np = self.indices[1].cpu().numpy()
-            for y in range(out_dim):
-                given_x_indices_of_y[indices_0_np[y]].append(y)
-                given_x_indices_of_y[indices_1_np[y]].append(y)
-            self.given_x_indices_of_y_start = torch.tensor(
-                np.array([0] + [len(g) for g in given_x_indices_of_y]).cumsum(), device=device, dtype=torch.int64)
-            self.given_x_indices_of_y = torch.tensor(
-                [item for sublist in given_x_indices_of_y for item in sublist], dtype=torch.int64, device=device)
+            self._compute_given_x_indices_of_y()
 
         self.num_neurons = out_dim
         self.num_weights = out_dim
+
+    # `indices` used to be a plain attribute, so the random wiring was NOT saved in
+    # checkpoints and had to be replayed from the construction-time RNG state. It is now
+    # a property backed by two persistent int64 buffers `conn_a` / `conn_b`: new
+    # checkpoints carry the wiring (load_state_dict restores it, overriding whatever
+    # wiring the layer was constructed with) and the buffers follow `.to(device)`.
+    # Back-compat: OLD checkpoints have no conn_* keys — `_load_from_state_dict` below
+    # drops them from missing_keys so strict loading still works, and the layer keeps
+    # its constructed wiring (exactly the pre-change semantics).
+    @property
+    def indices(self):
+        return self.conn_a, self.conn_b
+
+    @indices.setter
+    def indices(self, value):
+        a, b = value
+        if 'conn_a' in self._buffers:
+            # Check both shapes BEFORE mutating anything: copy_ would broadcast a
+            # scalar silently and a good-a/bad-b pair would corrupt (a updated, b not).
+            if tuple(a.shape) != tuple(self.conn_a.shape) or tuple(b.shape) != tuple(self.conn_b.shape):
+                raise RuntimeError(
+                    'LogicLayer.indices: shape mismatch, expected {} / {} but got {} / {}'.format(
+                        tuple(self.conn_a.shape), tuple(self.conn_b.shape),
+                        tuple(a.shape), tuple(b.shape)))
+            self.conn_a.copy_(a)
+            self.conn_b.copy_(b)
+            if self.implementation == 'cuda':
+                self._compute_given_x_indices_of_y()
+        else:  # first assignment (from __init__, before the buffers exist)
+            self.register_buffer('conn_a', a.to(torch.int64))
+            self.register_buffer('conn_b', b.to(torch.int64))
+
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        super()._load_from_state_dict(state_dict, prefix, local_metadata, strict,
+                                      missing_keys, unexpected_keys, error_msgs)
+        # Strip conn_* from missing_keys only for genuinely OLD-format checkpoints
+        # (BOTH keys absent). A half-present checkpoint (conn_a without conn_b, or vice
+        # versa) is corrupt: leave the absent key in missing_keys so strict=True errors
+        # instead of silently loading inconsistent wiring.
+        if not any((prefix + name) in state_dict for name in ('conn_a', 'conn_b')):
+            for name in ('conn_a', 'conn_b'):
+                key = prefix + name
+                if key in missing_keys:
+                    missing_keys.remove(key)
+        if self.implementation == 'cuda' and (prefix + 'conn_a') in state_dict:
+            # wiring was restored from the checkpoint: refresh the backward helper
+            # indices, which were precomputed from the constructed wiring.
+            self._compute_given_x_indices_of_y()
+
+    def _compute_given_x_indices_of_y(self):
+        """
+        Defining additional indices for improving the efficiency of the backward of the CUDA implementation.
+        """
+        given_x_indices_of_y = [[] for _ in range(self.in_dim)]
+        indices_0_np = self.indices[0].cpu().numpy()
+        indices_1_np = self.indices[1].cpu().numpy()
+        for y in range(self.out_dim):
+            given_x_indices_of_y[indices_0_np[y]].append(y)
+            given_x_indices_of_y[indices_1_np[y]].append(y)
+        device = self.conn_a.device
+        self.given_x_indices_of_y_start = torch.tensor(
+            np.array([0] + [len(g) for g in given_x_indices_of_y]).cumsum(), device=device, dtype=torch.int64)
+        self.given_x_indices_of_y = torch.tensor(
+            [item for sublist in given_x_indices_of_y for item in sublist], dtype=torch.int64, device=device)
 
     def forward(self, x):
         if isinstance(x, PackBitsTensor):
