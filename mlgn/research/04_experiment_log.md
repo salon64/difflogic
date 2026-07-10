@@ -13,6 +13,85 @@ Template:
 
 ---
 
+## 2026-07-10 — P3a falsifier EXECUTED: exporter works; two theorems PROVED; naive IC3 fails, tempor recipe closes it
+- **Hypothesis (research/20 §D1 gate):** export one disc=1.000 copy checkpoint → ABC
+  `pdr`/`bmc3` on a hold invariant; one afternoon de-risks or reframes P3a.
+- **Setup:** NEW `mlgn/netlist/` (extract / ir / sim / props / blif / falsify).
+  Target `ckpt_cp50A_curr_c35.pt` (combo copy-35, h1024, seed 0, disc test 1.000 —
+  no clatch ckpt exists locally; at eval combo/clatch/gated deploy to the same
+  MUX-register circuit). ABC built in WSL (`make ABC_USE_NO_READLINE=1`). Wiring
+  reconstructed by RNG replay (indices aren't in state_dict — footgun #2): seed →
+  the two `randperm`s per LogicLayer in module order; synthetic tasks consume zero
+  global-CPU draws so the stream position is exact. CPU host, torch 2.10.
+- **Gates passed:** rebuilt disc acc **1.0000 == recorded** (full 10k, survives the
+  DUST→local torch change); netlist **bit-exact** vs torch (9.2M state bits, 0
+  mismatches). Netlist: 9 PIs, 1024 latches, 7168 gates (candidate MLP + gate MLP +
+  3-gate MUX/bit).
+- **Finding 1 — the learned register is an ATTRACTOR, not a latch:** after the cue
+  write, the state keeps changing 9–15 blank steps (legal) before hitting a
+  per-symbol fixed point; decode is WRONG during the transient (defaults to class
+  2). Exhaustive closed-system sim of ALL 512 first inputs (post-write inputs are
+  forced blank ⇒ complete case analysis): every input settles, garbage ≤ 18 steps,
+  slowest = multi-hot conflicting writes ({1,7}), ZERO limit cycles.
+- **Finding 2 — verdict table on the true K=16 hold invariant (1041 lat / 8183 and):**
+  `pdr` timeout 900 s @ frame 16; `ind` timeout 300 s @ frame 17 (204k conflicts);
+  `scorr;dc2;pdr` timeout 600 s; `bmc3` clean to 310 frames (bounded only);
+  **`tempor -F 20; scorr; dc2; pdr` → PROVED in ~2 s** (property cone collapses to
+  const-0). anyx0 variant (K=19): PROVED in ~3 s. **Recipe = settle bound by
+  simulation → temporal decomposition past it → inductive sweeping.** The ablation
+  shows tempor (with the sim-derived K) is the unlock, not scorr.
+- **Theorems (machine-checked, deployed circuit):** (i) every legal write is held
+  FOREVER after 16 blank steps + fixed points decode correctly (8/8) ⇒ functional
+  correctness at ARBITRARY delay ≥ 16; (ii) NO first input (incl. garbage) can
+  cause a non-converging orbit (settles ≤ 19, then fixed forever).
+- **Finding 3 — contrast run `ckpt_cpB_gated_oracle` (gated copy-50, disc 0.3803)
+  EXPLAINS the accuracy mechanistically:** the gated circuit is ALSO provably
+  stable (all 512 x0 settle ≤ 21, zero cycles; both K=22 hold theorems PROVED by
+  the same recipe in <1 s; naive pdr again dies at the arming frontier, frame 22)
+  — but only **3/8 fixed points decode correctly** (syms 0,2,6), and 3/8 = 0.375
+  ≈ 0.3803: the "38%" is a deterministic 3-of-8-attractors map, not noise. Both
+  ckpts have test_soft ≈ 0.88 → soft accuracy can't see any of this. **Stability
+  is architectural (both mechanisms); correctness = which fixpoints the write
+  dynamics select.**
+- **Read (P3a verdict): DE-RISKED with a reframe.** Push-button IC3 at ~1000
+  latches genuinely fails (as research/20 feared) — but the paper doesn't need it:
+  the method contribution is the sim+tempor recipe, and the real MC territory is
+  FREE-INPUT properties (distcopy "no distractor corrupts the register" — needs the
+  popcount/GroupSum comparator head, the known missing encoding) plus the
+  stability-vs-correctness cross-mechanism contrast. Full details + artifacts:
+  `mlgn/netlist/README.md`, `mlgn/netlist/out/*/`. P2-boundary decision (beat-4
+  demo vs descope) now has its artifact and stays open for malcolm.
+
+## 2026-07-10 — P1 hardening queue (p1f_*, 23 runs) ingested → draft v1.1; P1 experiments CLOSED
+- **Setup:** `mlgn/paper/p1/run_queue_p1.sh` (Tiers A+B) on DUST. All 23 complete, **0 skipped
+  steps in all 23**. Addresses validation §B (20_program_validation.md). Ingested together with
+  the P2-backfill spillover that touches P1 (psm gated-kb0 s3/s4, eqgates dupes — entry below).
+- **Results (now in `mlgn/paper/p1/p1_draft1.md` v1.1):**
+  - **psMNIST-28 §5.3 boundary, all arms seeded:** control eqgates (h2000) **0.674±0.017** (n=3),
+    control h1000 0.629±0.012 (n=3), gated kb0 **0.616±0.056** (n=5, incl. the P2-queue s3/s4;
+    gap mean +0.079 vs control's +0.034). Control ahead 5.8pt; **note:** gated-s3 (0.6555) edges
+    control-s0 (0.6552) by 3e-4 ⇒ strict seed non-overlap is FALSE — worded as "no gated seed
+    reaches the control mean," NOT non-overlap. gated kb4 n=3: 0.431±0.080 (sweep endpoint firm).
+  - **dMNIST-50 EQGATES CONTROL (new, h2000 = 4k gates):** disc 0.117, soft 0.1135 (majority
+    baseline), **grad_profile[0] = 0 exactly** — the zero-write-step-gradient failure is
+    gate-count-independent ON THE HEADLINE TASK (previously only argued from copy).
+  - **dMNIST-50 kb sweep n=3:** kb0 {0.177,0.135,0.152}=0.155±0.021, **soft = 0.1135 in 3/3
+    (cold start replicates)**; kb3 {0.293,0.241,0.411}=0.315±0.087 — kb3≈kb6 within noise at
+    D=50; the necessary ingredient is kb>0.
+  - **copy controls n=3 + eqgates-L20 anomaly RESOLVED:** narrow 0.25±0.00/0.21±0.07/0.25±0.01
+    (L20/35/50), eqgates 0.21±0.07/0.25±0.00/0.29±0.07; s0's eqgates-L20 0.126 was seed noise
+    between dead circuits. Soft pinned at chance (0.118–0.130) in ALL 18 control runs.
+    ⚠ eqgates-L50-s1 discretizes to **0.369 from a chance soft** — rounding a dead circuit can
+    scatter high ⇒ control disc = *scatter around a degenerate predictor* (0.13–0.37), never a
+    learned level (and gated's deployed L50 margin over that scatter is small — gap-bound, §5.5).
+- **Also this session:** canonical per-figure scripts `mlgn/paper/p1/fig{1,2,3}_*.py` +
+  `figstyle.py` (Okabe-Ito, seed error bars, P1 hygiene filter — mechanisms ∩ no ds/margin/anneal,
+  same-seed dupes collapsed — enforced in the loader; outputs `figs/*.{png,pdf}`), incl. the
+  long-owed **grad-norm carousel figure (Fig 3)**; `seqlgn/plot.py` got the same filter (doc-20
+  debt). §3.4 stability caveat re-worded to the kb×horizon driver (consistent w/ 07-09 pair).
+- **Read:** P1 experiments CLOSED (Tier-C extras stay commented in run_queue_p1.sh). Next:
+  workshop pick (~Jul 11) → condense to 4pp → verify bib author names → submit (~Aug 29).
+
 ## 2026-07-09 — P2 backfill queue RAN (all 27): stability edge REFUTED by the matched pair; gap edge HARDENED at 5 seeds
 - **Setup:** `mlgn/paper/p2/run_queue_p2.sh` on DUST (both GPUs; logs in `mlgn/paper/p2/logs/`; results commit 9e52847):
   distcopy s2 ×4, selcopy-L100 kb-MATCHED pair ×2, psMNIST kb0 s3/s4 ×6 + rddlgn-eqgates s1/s2 + gated+ds probe ×3,

@@ -7,6 +7,14 @@ memory where the recompute-recurrence control (RDDLGN-style) fails. Pairs with
 
 ---
 
+## STATUS UPDATE (2026-07-10) — EXPERIMENTS CLOSED; draft v1.1 + figures + bib DONE
+All remaining runs below were completed 06-24..07-01 (delayed-MNIST seeds/kb/delays) and
+2026-07-10 (`p1f_*` hardening queue: all controls 3-seed, dMNIST eqgates control w/ grad≡0,
+kb-sweep seeds — see 04_experiment_log 2026-07-10). Draft: `mlgn/paper/p1/p1_draft1.md`
+(v1.1) + `references.bib` + canonical figure scripts `fig{1,2,3}_*.py` → `figs/`.
+**Remaining is writing/admin only:** pick workshop (~Jul 11) → condense to 4pp → verify
+bib author names → submit (~Aug 29).
+
 ## CURRENT STATUS (2026-06-21) — experiments ~complete; venue = NeurIPS 2026 workshop
 
 **Result (scoped, honest):** the gated carousel enables long-range **recall** where

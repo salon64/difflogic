@@ -15,12 +15,24 @@ Changes vs v0.1 (per research/20_program_validation.md §B):
   - Stability-recipe claim scoped ("sufficient for every run reported here", not universal).
   - FPGA/ASIC -> FPGA only. Citations now real, keys match references.bib (pandoc syntax [@key]).
 
+v1.1 (2026-07-10) — p1f hardening queue (paper/p1/run_queue_p1.sh, Tiers A+B, 23 runs) ingested:
+  - ALL control cells now 3-seed (copy both widths; psMNIST both widths); psMNIST kb4 and
+    dMNIST-50 kb0/kb3 now 3-seed; psMNIST gated kb0 now 5-seed (s3/s4 arrived via the P2
+    backfill queue, same config). §5.3 boundary FIRMED (control eqgates 0.674±0.017 vs gated
+    0.616±0.056; no gated seed reaches the control mean — strict seed non-overlap missed by
+    0.0003, so it is NOT claimed). dMNIST kb0 cold-start replicates 3/3.
+  - NEW equal-gates control on the headline task (dMNIST-50, h2000): disc 0.1165, soft 0.1135,
+    write-step gradient exactly 0 -> §5.1's gate-count argument is now data.
+  - copy eqgates L20 anomaly resolved as seed noise; control disc reframed as scatter
+    (0.13-0.37) around a degenerate predictor whose soft accuracy is pinned at chance (18/18).
+  - Figures rebuilt from paper-local scripts (fig1/2/3_*.py -> figs/), Okabe-Ito palette,
+    3-seed error bars, grad-norm carousel figure now IN the paper (Fig 3).
+
 Remaining TODOs before submission (~Aug 29, workshop picked after Jul 11 list drops):
-  [TODO-FIG] split Fig 1 (recall = money plot); grad-norm-through-time figure (data in 47 JSONs,
-             see results/curves_gradnorm.png if already generated / appendix A.3).
   [TODO-BIB] verify author given names + final venue strings against arXiv (marked in .bib).
   [TODO-VENUE] condense to 4 pp for the chosen workshop template; affiliations; acknowledgements.
-  [TODO-OPT] optional runs: none required (all tables have >=1 seed, headlines have 3).
+  [TODO-OPT] optional runs: none required. Tier-C extras (lstm kb6, capacity seeds, sMNIST row,
+             d100 eqgates control, float-GRU harness) remain commented in run_queue_p1.sh.
 -->
 
 # Gating Enables Long-Range Recall in Recurrent Logic Gate Networks
@@ -50,7 +62,7 @@ that rescues recall inverts on a classification task. We give the training recip
 LGNs need (keep-biased initialization against vanishing gradients; learning-rate decay and
 non-finite-step skipping against exploding ones), and we report an honest boundary: at
 equal gate count, gating does **not** help classification (permuted-MNIST-28: control
-0.655 vs. gated 0.602 ± 0.072), and the multiplexer's blended state discretizes worse than
+0.674 ± 0.017 vs. gated 0.616 ± 0.056), and the multiplexer's blended state discretizes worse than
 logic-recompute, a *computation* gap that grows with sequence length. To our knowledge this
 is the first gated recurrent LGN and the first demonstration of long-range (50–100-step)
 recall in a learned logic circuit.
@@ -252,8 +264,9 @@ explicitly:
   an exploding batch never touches the weights; a dead-run early-stop aborts if an entire
   evaluation window is skipped. With this recipe every headline run in §5 completed with
   **zero skipped steps**. We scope the claim honestly: the recipe was sufficient for every
-  configuration reported here, but in later experiments outside this paper's scope (longer
-  sequences, larger learning rates, auxiliary losses) heavy step-skipping can reappear;
+  configuration reported here, but in later experiments outside this paper's scope heavy
+  step-skipping can reappear — the drivers we have observed are a strong keep-bias
+  combined with a much longer unroll, larger learning rates, and auxiliary losses;
   skipping is a symptom to fix via the learning rate, not a cure.
 
 ---
@@ -283,8 +296,8 @@ chosen to isolate *memory* — how well a cell carries information across time:
 accuracy of the actual deployed logic circuit (`disc`). We also report the relaxed
 training-mode accuracy (`soft`) and the **discretization gap** `= soft − disc`, both on
 the same best-validation checkpoint. Model selection uses discrete validation accuracy;
-the test set is touched once. Headline numbers are means ± s.d. over 3 seeds with paired
-seeds across arms; single-seed cells are marked. Fairness controls: the concat-recurrence
+the test set is touched once. Headline numbers are means ± s.d. over at least 3 seeds
+(sample s.d.) with paired seeds across arms; single-seed cells are marked. Fairness controls: the concat-recurrence
 control is run both at equal *width* (2H learned gates) and at equal *learned gates*
 (width doubled, 4H); we also verified the control's failure is not a gradient-scaling
 artifact (`grad_factor = 2` does not revive it).
@@ -298,18 +311,21 @@ Runs take ~25 min (psMNIST-28) to ~4.5 h (dMNIST-100) on RTX-2080-class GPUs.
 
 ## 5. Results
 
-![**Figure 1** — Length sweeps (`results/curves.png`). Left: copy — the gated cell (blue)
-solves long-range recall while the concat-recurrence control (red) never learns and the
-dual-state cells (`lstm`/`gru_cell`) cold-start past L20. Right: psMNIST-28 length sweep at
-a fixed recall-tuned keep-bias — see §5.2 for why this keep-bias is wrong for
-classification (cautionary panel).](../../seqlgn/results/curves.png)
+![**Figure 1** — Length sweeps (mean ± s.d., 3 seeds). Left: copy — the gated cell (blue)
+solves long-range recall while both controls (vermillion; solid = equal width, dashed
+open = equal gates) never learn (soft accuracy of every control run ≈ chance; the
+discrete scatter around 0.2–0.3 is a degenerate circuit) and the dual-state ablations
+(`lstm`/`gru_cell`) cold-start past L20. The faint dashed line is the gated cell's soft
+accuracy — its distance from the solid line at L50 is the computation gap of §5.5.
+Right: psMNIST-28 length sweep at a fixed recall-tuned keep-bias — see §5.2 for why this
+keep-bias is wrong for classification (cautionary panel).](figs/fig1_length_sweeps.png)
 
-![**Figure 2** — (`results/curves_bc.png`) Left (B): one dial, opposite slopes — the
-keep-bias sweep *rises* on recall (dMNIST-50, blue) and *falls* on integration
-(psMNIST-28, orange). Right (C): real-data recall vs. delay, mean ± s.d. over 3 seeds —
-the control (red) sits exactly at the majority-class baseline at every delay ≥ 25 while
-the gated cell (blue) holds ~3× chance through 100 blank
-steps.](../../seqlgn/results/curves_bc.png)
+![**Figure 2** — Left (B): one dial, opposite slopes — the keep-bias sweep *rises* on
+recall (dMNIST-50, blue) and *falls* on integration (psMNIST-28, orange); bars where a
+point has 3 seeds. Right (C): real-data recall vs. delay, mean ± s.d. over 3 seeds — the
+control (vermillion) sits exactly at the majority-class baseline at every delay ≥ 25,
+stays there at equal gate count (open diamond, D = 50), while the gated cell (blue) holds
+~3× chance through 100 blank steps.](figs/fig2_keepbias_recall.png)
 
 ### 5.1 Gating enables long-range recall; concat-recurrence fails outright
 
@@ -317,15 +333,18 @@ steps.](../../seqlgn/results/curves_bc.png)
 
 | L (blank steps) | gated (4,096 gates) | control (2,048) | control, equal-gates (4,096) | lstm (10,240) | gru_cell (8,192) |
 |---:|:---:|:---:|:---:|:---:|:---:|
-| 20 | **0.96 ± 0.07** | 0.25 | 0.13 | 0.76 | 0.75 |
-| 35 | **0.79 ± 0.26** | 0.26 | 0.25 | 0.13 | 0.13 |
-| 50 | **0.33 ± 0.08** | 0.26 | 0.25 | 0.13 | 0.13 |
+| 20 | **0.96 ± 0.07** | 0.25 ± 0.00 | 0.21 ± 0.07 | 0.76 | 0.75 |
+| 35 | **0.79 ± 0.26** | 0.21 ± 0.07 | 0.25 ± 0.00 | 0.13 | 0.13 |
+| 50 | **0.33 ± 0.08** | 0.25 ± 0.01 | 0.29 ± 0.07 | 0.13 | 0.13 |
 
-The control **never learns the task**: its *soft* accuracy is pinned at chance (≈ 0.12) at
-every length — the relaxed model, with every advantage of continuous optimization, extracts
-nothing — and this does not change at equal gate count or with `grad_factor = 2`. (Its
-discretized circuit reaches ≈ 0.25, i.e., 2× chance; rounding a chance-level soft optimum
-recovers a weak heuristic — we note the curiosity and do not analyze it further.) The
+The control **never learns the task**: across all 18 control runs (both widths × 3
+lengths × 3 seeds) its *soft* accuracy is pinned at chance (0.12–0.13) — the relaxed
+model, with every advantage of continuous optimization, extracts nothing — and this does
+not change at equal gate count or with `grad_factor = 2`. Its discretized circuits
+scatter between 0.13 and 0.37 (mean ≈ 0.24): rounding a chance-level soft optimum
+sometimes recovers a weak heuristic, so these numbers are noise around a degenerate
+predictor, not learning (which is also why the gated cell's *deployed* margin at L = 50,
+where its own circuit is gap-bound, shrinks toward this scatter — §5.5). The
 gated cell solves L = 20 essentially perfectly and degrades with length; the L = 35 spread
 is bimodal ({0.50, 0.88, 1.00} — seeds either solve or half-solve). At L = 50 the *soft*
 model still reaches 0.83 ± 0.08 while the deployed circuit gets 0.33 — a gap we return to
@@ -350,32 +369,45 @@ At **any** nonzero delay we tested (25–100), the control lands on **exactly 0.
 majority-class baseline of the MNIST test set — in both soft and discrete evaluation**. It
 does not degrade; it fails completely, and the mechanism is visible in the gradients: the
 norm of the loss gradient reaching the write step (`t = 0`) is **identically zero**, and
-the gradient dies within ~3 steps of the readout (App. A.3). No amount of gate count,
+the gradient dies within ~3 steps of the readout (Fig. 3). No amount of gate count,
 capacity, or tuning fixes a model whose training signal never reaches the only informative
-timestep. The gated cell, whose carousel carries gradient to `t = 0` at full strength
-(early-step gradient norms exceed late-step norms by 2–3 orders of magnitude), holds the
-digit at **3.0× uniform chance (2.6× the majority baseline) through 100 blank steps**.
+timestep — and we verified the gate-count case directly: an **equal-gates control**
+(H = 2000, matching the gated cell's 4,000 learned gates) at D = 50 again lands at the
+baseline (disc 0.117, soft 0.1135) with a write-step gradient of exactly zero (Fig. 2C).
+The gated cell, whose carousel carries gradient to `t = 0` at full strength
+(early-step gradient norms exceed late-step norms by 2–3 orders of magnitude, Fig. 3),
+holds the digit at **3.0× uniform chance (2.6× the majority baseline) through 100 blank
+steps**.
 (D = 75 dipping below D = 100 is within seed noise.)
+
+![**Figure 3** — Gradient norm through time on both recall tasks: the control's gradient
+at the write step is *exactly zero* (below float precision; ×'s on the display floor) and
+dies within ~3–5 steps of the readout, while the gated carousel carries signal to `t = 0`
+at full strength — 2–3 orders of magnitude *above* its late-step norm (the exploding-side
+tendency §3.4 manages).](figs/fig3_gradnorm.png)
 
 ### 5.2 Keep-bias is a task-dependent dial — shown from both sides
 
 The same initialization that *enables* recall *hurts* integration, and vice versa. We
-sweep `keep_bias` on one task of each kind (single seed; Fig. 2B):
+sweep `keep_bias` on one task of each kind (mean ± s.d. where 3 seeds, else single seed;
+Fig. 2B):
 
 | keep-bias | psMNIST-28, disc (soft) | dMNIST-50, disc (soft) |
 |---:|:---:|:---:|
-| 0 | **0.632** (0.709) | 0.177 (0.114 — cold start) |
+| 0 | **0.616 ± 0.056** (0.696) | 0.155 ± 0.021 (0.114 — cold start, 3/3 seeds) |
 | 1 | 0.548 (0.660) | — |
 | 2 | 0.541 (0.668) | — |
-| 3 | — | 0.293 (0.582) |
-| 4 | 0.389 (0.659) | — |
-| 6 | — | **0.369** (0.562) |
+| 3 | — | 0.315 ± 0.087 (0.593) |
+| 4 | 0.431 ± 0.080 (0.648) | — |
+| 6 | — | **0.362 ± 0.045** (0.527) |
 
 On classification, keep-bias 0 is best and the discretization gap shrinks monotonically as
-the bias drops (0.27 at kb 4 → 0.08 at kb 0); the kb 1 vs. kb 2 ordering is within noise.
-On recall the slope is *reversed*: kb 0 cold-starts (the soft model never leaves the
-majority baseline — the §3.3 mechanism, observed on real data), and accuracy rises with
-the bias. **One interpretable dial, opposite optima: high to hold, low to absorb.** This
+the bias drops (+0.22 mean at kb 4 → +0.09 at kb 0); the kb 1 vs. kb 2 ordering is within
+noise. On recall the slope is *reversed*: kb 0 cold-starts (in all three seeds the soft
+model never leaves the majority baseline — the §3.3 mechanism, observed on real data), and
+accuracy rises once the carousel is on (kb 3 vs. kb 6 overlap within seed noise at this
+delay; the necessary ingredient is a nonzero keep-bias).
+**One interpretable dial, opposite optima: high to hold, low to absorb.** This
 also retroactively explains our own first psMNIST result (kb 4, chosen for recall) being
 poor — Fig. 1 right shows the control beating the recall-tuned gated cell at *every*
 length, a cautionary tale about porting a memory-task configuration to an integration
@@ -388,14 +420,16 @@ arm's best keep-bias, on psMNIST-28:
 
 | model | gates | disc | soft | gap |
 |---|:---:|:---:|:---:|:---:|
-| gated, kb 0 (3 seeds) | 4,000 | 0.602 ± 0.072 | 0.689 ± 0.022 | +0.087 |
-| control (H = 2000) | 4,000 | **0.655** | 0.694 | +0.038 |
-| control (H = 1000) | 2,000 | 0.620 | 0.652 | +0.033 |
+| gated, kb 0 (5 seeds) | 4,000 | 0.616 ± 0.056 | 0.696 ± 0.018 | +0.079 |
+| control (H = 2000, 3 seeds) | 4,000 | **0.674 ± 0.017** | 0.708 ± 0.013 | +0.034 |
+| control (H = 1000, 3 seeds) | 2,000 | 0.629 ± 0.012 | 0.664 ± 0.014 | +0.035 |
 
-The control matches or beats the gated cell (the gated mean is dragged by one outlier
-seed at 0.519, but no seed beats 0.655). Soft accuracies are a wash; the difference is the
-**discretization gap**, which is 2–4× larger for the gated cell (§5.5). **Gating buys
-nothing on integration tasks.** This is consistent with §5.1–5.2: the carousel matters
+The control is ahead by 5.8 points and no gated seed reaches the control mean (best gated
+seed 0.656 vs. control seeds {0.655, 0.681, 0.686}); the gated mean is additionally
+dragged by one outlier seed (0.519). Soft accuracies are close (0.708 ± 0.013 vs.
+0.696 ± 0.018); the deployed-circuit difference is dominated by the **discretization
+gap**, 2.3× larger for the gated cell (§5.5). **Gating buys nothing on integration
+tasks.** This is consistent with §5.1–5.2: the carousel matters
 exactly when the task requires carrying information across many uninformative steps —
 which classification at these lengths does not, since the control's vanishing gradient is
 not fatal at 28 steps of informative input.
@@ -426,7 +460,7 @@ failure:
 ### 5.5 The gap that remains: a computation gap that grows with length
 
 Where the gated cell only partially solves a task, its deployed circuit underperforms its
-soft model (copy-50: soft 0.83, disc 0.33; psMNIST-28: gap +0.09 vs. the control's +0.04).
+soft model (copy-50: soft 0.83, disc 0.33; psMNIST-28: gap +0.09 vs. the control's +0.03).
 Following @kim2026align, the train/deploy gap decomposes into a *selection* gap (which
 gate; removable by hard-forward training) and a *computation* gap (soft vs. hard values
 through the *same* gates; zero iff the propagated values are binary). Two observations
@@ -527,7 +561,17 @@ as a crisp target for what comes next.
   reached soft 1.000 at the same disc — the gap, not the seed, is the story).
 - **dMNIST, gated kb 6, disc:** D0 {0.700, 0.722, 0.722}; D25 {0.457, 0.511, 0.498};
   D50 {0.370, 0.403, 0.314}; D75 {0.313, 0.263, 0.245}; D100 {0.339, 0.230, 0.331}.
-- **psMNIST-28, gated kb 0, disc:** {0.632, 0.654, 0.519} (soft {0.709, 0.693, 0.665}).
+- **psMNIST-28, gated kb 0, disc (5 seeds):** {0.632, 0.654, 0.519, 0.656, 0.621}
+  (soft {0.709, 0.693, 0.665, 0.707, 0.705}).
+- **psMNIST-28 controls, disc:** H = 2000 {0.655, 0.686, 0.681}; H = 1000
+  {0.620, 0.625, 0.642}. **gated kb 4, disc:** {0.389, 0.523, 0.380}.
+- **copy controls, disc** (soft ∈ [0.118, 0.130] in all 18 runs): H = 1024 —
+  L20 {0.247, 0.243, 0.252}, L35 {0.259, 0.245, 0.126}, L50 {0.259, 0.239, 0.246};
+  H = 2048 (equal gates) — L20 {0.126, 0.244, 0.252}, L35 {0.248, 0.244, 0.249},
+  L50 {0.248, 0.369, 0.248}.
+- **dMNIST-50 keep-bias sweep, gated, disc:** kb 0 {0.177, 0.135, 0.152} (soft = 0.1135
+  in all three — cold start); kb 3 {0.293, 0.241, 0.411}. **Equal-gates control**
+  (H = 2000): disc 0.117, soft 0.1135, grad-norm at t = 0 exactly 0.
 - **copy capacity run:** gated H = 2048, L50: disc 0.757 (soft 0.879).
 - **Entropy-regularizer negative result:** copy-50, H = 2048, coeff 0.05: disc 0.754
   (unchanged), soft 1.0 → 0.886.
@@ -558,19 +602,28 @@ train --task psmnist --chunk {16,14,8,7} --mechanism {gated,rddlgn} --hidden 100
 
 Result JSONs (accuracy, soft, gap, gate count, skipped steps, train minutes, gradient
 profiles) live in `mlgn/seqlgn/results/`; the full run log is
-`mlgn/research/04_experiment_log.md`.
+`mlgn/research/04_experiment_log.md`. The final seed-completion batch (all control
+seeds, the kb-sweep seeds, and the dMNIST equal-gates control; tags `p1f_*`) was run by
+`mlgn/paper/p1/run_queue_p1.sh`.
 
 ### A.3 Figures
 
-`curves.png` and `curves_bc.png` are generated by `python -m mlgn.seqlgn.plot` (last
-regenerated 2026-07-02, i.e., from exactly the runs reported here). **Caveat for
-regeneration:** the results directory now also contains later-project runs (mechanisms
-`latch`/`clatch`/`combo`, and `gated` runs with `deep_sup > 0` / `margin_reg > 0` /
-`anneal`); `plot.py` must exclude those (filter `deep_sup in {0, None}`, no `anneal`,
-mechanism ∈ {rddlgn, gated, lstm, gru_cell}) before regenerating, or the copy panel will
-mix in runs that use a different training signal. Gradient-norm-through-time profiles
-(`grad_profile` arrays) are stored in 47 result JSONs — e.g., copy-50: gated
-`[109.8, 98.2, …, 0.017]` vs. control `[0.0, 0.0, …, 0.031]`; dMNIST-50: gated
-`[15.9, …, 0.026]` vs. control `[0.0, …, 0.028]` — and back the carousel figure
-(`curves_gradnorm.png`). [TODO-FIG: promote the recall panels to Figure 1 for the
-camera-ready; re-caption the psMNIST length panel as the cautionary keep-bias example.]
+The paper's figures are generated by the scripts next to this draft — the canonical
+source (run from the repo root; outputs to `mlgn/paper/p1/figs/` as `.png` + `.pdf`):
+
+```bash
+python mlgn/paper/p1/fig1_length_sweeps.py    # Fig 1: copy + psMNIST-28 length sweeps
+python mlgn/paper/p1/fig2_keepbias_recall.py  # Fig 2: keep-bias dial + recall-vs-delay
+python mlgn/paper/p1/fig3_gradnorm.py         # Fig 3: gradient norm through time
+```
+
+Their shared loader (`figstyle.py`) enforces the data-hygiene rules so a regeneration
+cannot silently regress: P1 mechanisms only (rddlgn/gated/lstm/gru_cell — the results
+directory also holds later-project `latch`/`clatch`/`combo` runs), no run trained with
+`--deep-sup`/`--margin-reg`/`--anneal`, the clean-sweep config (lr 3e-3 → 3e-4, 20k
+iters), same-seed duplicate runs collapsed by mean before seed statistics (ddof = 1,
+matching the tables). Colors are Okabe-Ito (colorblind-safe); color follows the
+mechanism across all figures. The quick working-figure tool `mlgn/seqlgn/plot.py`
+carries the same filter. Gradient-norm-through-time profiles (`grad_profile` arrays,
+recorded by `--grad-analysis`) are stored in 48 result JSONs — e.g., copy-50: gated
+`[109.8, 98.2, …, 0.017]` vs. control `[0.0, 0.0, …, 0.031]` — and back Fig. 3.
