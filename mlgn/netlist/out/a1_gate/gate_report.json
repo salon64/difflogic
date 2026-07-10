@@ -1,0 +1,22 @@
+{
+  "ckpt": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\ckpt_cp50A_curr_c35.pt",
+  "json": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\copy_combo_cp50A_curr_c35_20260704-023800.json",
+  "settle": 16,
+  "frames": 40,
+  "protocol_analysis_ok": true,
+  "property_netlist": {
+    "pis": 9,
+    "latches": 1049,
+    "gates": 19022
+  },
+  "legal_writes_bad_any": false,
+  "control_corrupted_shadow_fires": true,
+  "control_illegal_write_silent": true,
+  "abc": {
+    "script": "read_blif protocol_decode.blif; strash; print_stats; tempor -F 18; scorr; dc2; print_stats; pdr -T 600",
+    "seconds": 7.0,
+    "proved": true,
+    "log": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\a1_gate\\protocol_decode.tempor_pdr.log"
+  },
+  "gate_passed": true
+}

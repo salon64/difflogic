@@ -108,6 +108,9 @@ def main() -> int:
                     help="arming delay K for the protocol properties: the theorem is "
                          "'settles within K steps, then holds forever'. 'auto' = max "
                          "observed settle step + 1 from the trajectory analysis")
+    ap.add_argument("--engines", default="pdr,bmc3,tempor_pdr",
+                    help="sequential-property engines to run (comma list of pdr,bmc3,tempor_pdr); "
+                         "comb properties always use sat")
     ap.add_argument("--timeout", type=int, default=600, help="per ABC engine call, seconds")
     ap.add_argument("--abc-path", default="~/abc/abc")
     ap.add_argument("--no-wsl", action="store_true", help="abc-path is a native binary, not inside WSL")
@@ -220,7 +223,7 @@ def main() -> int:
     prop_settle = {"protocol_hold": settle_legal, "protocol_hold_anyx0": settle_any}
     for name, (path, comb) in paths.items():
         fname = os.path.basename(path)
-        engines = ["sat"] if comb else ["pdr", "bmc3", "tempor_pdr"]
+        engines = ["sat"] if comb else [e.strip() for e in args.engines.split(",") if e.strip()]
         results[name] = {}
         for eng in engines:
             if eng == "sat":
