@@ -1,0 +1,279 @@
+"""
+export_fsm.py — hardware export of the verified copy-FSM checkpoint.
+====================================================================
+
+Rebuilds ``ckpt_cp50A_curr_c35`` (combo, copy, alphabet 8, hidden 1024 — the
+checkpoint with two machine-checked hold theorems, see ../README.md), extracts the
+netlist, and emits everything the hardware flow needs into this directory:
+
+    fsm.v               synthesizable Verilog-2001 (module lgn_fsm), via verilog.py
+    fsm.blif            same netlist as BLIF with ALL 1024 q signals as outputs
+                        (so yosys sweeps nothing)
+    fsm_clk.blif        fsm.blif with explicit '.latch ... re clk ...' latches
+                        (what yosys needs to map FDREs; ABC uses fsm.blif)
+    golden_sym<k>.txt   40 frames of 1024-bit state as 256-hex-digit lines, one file
+                        per legal write (cue + one-hot symbol k at t=0, then blanks),
+                        dumped from the bit-exact python simulator (sim.py)
+    tb_fsm.v            iverilog testbench: drives the same 8 sequences and compares
+                        q against the golden files cycle-exactly (8/8 must pass)
+    ops_test.v/tb_ops.v micro-test: one gate per op 0..15 on free inputs; the TB
+                        checks all 4 input combinations against ir.GATE_FN truth
+                        tables (guards the asymmetric ops 2/4/11/13)
+
+Run from the repo root:
+
+    python -m mlgn.netlist.synth.export_fsm            # quick accuracy gate (8 batches)
+    python -m mlgn.netlist.synth.export_fsm --full-gate
+
+Then simulate/synthesize in WSL (OSS CAD Suite in ~/oss-cad-suite), from this dir:
+
+    iverilog -g2001 -o tb_ops.vvp ops_test.v tb_ops.v   && vvp tb_ops.vvp
+    iverilog -g2001 -o tb_fsm.vvp fsm.v tb_fsm.v        && vvp tb_fsm.vvp
+    yosys -p "read_verilog fsm.v; synth_xilinx -top lgn_fsm; stat"
+    yosys -p "read_blif fsm.blif; synth_xilinx; stat"
+"""
+
+from __future__ import annotations
+
+import argparse
+import dataclasses
+import os
+import sys
+
+import numpy as np
+
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
+from mlgn.netlist import blif, sim  # noqa: E402
+from mlgn.netlist.extract import (build_task, check_accuracy, rebuild_model,  # noqa: E402
+                                  spec_from_json)
+from mlgn.netlist.ir import GATE_FN, Netlist, NetlistBuilder, extract_netlist  # noqa: E402
+from mlgn.netlist.verilog import emit_verilog  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CKPT = os.path.join(_ROOT, "mlgn", "seqlgn", "results", "ckpt_cp50A_curr_c35.pt")
+JSON = os.path.join(_ROOT, "mlgn", "seqlgn", "results",
+                    "copy_combo_cp50A_curr_c35_20260704-023800.json")
+FRAMES = 40
+
+
+def derive_clk_blif(src: str, dst: str) -> None:
+    """fsm.blif -> fsm_clk.blif: '.latch a q i' -> '.latch a q re clk i' + clk PI.
+
+    yosys' read_blif turns the ABC-native 3-token latch form into clockless
+    ``$_FF_`` cells (no FDRE mapping, init warnings); the explicit rising-edge
+    form synthesizes cleanly. ABC itself keeps consuming the 3-token fsm.blif.
+    """
+    out = []
+    for ln in open(src, encoding="utf-8"):
+        ln = ln.rstrip("\n")
+        if ln.startswith(".inputs "):
+            ln += " clk"
+        elif ln.startswith(".latch "):
+            t = ln.split()
+            assert len(t) == 4, ln
+            ln = f".latch {t[1]} {t[2]} re clk {t[3]}"
+        out.append(ln)
+    with open(dst, "w", newline="\n", encoding="utf-8") as f:
+        f.write("\n".join(out) + "\n")
+
+
+def state_hex(state: np.ndarray, n_state: int) -> str:
+    """1-D bool state -> hex string of the value of q (q[0] = LSB)."""
+    bits = np.asarray(state, dtype=np.uint8).ravel()
+    val = int.from_bytes(np.packbits(bits, bitorder="little").tobytes(), "little")
+    return format(val, f"0{(n_state + 3) // 4}x")
+
+
+def dump_golden(net: Netlist, alphabet: int) -> list[int]:
+    """Per legal write: simulate FRAMES steps, write hex lines. Returns final decodes."""
+    decodes = []
+    for sym in range(alphabet):
+        x_seq = np.zeros((1, FRAMES, net.n_pi), dtype=bool)
+        x_seq[0, 0, sym] = True
+        x_seq[0, 0, alphabet] = True                      # cue bit
+        final, states = sim.run_sequence(net, x_seq, return_trajectory=True)
+        assert len(states) == FRAMES
+        path = os.path.join(HERE, f"golden_sym{sym}.txt")
+        with open(path, "w", newline="\n") as f:
+            for st in states:
+                f.write(state_hex(st[0], net.n_state) + "\n")
+        decodes.append(int(sim.head_scores(net, final).argmax(-1)[0]))
+    return decodes
+
+
+def write_tb_fsm(net: Netlist, alphabet: int) -> None:
+    n, npi = net.n_state, net.n_pi
+    total = alphabet * FRAMES
+    init_bits = "".join(str(int(net.init[i])) for i in range(n - 1, -1, -1))
+    L = [
+        "// generated by export_fsm.py — golden-vector equivalence testbench",
+        "`timescale 1ns/1ps",
+        "module tb_fsm;",
+        "    reg clk = 1'b0;",
+        "    reg rst;",
+        f"    reg  [{npi - 1}:0] x;",
+        f"    wire [{n - 1}:0] q;",
+        "    lgn_fsm dut (.clk(clk), .rst(rst), .x(x), .q(q));",
+        "    always #5 clk = ~clk;",
+        "",
+        f"    reg [{n - 1}:0] golden [0:{total - 1}];",
+        "    integer sym, t, errors, sym_errors, pass_count;",
+        "",
+        "    initial begin",
+    ]
+    for sym in range(alphabet):
+        L.append(f'        $readmemh("golden_sym{sym}.txt", golden, '
+                 f"{sym * FRAMES}, {sym * FRAMES + FRAMES - 1});")
+    L += [
+        "        errors = 0;",
+        "        pass_count = 0;",
+        f"        for (sym = 0; sym < {alphabet}; sym = sym + 1) begin",
+        "            sym_errors = 0;",
+        "            // synchronous reset: load net.init",
+        "            rst = 1'b1;",
+        f"            x = {npi}'b0;",
+        "            @(posedge clk); #1;",
+        f"            if (q !== {n}'b{init_bits}) begin",
+        '                $display("SYM %0d: FAIL at reset", sym);',
+        "                sym_errors = sym_errors + 1;",
+        "            end",
+        "            rst = 1'b0;",
+        "            // t=0: the write frame (cue + one-hot symbol)",
+        f"            x = ({npi}'b1 << sym) | ({npi}'b1 << {alphabet});",
+        "            @(posedge clk); #1;",
+        f"            x = {npi}'b0;                 // forced blanks afterwards",
+        f"            for (t = 0; t < {FRAMES}; t = t + 1) begin",
+        "                if (t > 0) begin @(posedge clk); #1; end",
+        f"                if (q !== golden[sym * {FRAMES} + t]) begin",
+        "                    sym_errors = sym_errors + 1;",
+        "                    if (sym_errors <= 3)",
+        '                        $display("SYM %0d: MISMATCH frame %0d", sym, t);',
+        "                end",
+        "            end",
+        "            if (sym_errors == 0) begin",
+        '                $display("SYM %0d: PASS (40/40 frames)", sym);',
+        "                pass_count = pass_count + 1;",
+        "            end else",
+        '                $display("SYM %0d: FAIL (%0d bad frames)", sym, sym_errors);',
+        "            errors = errors + sym_errors;",
+        "        end",
+        f'        $display("EQUIV: %0d/{alphabet} symbols PASS, %0d frame mismatches",'
+        " pass_count, errors);",
+        f"        if (pass_count == {alphabet} && errors == 0)",
+        '            $display("RESULT: PASS");',
+        "        else",
+        '            $display("RESULT: FAIL");',
+        "        $finish;",
+        "    end",
+        "endmodule",
+    ]
+    with open(os.path.join(HERE, "tb_fsm.v"), "w", newline="\n", encoding="utf-8") as f:
+        f.write("\n".join(L) + "\n")
+
+
+def write_ops_test() -> None:
+    """16-gate micro-netlist (one gate per op on PIs a,b) + exhaustive 4-case TB."""
+    b = NetlistBuilder(n_pi=2, n_state=0)
+    outs = [b.add_gate(op, b.pi(0), b.pi(1)) for op in range(16)]
+    b.end_layer()
+    net = b.build(next_state=[], outputs=outs)
+    emit_verilog(net, os.path.join(HERE, "ops_test.v"), module="lgn_ops")
+
+    # expected obus per input case, from the SAME truth tables the simulator uses
+    exp = []
+    for case in range(4):
+        a = np.array([bool(case & 1)])          # x0 = a
+        bb = np.array([bool(case >> 1)])        # x1 = b
+        v = sum(int(GATE_FN[op](a, bb)[0]) << op for op in range(16))
+        exp.append(v)
+
+    obus = "{" + ", ".join(f"o{i}" for i in range(15, -1, -1)) + "}"
+    L = [
+        "// generated by export_fsm.py — exhaustive check of the 16 gate ops",
+        "`timescale 1ns/1ps",
+        "module tb_ops;",
+        "    reg clk = 1'b0, rst = 1'b0;",
+        "    reg [1:0] x;",
+        "    wire [15:0] obus;",
+    ]
+    wires = ", ".join(f"o{i}" for i in range(16))
+    L += [
+        f"    wire {wires};",
+        "    lgn_ops dut (.clk(clk), .rst(rst), .x(x)"
+        + "".join(f", .o{i}(o{i})" for i in range(16)) + ");",
+        f"    assign obus = {obus};",
+        "    integer errors;",
+        "    initial begin",
+        "        errors = 0;",
+    ]
+    for case in range(4):
+        L += [
+            f"        x = 2'd{case}; #1;",
+            f"        if (obus !== 16'h{exp[case]:04x}) begin",
+            f'            $display("OPS: case a=%0d b=%0d got %h want {exp[case]:04x}",'
+            f" x[0], x[1], obus);",
+            "            errors = errors + 1;",
+            "        end",
+        ]
+    L += [
+        "        if (errors == 0)",
+        '            $display("OPS: 4/4 cases PASS");',
+        "        else",
+        '            $display("OPS: FAIL (%0d cases)", errors);',
+        "        $finish;",
+        "    end",
+        "endmodule",
+    ]
+    with open(os.path.join(HERE, "tb_ops.v"), "w", newline="\n", encoding="utf-8") as f:
+        f.write("\n".join(L) + "\n")
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    ap.add_argument("--ckpt", default=CKPT)
+    ap.add_argument("--json", default=JSON)
+    ap.add_argument("--alphabet", type=int, default=8)
+    ap.add_argument("--full-gate", action="store_true",
+                    help="accuracy gate on the FULL test set (default: 8 batches)")
+    args = ap.parse_args()
+
+    spec = spec_from_json(args.json, alphabet=args.alphabet)
+    print(f"[1/4] rebuild {os.path.basename(args.ckpt)}: {spec.task}/{spec.mechanism} "
+          f"hidden={spec.hidden} seed={spec.seed} (recorded test_acc={spec.test_acc})")
+    model = rebuild_model(spec, args.ckpt)
+    task = build_task(spec)
+    gate = check_accuracy(model, spec, task=task,
+                          max_batches=None if args.full_gate else 8)
+    print(f"      accuracy gate: rebuilt={gate['rebuilt_test_acc']:.4f} "
+          f"recorded={gate['recorded_test_acc']} full={gate['full_test_set']}")
+    if gate["rebuilt_test_acc"] < 0.999:
+        print("[FAIL] rebuild gate — aborting export.")
+        return 2
+
+    net = extract_netlist(model)
+    used_ops = sorted(int(o) for o in np.unique(net.ops))
+    print(f"[2/4] netlist: {net.n_pi} PIs, {net.n_state} latches, {net.n_gates} gates; "
+          f"ops used: {used_ops}")
+
+    emit_verilog(net, os.path.join(HERE, "fsm.v"), module="lgn_fsm")
+    # BLIF twin with ALL q signals as outputs so synthesis cannot sweep any state
+    net_po = dataclasses.replace(net, outputs=[net.q(i) for i in range(net.n_state)])
+    blif.emit_blif(net_po, os.path.join(HERE, "fsm.blif"), model="lgn_fsm")
+    derive_clk_blif(os.path.join(HERE, "fsm.blif"), os.path.join(HERE, "fsm_clk.blif"))
+    print("[3/4] wrote fsm.v, fsm.blif and fsm_clk.blif")
+
+    decodes = dump_golden(net, spec.alphabet)
+    ok = sum(int(d == s) for s, d in enumerate(decodes))
+    print(f"[4/4] golden vectors: {spec.alphabet} files x {FRAMES} frames; "
+          f"final decode correct {ok}/{spec.alphabet} {decodes}")
+    write_tb_fsm(net, spec.alphabet)
+    write_ops_test()
+    print("      wrote tb_fsm.v, ops_test.v, tb_ops.v")
+    return 0 if ok == spec.alphabet else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

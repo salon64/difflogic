@@ -1,0 +1,2607 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67+4 (git sha1 b88b73a99, Release, Clang /usr/bin/clang++ 18.1.8)
+
+-- Running command `read_blif fsm_clk.blif; synth_xilinx; stat' --
+
+1. Executing BLIF frontend.
+
+2. Executing SYNTH_XILINX pass.
+
+2.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/cells_sim.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/cells_sim.v' to AST representation.
+Generating RTLIL representation for module `\VCC'.
+Generating RTLIL representation for module `\GND'.
+Generating RTLIL representation for module `\IBUF'.
+Generating RTLIL representation for module `\IBUFG'.
+Generating RTLIL representation for module `\OBUF'.
+Generating RTLIL representation for module `\IOBUF'.
+Generating RTLIL representation for module `\OBUFT'.
+Generating RTLIL representation for module `\BUFG'.
+Generating RTLIL representation for module `\BUFGCTRL'.
+Generating RTLIL representation for module `\BUFHCE'.
+Generating RTLIL representation for module `\INV'.
+Generating RTLIL representation for module `\LUT1'.
+Generating RTLIL representation for module `\LUT2'.
+Generating RTLIL representation for module `\LUT3'.
+Generating RTLIL representation for module `\LUT4'.
+Generating RTLIL representation for module `\LUT5'.
+Generating RTLIL representation for module `\LUT6'.
+Generating RTLIL representation for module `\LUT6_2'.
+Generating RTLIL representation for module `\$__ABC9_LUT7'.
+Generating RTLIL representation for module `\$__ABC9_LUT8'.
+Generating RTLIL representation for module `\MUXCY'.
+Generating RTLIL representation for module `\MUXF5'.
+Generating RTLIL representation for module `\MUXF6'.
+Generating RTLIL representation for module `\MUXF7'.
+Generating RTLIL representation for module `\MUXF8'.
+Generating RTLIL representation for module `\MUXF9'.
+Generating RTLIL representation for module `\XORCY'.
+Generating RTLIL representation for module `\CARRY4'.
+Generating RTLIL representation for module `\CARRY8'.
+Generating RTLIL representation for module `\ORCY'.
+Generating RTLIL representation for module `\MULT_AND'.
+Generating RTLIL representation for module `\FDRE'.
+Generating RTLIL representation for module `\FDRE_1'.
+Generating RTLIL representation for module `\FDSE'.
+Generating RTLIL representation for module `\FDSE_1'.
+Generating RTLIL representation for module `\FDRSE'.
+Generating RTLIL representation for module `\FDRSE_1'.
+Generating RTLIL representation for module `\FDCE'.
+Generating RTLIL representation for module `\FDCE_1'.
+Generating RTLIL representation for module `\FDPE'.
+Generating RTLIL representation for module `\FDPE_1'.
+Generating RTLIL representation for module `\FDCPE'.
+Generating RTLIL representation for module `\FDCPE_1'.
+Generating RTLIL representation for module `\LDCE'.
+Generating RTLIL representation for module `\LDPE'.
+Generating RTLIL representation for module `\LDCPE'.
+Generating RTLIL representation for module `\AND2B1L'.
+Generating RTLIL representation for module `\OR2L'.
+Generating RTLIL representation for module `\RAM16X1S'.
+Generating RTLIL representation for module `\RAM16X1S_1'.
+Generating RTLIL representation for module `\RAM32X1S'.
+Generating RTLIL representation for module `\RAM32X1S_1'.
+Generating RTLIL representation for module `\RAM64X1S'.
+Generating RTLIL representation for module `\RAM64X1S_1'.
+Generating RTLIL representation for module `\RAM128X1S'.
+Generating RTLIL representation for module `\RAM128X1S_1'.
+Generating RTLIL representation for module `\RAM256X1S'.
+Generating RTLIL representation for module `\RAM512X1S'.
+Generating RTLIL representation for module `\RAM16X2S'.
+Generating RTLIL representation for module `\RAM32X2S'.
+Generating RTLIL representation for module `\RAM64X2S'.
+Generating RTLIL representation for module `\RAM16X4S'.
+Generating RTLIL representation for module `\RAM32X4S'.
+Generating RTLIL representation for module `\RAM16X8S'.
+Generating RTLIL representation for module `\RAM32X8S'.
+Generating RTLIL representation for module `\RAM16X1D'.
+Generating RTLIL representation for module `\RAM16X1D_1'.
+Generating RTLIL representation for module `\RAM32X1D'.
+Generating RTLIL representation for module `\RAM32X1D_1'.
+Generating RTLIL representation for module `\RAM64X1D'.
+Generating RTLIL representation for module `\RAM64X1D_1'.
+Generating RTLIL representation for module `\RAM128X1D'.
+Generating RTLIL representation for module `\RAM256X1D'.
+Generating RTLIL representation for module `\RAM32M'.
+Generating RTLIL representation for module `\RAM32M16'.
+Generating RTLIL representation for module `\RAM64M'.
+Generating RTLIL representation for module `\RAM64M8'.
+Generating RTLIL representation for module `\RAM32X16DR8'.
+Generating RTLIL representation for module `\RAM64X8SW'.
+Generating RTLIL representation for module `\ROM16X1'.
+Generating RTLIL representation for module `\ROM32X1'.
+Generating RTLIL representation for module `\ROM64X1'.
+Generating RTLIL representation for module `\ROM128X1'.
+Generating RTLIL representation for module `\ROM256X1'.
+Generating RTLIL representation for module `\SRL16'.
+Generating RTLIL representation for module `\SRL16E'.
+Generating RTLIL representation for module `\SRLC16'.
+Generating RTLIL representation for module `\SRLC16E'.
+Generating RTLIL representation for module `\SRLC32E'.
+Generating RTLIL representation for module `\CFGLUT5'.
+Generating RTLIL representation for module `\MULT18X18'.
+Generating RTLIL representation for module `\MULT18X18S'.
+Generating RTLIL representation for module `\MULT18X18SIO'.
+Generating RTLIL representation for module `\DSP48A'.
+Generating RTLIL representation for module `\DSP48A1'.
+Generating RTLIL representation for module `\DSP48'.
+Generating RTLIL representation for module `\DSP48E1'.
+Generating RTLIL representation for module `\RAMB18E1'.
+Generating RTLIL representation for module `\RAMB36E1'.
+Successfully finished Verilog frontend.
+
+2.2. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/cells_xtra.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/cells_xtra.v' to AST representation.
+Generating RTLIL representation for module `\RAMB4_S1'.
+Generating RTLIL representation for module `\RAMB4_S2'.
+Generating RTLIL representation for module `\RAMB4_S4'.
+Generating RTLIL representation for module `\RAMB4_S8'.
+Generating RTLIL representation for module `\RAMB4_S16'.
+Generating RTLIL representation for module `\RAMB4_S1_S1'.
+Generating RTLIL representation for module `\RAMB4_S1_S2'.
+Generating RTLIL representation for module `\RAMB4_S1_S4'.
+Generating RTLIL representation for module `\RAMB4_S1_S8'.
+Generating RTLIL representation for module `\RAMB4_S1_S16'.
+Generating RTLIL representation for module `\RAMB4_S2_S2'.
+Generating RTLIL representation for module `\RAMB4_S2_S4'.
+Generating RTLIL representation for module `\RAMB4_S2_S8'.
+Generating RTLIL representation for module `\RAMB4_S2_S16'.
+Generating RTLIL representation for module `\RAMB4_S4_S4'.
+Generating RTLIL representation for module `\RAMB4_S4_S8'.
+Generating RTLIL representation for module `\RAMB4_S4_S16'.
+Generating RTLIL representation for module `\RAMB4_S8_S8'.
+Generating RTLIL representation for module `\RAMB4_S8_S16'.
+Generating RTLIL representation for module `\RAMB4_S16_S16'.
+Generating RTLIL representation for module `\RAMB16_S1'.
+Generating RTLIL representation for module `\RAMB16_S2'.
+Generating RTLIL representation for module `\RAMB16_S4'.
+Generating RTLIL representation for module `\RAMB16_S9'.
+Generating RTLIL representation for module `\RAMB16_S18'.
+Generating RTLIL representation for module `\RAMB16_S36'.
+Generating RTLIL representation for module `\RAMB16_S1_S1'.
+Generating RTLIL representation for module `\RAMB16_S1_S2'.
+Generating RTLIL representation for module `\RAMB16_S1_S4'.
+Generating RTLIL representation for module `\RAMB16_S1_S9'.
+Generating RTLIL representation for module `\RAMB16_S1_S18'.
+Generating RTLIL representation for module `\RAMB16_S1_S36'.
+Generating RTLIL representation for module `\RAMB16_S2_S2'.
+Generating RTLIL representation for module `\RAMB16_S2_S4'.
+Generating RTLIL representation for module `\RAMB16_S2_S9'.
+Generating RTLIL representation for module `\RAMB16_S2_S18'.
+Generating RTLIL representation for module `\RAMB16_S2_S36'.
+Generating RTLIL representation for module `\RAMB16_S4_S4'.
+Generating RTLIL representation for module `\RAMB16_S4_S9'.
+Generating RTLIL representation for module `\RAMB16_S4_S18'.
+Generating RTLIL representation for module `\RAMB16_S4_S36'.
+Generating RTLIL representation for module `\RAMB16_S9_S9'.
+Generating RTLIL representation for module `\RAMB16_S9_S18'.
+Generating RTLIL representation for module `\RAMB16_S9_S36'.
+Generating RTLIL representation for module `\RAMB16_S18_S18'.
+Generating RTLIL representation for module `\RAMB16_S18_S36'.
+Generating RTLIL representation for module `\RAMB16_S36_S36'.
+Generating RTLIL representation for module `\RAMB16BWE_S18'.
+Generating RTLIL representation for module `\RAMB16BWE_S36'.
+Generating RTLIL representation for module `\RAMB16BWE_S18_S9'.
+Generating RTLIL representation for module `\RAMB16BWE_S18_S18'.
+Generating RTLIL representation for module `\RAMB16BWE_S36_S9'.
+Generating RTLIL representation for module `\RAMB16BWE_S36_S18'.
+Generating RTLIL representation for module `\RAMB16BWE_S36_S36'.
+Generating RTLIL representation for module `\RAMB16BWER'.
+Generating RTLIL representation for module `\RAMB8BWER'.
+Generating RTLIL representation for module `\FIFO16'.
+Generating RTLIL representation for module `\RAMB16'.
+Generating RTLIL representation for module `\RAMB32_S64_ECC'.
+Generating RTLIL representation for module `\FIFO18'.
+Generating RTLIL representation for module `\FIFO18_36'.
+Generating RTLIL representation for module `\FIFO36'.
+Generating RTLIL representation for module `\FIFO36_72'.
+Generating RTLIL representation for module `\RAMB18'.
+Generating RTLIL representation for module `\RAMB36'.
+Generating RTLIL representation for module `\RAMB18SDP'.
+Generating RTLIL representation for module `\RAMB36SDP'.
+Generating RTLIL representation for module `\FIFO18E1'.
+Generating RTLIL representation for module `\FIFO36E1'.
+Generating RTLIL representation for module `\FIFO18E2'.
+Generating RTLIL representation for module `\FIFO36E2'.
+Generating RTLIL representation for module `\RAMB18E2'.
+Generating RTLIL representation for module `\RAMB36E2'.
+Generating RTLIL representation for module `\URAM288'.
+Generating RTLIL representation for module `\URAM288_BASE'.
+Generating RTLIL representation for module `\DSP48E'.
+Generating RTLIL representation for module `\DSP48E2'.
+Generating RTLIL representation for module `\FDDRCPE'.
+Generating RTLIL representation for module `\FDDRRSE'.
+Generating RTLIL representation for module `\IFDDRCPE'.
+Generating RTLIL representation for module `\IFDDRRSE'.
+Generating RTLIL representation for module `\OFDDRCPE'.
+Generating RTLIL representation for module `\OFDDRRSE'.
+Generating RTLIL representation for module `\OFDDRTCPE'.
+Generating RTLIL representation for module `\OFDDRTRSE'.
+Generating RTLIL representation for module `\IDDR2'.
+Generating RTLIL representation for module `\ODDR2'.
+Generating RTLIL representation for module `\IDDR'.
+Generating RTLIL representation for module `\IDDR_2CLK'.
+Generating RTLIL representation for module `\ODDR'.
+Generating RTLIL representation for module `\IDELAYCTRL'.
+Generating RTLIL representation for module `\IDELAY'.
+Generating RTLIL representation for module `\ISERDES'.
+Generating RTLIL representation for module `\OSERDES'.
+Generating RTLIL representation for module `\IODELAY'.
+Generating RTLIL representation for module `\ISERDES_NODELAY'.
+Generating RTLIL representation for module `\IODELAYE1'.
+Generating RTLIL representation for module `\ISERDESE1'.
+Generating RTLIL representation for module `\OSERDESE1'.
+Generating RTLIL representation for module `\IDELAYE2'.
+Generating RTLIL representation for module `\ODELAYE2'.
+Generating RTLIL representation for module `\ISERDESE2'.
+Generating RTLIL representation for module `\OSERDESE2'.
+Generating RTLIL representation for module `\PHASER_IN'.
+Generating RTLIL representation for module `\PHASER_IN_PHY'.
+Generating RTLIL representation for module `\PHASER_OUT'.
+Generating RTLIL representation for module `\PHASER_OUT_PHY'.
+Generating RTLIL representation for module `\PHASER_REF'.
+Generating RTLIL representation for module `\PHY_CONTROL'.
+Generating RTLIL representation for module `\IDDRE1'.
+Generating RTLIL representation for module `\ODDRE1'.
+Generating RTLIL representation for module `\IDELAYE3'.
+Generating RTLIL representation for module `\ODELAYE3'.
+Generating RTLIL representation for module `\ISERDESE3'.
+Generating RTLIL representation for module `\OSERDESE3'.
+Generating RTLIL representation for module `\BITSLICE_CONTROL'.
+Generating RTLIL representation for module `\RIU_OR'.
+Generating RTLIL representation for module `\RX_BITSLICE'.
+Generating RTLIL representation for module `\RXTX_BITSLICE'.
+Generating RTLIL representation for module `\TX_BITSLICE'.
+Generating RTLIL representation for module `\TX_BITSLICE_TRI'.
+Generating RTLIL representation for module `\IODELAY2'.
+Generating RTLIL representation for module `\IODRP2'.
+Generating RTLIL representation for module `\IODRP2_MCB'.
+Generating RTLIL representation for module `\ISERDES2'.
+Generating RTLIL representation for module `\OSERDES2'.
+Generating RTLIL representation for module `\IBUF_DLY_ADJ'.
+Generating RTLIL representation for module `\IBUF_IBUFDISABLE'.
+Generating RTLIL representation for module `\IBUF_INTERMDISABLE'.
+Generating RTLIL representation for module `\IBUF_ANALOG'.
+Generating RTLIL representation for module `\IBUFE3'.
+Generating RTLIL representation for module `\IBUFDS'.
+Generating RTLIL representation for module `\IBUFDS_DLY_ADJ'.
+Generating RTLIL representation for module `\IBUFDS_IBUFDISABLE'.
+Generating RTLIL representation for module `\IBUFDS_INTERMDISABLE'.
+Generating RTLIL representation for module `\IBUFDS_DIFF_OUT'.
+Generating RTLIL representation for module `\IBUFDS_DIFF_OUT_IBUFDISABLE'.
+Generating RTLIL representation for module `\IBUFDS_DIFF_OUT_INTERMDISABLE'.
+Generating RTLIL representation for module `\IBUFDSE3'.
+Generating RTLIL representation for module `\IBUFDS_DPHY'.
+Generating RTLIL representation for module `\IBUFGDS'.
+Generating RTLIL representation for module `\IBUFGDS_DIFF_OUT'.
+Generating RTLIL representation for module `\IOBUF_DCIEN'.
+Generating RTLIL representation for module `\IOBUF_INTERMDISABLE'.
+Generating RTLIL representation for module `\IOBUFE3'.
+Generating RTLIL representation for module `\IOBUFDS'.
+Generating RTLIL representation for module `\IOBUFDS_DCIEN'.
+Generating RTLIL representation for module `\IOBUFDS_INTERMDISABLE'.
+Generating RTLIL representation for module `\IOBUFDS_DIFF_OUT'.
+Generating RTLIL representation for module `\IOBUFDS_DIFF_OUT_DCIEN'.
+Generating RTLIL representation for module `\IOBUFDS_DIFF_OUT_INTERMDISABLE'.
+Generating RTLIL representation for module `\IOBUFDSE3'.
+Generating RTLIL representation for module `\OBUFDS'.
+Generating RTLIL representation for module `\OBUFDS_DPHY'.
+Generating RTLIL representation for module `\OBUFTDS'.
+Generating RTLIL representation for module `\KEEPER'.
+Generating RTLIL representation for module `\PULLDOWN'.
+Generating RTLIL representation for module `\PULLUP'.
+Generating RTLIL representation for module `\DCIRESET'.
+Generating RTLIL representation for module `\HPIO_VREF'.
+Generating RTLIL representation for module `\BUFGCE'.
+Generating RTLIL representation for module `\BUFGCE_1'.
+Generating RTLIL representation for module `\BUFGMUX'.
+Generating RTLIL representation for module `\BUFGMUX_1'.
+Generating RTLIL representation for module `\BUFGMUX_CTRL'.
+Generating RTLIL representation for module `\BUFGMUX_VIRTEX4'.
+Generating RTLIL representation for module `\BUFG_GT'.
+Generating RTLIL representation for module `\BUFG_GT_SYNC'.
+Generating RTLIL representation for module `\BUFG_PS'.
+Generating RTLIL representation for module `\BUFGCE_DIV'.
+Generating RTLIL representation for module `\BUFH'.
+Generating RTLIL representation for module `\BUFIO2'.
+Generating RTLIL representation for module `\BUFIO2_2CLK'.
+Generating RTLIL representation for module `\BUFIO2FB'.
+Generating RTLIL representation for module `\BUFPLL'.
+Generating RTLIL representation for module `\BUFPLL_MCB'.
+Generating RTLIL representation for module `\BUFIO'.
+Generating RTLIL representation for module `\BUFIODQS'.
+Generating RTLIL representation for module `\BUFR'.
+Generating RTLIL representation for module `\BUFMR'.
+Generating RTLIL representation for module `\BUFMRCE'.
+Generating RTLIL representation for module `\DCM'.
+Generating RTLIL representation for module `\DCM_SP'.
+Generating RTLIL representation for module `\DCM_CLKGEN'.
+Generating RTLIL representation for module `\DCM_ADV'.
+Generating RTLIL representation for module `\DCM_BASE'.
+Generating RTLIL representation for module `\DCM_PS'.
+Generating RTLIL representation for module `\PMCD'.
+Generating RTLIL representation for module `\PLL_ADV'.
+Generating RTLIL representation for module `\PLL_BASE'.
+Generating RTLIL representation for module `\MMCM_ADV'.
+Generating RTLIL representation for module `\MMCM_BASE'.
+Generating RTLIL representation for module `\MMCME2_ADV'.
+Generating RTLIL representation for module `\MMCME2_BASE'.
+Generating RTLIL representation for module `\PLLE2_ADV'.
+Generating RTLIL representation for module `\PLLE2_BASE'.
+Generating RTLIL representation for module `\MMCME3_ADV'.
+Generating RTLIL representation for module `\MMCME3_BASE'.
+Generating RTLIL representation for module `\PLLE3_ADV'.
+Generating RTLIL representation for module `\PLLE3_BASE'.
+Generating RTLIL representation for module `\MMCME4_ADV'.
+Generating RTLIL representation for module `\MMCME4_BASE'.
+Generating RTLIL representation for module `\PLLE4_ADV'.
+Generating RTLIL representation for module `\PLLE4_BASE'.
+Generating RTLIL representation for module `\BUFT'.
+Generating RTLIL representation for module `\IN_FIFO'.
+Generating RTLIL representation for module `\OUT_FIFO'.
+Generating RTLIL representation for module `\HARD_SYNC'.
+Generating RTLIL representation for module `\STARTUP_SPARTAN3'.
+Generating RTLIL representation for module `\STARTUP_SPARTAN3E'.
+Generating RTLIL representation for module `\STARTUP_SPARTAN3A'.
+Generating RTLIL representation for module `\STARTUP_SPARTAN6'.
+Generating RTLIL representation for module `\STARTUP_VIRTEX4'.
+Generating RTLIL representation for module `\STARTUP_VIRTEX5'.
+Generating RTLIL representation for module `\STARTUP_VIRTEX6'.
+Generating RTLIL representation for module `\STARTUPE2'.
+Generating RTLIL representation for module `\STARTUPE3'.
+Generating RTLIL representation for module `\CAPTURE_SPARTAN3'.
+Generating RTLIL representation for module `\CAPTURE_SPARTAN3A'.
+Generating RTLIL representation for module `\CAPTURE_VIRTEX4'.
+Generating RTLIL representation for module `\CAPTURE_VIRTEX5'.
+Generating RTLIL representation for module `\CAPTURE_VIRTEX6'.
+Generating RTLIL representation for module `\CAPTUREE2'.
+Generating RTLIL representation for module `\ICAP_SPARTAN3A'.
+Generating RTLIL representation for module `\ICAP_SPARTAN6'.
+Generating RTLIL representation for module `\ICAP_VIRTEX4'.
+Generating RTLIL representation for module `\ICAP_VIRTEX5'.
+Generating RTLIL representation for module `\ICAP_VIRTEX6'.
+Generating RTLIL representation for module `\ICAPE2'.
+Generating RTLIL representation for module `\ICAPE3'.
+Generating RTLIL representation for module `\BSCAN_SPARTAN3'.
+Generating RTLIL representation for module `\BSCAN_SPARTAN3A'.
+Generating RTLIL representation for module `\BSCAN_SPARTAN6'.
+Generating RTLIL representation for module `\BSCAN_VIRTEX4'.
+Generating RTLIL representation for module `\BSCAN_VIRTEX5'.
+Generating RTLIL representation for module `\BSCAN_VIRTEX6'.
+Generating RTLIL representation for module `\BSCANE2'.
+Generating RTLIL representation for module `\DNA_PORT'.
+Generating RTLIL representation for module `\DNA_PORTE2'.
+Generating RTLIL representation for module `\FRAME_ECC_VIRTEX4'.
+Generating RTLIL representation for module `\FRAME_ECC_VIRTEX5'.
+Generating RTLIL representation for module `\FRAME_ECC_VIRTEX6'.
+Generating RTLIL representation for module `\FRAME_ECCE2'.
+Generating RTLIL representation for module `\FRAME_ECCE3'.
+Generating RTLIL representation for module `\FRAME_ECCE4'.
+Generating RTLIL representation for module `\USR_ACCESS_VIRTEX4'.
+Generating RTLIL representation for module `\USR_ACCESS_VIRTEX5'.
+Generating RTLIL representation for module `\USR_ACCESS_VIRTEX6'.
+Generating RTLIL representation for module `\USR_ACCESSE2'.
+Generating RTLIL representation for module `\POST_CRC_INTERNAL'.
+Generating RTLIL representation for module `\SUSPEND_SYNC'.
+Generating RTLIL representation for module `\KEY_CLEAR'.
+Generating RTLIL representation for module `\MASTER_JTAG'.
+Generating RTLIL representation for module `\SPI_ACCESS'.
+Generating RTLIL representation for module `\EFUSE_USR'.
+Generating RTLIL representation for module `\SYSMON'.
+Generating RTLIL representation for module `\XADC'.
+Generating RTLIL representation for module `\SYSMONE1'.
+Generating RTLIL representation for module `\SYSMONE4'.
+Generating RTLIL representation for module `\GTPA1_DUAL'.
+Generating RTLIL representation for module `\GT11_CUSTOM'.
+Generating RTLIL representation for module `\GT11_DUAL'.
+Generating RTLIL representation for module `\GT11CLK'.
+Generating RTLIL representation for module `\GT11CLK_MGT'.
+Generating RTLIL representation for module `\GTP_DUAL'.
+Generating RTLIL representation for module `\GTX_DUAL'.
+Generating RTLIL representation for module `\CRC32'.
+Generating RTLIL representation for module `\CRC64'.
+Generating RTLIL representation for module `\GTHE1_QUAD'.
+Generating RTLIL representation for module `\GTXE1'.
+Generating RTLIL representation for module `\IBUFDS_GTXE1'.
+Generating RTLIL representation for module `\IBUFDS_GTHE1'.
+Generating RTLIL representation for module `\GTHE2_CHANNEL'.
+Generating RTLIL representation for module `\GTHE2_COMMON'.
+Generating RTLIL representation for module `\GTPE2_CHANNEL'.
+Generating RTLIL representation for module `\GTPE2_COMMON'.
+Generating RTLIL representation for module `\GTXE2_CHANNEL'.
+Generating RTLIL representation for module `\GTXE2_COMMON'.
+Generating RTLIL representation for module `\IBUFDS_GTE2'.
+Generating RTLIL representation for module `\GTHE3_CHANNEL'.
+Generating RTLIL representation for module `\GTHE3_COMMON'.
+Generating RTLIL representation for module `\GTYE3_CHANNEL'.
+Generating RTLIL representation for module `\GTYE3_COMMON'.
+Generating RTLIL representation for module `\IBUFDS_GTE3'.
+Generating RTLIL representation for module `\OBUFDS_GTE3'.
+Generating RTLIL representation for module `\OBUFDS_GTE3_ADV'.
+Generating RTLIL representation for module `\GTHE4_CHANNEL'.
+Generating RTLIL representation for module `\GTHE4_COMMON'.
+Generating RTLIL representation for module `\GTYE4_CHANNEL'.
+Generating RTLIL representation for module `\GTYE4_COMMON'.
+Generating RTLIL representation for module `\IBUFDS_GTE4'.
+Generating RTLIL representation for module `\OBUFDS_GTE4'.
+Generating RTLIL representation for module `\OBUFDS_GTE4_ADV'.
+Generating RTLIL representation for module `\GTM_DUAL'.
+Generating RTLIL representation for module `\IBUFDS_GTM'.
+Generating RTLIL representation for module `\OBUFDS_GTM'.
+Generating RTLIL representation for module `\OBUFDS_GTM_ADV'.
+Generating RTLIL representation for module `\HSDAC'.
+Generating RTLIL representation for module `\HSADC'.
+Generating RTLIL representation for module `\RFDAC'.
+Generating RTLIL representation for module `\RFADC'.
+Generating RTLIL representation for module `\PCIE_A1'.
+Generating RTLIL representation for module `\PCIE_EP'.
+Generating RTLIL representation for module `\PCIE_2_0'.
+Generating RTLIL representation for module `\PCIE_2_1'.
+Generating RTLIL representation for module `\PCIE_3_0'.
+Generating RTLIL representation for module `\PCIE_3_1'.
+Generating RTLIL representation for module `\PCIE40E4'.
+Generating RTLIL representation for module `\PCIE4CE4'.
+Generating RTLIL representation for module `\EMAC'.
+Generating RTLIL representation for module `\TEMAC'.
+Generating RTLIL representation for module `\TEMAC_SINGLE'.
+Generating RTLIL representation for module `\CMAC'.
+Generating RTLIL representation for module `\CMACE4'.
+Generating RTLIL representation for module `\MCB'.
+Generating RTLIL representation for module `\HBM_REF_CLK'.
+Generating RTLIL representation for module `\HBM_SNGLBLI_INTF_APB'.
+Generating RTLIL representation for module `\HBM_SNGLBLI_INTF_AXI'.
+Generating RTLIL representation for module `\HBM_ONE_STACK_INTF'.
+Generating RTLIL representation for module `\HBM_TWO_STACK_INTF'.
+Generating RTLIL representation for module `\PPC405_ADV'.
+Generating RTLIL representation for module `\PPC440'.
+Generating RTLIL representation for module `\PS7'.
+Generating RTLIL representation for module `\PS8'.
+Generating RTLIL representation for module `\ILKN'.
+Generating RTLIL representation for module `\ILKNE4'.
+Generating RTLIL representation for module `\VCU'.
+Generating RTLIL representation for module `\FE'.
+Successfully finished Verilog frontend.
+
+2.3. Executing HIERARCHY pass (managing design hierarchy).
+
+2.3.1. Finding top of design hierarchy..
+root of   0 design levels: lgn_fsm             
+Automatically selected lgn_fsm as design top module.
+
+2.3.2. Analyzing design hierarchy..
+Top module:  \lgn_fsm
+
+2.3.3. Analyzing design hierarchy..
+Top module:  \lgn_fsm
+Removed 0 unused modules.
+
+2.4. Executing PROC pass (convert processes to netlists).
+
+2.4.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.4.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.4.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+2.4.4. Executing PROC_INIT pass (extract init attributes).
+
+2.4.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.4.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.4.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+
+2.4.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.4.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.4.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.4.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.4.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.5. Executing TRIBUF pass.
+
+2.6. Executing DEMINOUT pass (demote inout ports to input or output).
+
+2.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+Removed 10 unused cells and 10 unused wires.
+<suppressed ~20 debug messages>
+
+2.9. Executing CHECK pass (checking for obvious problems).
+Checking module lgn_fsm...
+Found and reported 0 problems.
+
+2.10. Executing OPT pass (performing simple optimizations).
+
+2.10.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.10.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7795 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+<suppressed ~24 debug messages>
+Removed a total of 8 cells.
+
+2.10.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lgn_fsm..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+2.10.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lgn_fsm.
+Performed a total of 0 changes.
+
+2.10.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.10.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.10.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.10.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.10.9. Finished fast OPT passes. (There is nothing left to do.)
+
+2.11. Executing FSM pass (extract and optimize FSM).
+
+2.11.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+2.11.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+2.11.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.11.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.11.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.11.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+2.11.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+2.11.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+2.12. Executing OPT pass (performing simple optimizations).
+
+2.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.12.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lgn_fsm..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+2.12.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lgn_fsm.
+Performed a total of 0 changes.
+
+2.12.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.12.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.12.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.12.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.12.9. Finished fast OPT passes. (There is nothing left to do.)
+
+2.13. Executing WREDUCE pass (reducing word size of cells).
+
+2.14. Executing PEEPOPT pass (run peephole optimizers).
+
+2.15. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.16. Executing PMUX2SHIFTX pass.
+
+2.17. Executing SORT pass.
+
+2.18. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+2.19. Executing TECHMAP pass (map to technology primitives).
+
+2.19.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/mul2dsp.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/mul2dsp.v' to AST representation.
+Generating RTLIL representation for module `\_80_mul'.
+Generating RTLIL representation for module `\_90_soft_mul'.
+Successfully finished Verilog frontend.
+
+2.19.2. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/xc7_dsp_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/xc7_dsp_map.v' to AST representation.
+Generating RTLIL representation for module `$__MUL25X18'.
+Successfully finished Verilog frontend.
+
+2.19.3. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~5 debug messages>
+
+2.20. Executing OPT_EXPR pass (perform const folding).
+
+2.21. Executing WREDUCE pass (reducing word size of cells).
+
+2.22. Executing XILINX_DSP pass (pack resources into DSPs).
+
+2.23. Executing TECHMAP pass (map to technology primitives).
+
+2.23.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/cmp2lut.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/cmp2lut.v' to AST representation.
+Generating RTLIL representation for module `\_90_lut_cmp_'.
+Successfully finished Verilog frontend.
+
+2.23.2. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/cmp2lcu.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/cmp2lcu.v' to AST representation.
+Generating RTLIL representation for module `\_80_lcu_cmp_'.
+Generating RTLIL representation for module `$__CMP2LCU'.
+Successfully finished Verilog frontend.
+
+2.23.3. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~7 debug messages>
+
+2.24. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module lgn_fsm:
+  created 0 $alu and 0 $macc cells.
+
+2.25. Executing SHARE pass (SAT-based resource sharing).
+
+2.26. Executing OPT pass (performing simple optimizations).
+
+2.26.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.26.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.26.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lgn_fsm..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+2.26.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lgn_fsm.
+Performed a total of 0 changes.
+
+2.26.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.26.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.26.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.26.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.26.9. Finished fast OPT passes. (There is nothing left to do.)
+
+2.27. Executing MEMORY pass.
+
+2.27.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+2.27.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+2.27.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+2.27.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+2.27.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+2.27.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.27.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+2.27.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+2.27.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.27.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.28. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.29. Executing MEMORY_LIBMAP pass (mapping memories to cells).
+
+2.30. Executing TECHMAP pass (map to technology primitives).
+
+2.30.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/lutrams_xc5v_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/lutrams_xc5v_map.v' to AST representation.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_SP_'.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_DP_'.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_QP_'.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_OP_'.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_SDP_'.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_64X8SW_'.
+Generating RTLIL representation for module `$__XILINX_LUTRAM_32X16DR8_'.
+Successfully finished Verilog frontend.
+
+2.30.2. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~9 debug messages>
+
+2.31. Executing TECHMAP pass (map to technology primitives).
+
+2.31.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/brams_xc6v_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/brams_xc6v_map.v' to AST representation.
+Generating RTLIL representation for module `$__XILINX_BLOCKRAM_TDP_'.
+Generating RTLIL representation for module `$__XILINX_BLOCKRAM_SDP_'.
+Successfully finished Verilog frontend.
+
+2.31.2. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~4 debug messages>
+
+2.32. Executing OPT pass (performing simple optimizations).
+
+2.32.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.32.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.32.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.32.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.32.5. Finished fast OPT passes.
+
+2.33. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+2.34. Executing OPT pass (performing simple optimizations).
+
+2.34.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.34.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.34.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lgn_fsm..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+2.34.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lgn_fsm.
+Performed a total of 0 changes.
+
+2.34.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 7787 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Removed a total of 0 cells.
+
+2.34.6. Executing OPT_SHARE pass.
+
+2.34.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.34.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+
+2.34.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+
+2.34.10. Finished fast OPT passes. (There is nothing left to do.)
+
+2.35. Executing XILINX_SRL pass (Xilinx shift register extraction).
+
+2.36. Executing TECHMAP pass (map to technology primitives).
+
+2.36.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/techmap.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu_brent_kung'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `$__div_mod_u'.
+Generating RTLIL representation for module `$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Generating RTLIL representation for module `$connect'.
+Generating RTLIL representation for module `$input_port'.
+Successfully finished Verilog frontend.
+
+2.36.2. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/arith_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/arith_map.v' to AST representation.
+Generating RTLIL representation for module `\_80_xilinx_lcu'.
+Generating RTLIL representation for module `\_80_xilinx_alu'.
+Successfully finished Verilog frontend.
+
+2.36.3. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $lut.
+No more expansions possible.
+<suppressed ~6840 debug messages>
+
+2.37. Executing OPT pass (performing simple optimizations).
+
+2.37.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+<suppressed ~13454 debug messages>
+
+2.37.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lgn_fsm'.
+Computing hashes of 8347 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Computing hashes of 7332 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Computing hashes of 7328 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Computing hashes of 7326 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+Computing hashes of 7325 cells of `\lgn_fsm'.
+Finding duplicate cells in `\lgn_fsm'.
+<suppressed ~3066 debug messages>
+Removed a total of 1022 cells.
+
+2.37.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.37.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lgn_fsm..
+Removed 327 unused cells and 12532 unused wires.
+<suppressed ~634 debug messages>
+
+2.37.5. Finished fast OPT passes.
+
+2.38. Executing IOPADMAP pass (mapping inputs/outputs to IO-PAD cells).
+Mapping port lgn_fsm.clk using IBUF.
+Mapping port lgn_fsm.o0 using OBUF.
+Mapping port lgn_fsm.o1 using OBUF.
+Mapping port lgn_fsm.o10 using OBUF.
+Mapping port lgn_fsm.o100 using OBUF.
+Mapping port lgn_fsm.o1000 using OBUF.
+Mapping port lgn_fsm.o1001 using OBUF.
+Mapping port lgn_fsm.o1002 using OBUF.
+Mapping port lgn_fsm.o1003 using OBUF.
+Mapping port lgn_fsm.o1004 using OBUF.
+Mapping port lgn_fsm.o1005 using OBUF.
+Mapping port lgn_fsm.o1006 using OBUF.
+Mapping port lgn_fsm.o1007 using OBUF.
+Mapping port lgn_fsm.o1008 using OBUF.
+Mapping port lgn_fsm.o1009 using OBUF.
+Mapping port lgn_fsm.o101 using OBUF.
+Mapping port lgn_fsm.o1010 using OBUF.
+Mapping port lgn_fsm.o1011 using OBUF.
+Mapping port lgn_fsm.o1012 using OBUF.
+Mapping port lgn_fsm.o1013 using OBUF.
+Mapping port lgn_fsm.o1014 using OBUF.
+Mapping port lgn_fsm.o1015 using OBUF.
+Mapping port lgn_fsm.o1016 using OBUF.
+Mapping port lgn_fsm.o1017 using OBUF.
+Mapping port lgn_fsm.o1018 using OBUF.
+Mapping port lgn_fsm.o1019 using OBUF.
+Mapping port lgn_fsm.o102 using OBUF.
+Mapping port lgn_fsm.o1020 using OBUF.
+Mapping port lgn_fsm.o1021 using OBUF.
+Mapping port lgn_fsm.o1022 using OBUF.
+Mapping port lgn_fsm.o1023 using OBUF.
+Mapping port lgn_fsm.o103 using OBUF.
+Mapping port lgn_fsm.o104 using OBUF.
+Mapping port lgn_fsm.o105 using OBUF.
+Mapping port lgn_fsm.o106 using OBUF.
+Mapping port lgn_fsm.o107 using OBUF.
+Mapping port lgn_fsm.o108 using OBUF.
+Mapping port lgn_fsm.o109 using OBUF.
+Mapping port lgn_fsm.o11 using OBUF.
+Mapping port lgn_fsm.o110 using OBUF.
+Mapping port lgn_fsm.o111 using OBUF.
+Mapping port lgn_fsm.o112 using OBUF.
+Mapping port lgn_fsm.o113 using OBUF.
+Mapping port lgn_fsm.o114 using OBUF.
+Mapping port lgn_fsm.o115 using OBUF.
+Mapping port lgn_fsm.o116 using OBUF.
+Mapping port lgn_fsm.o117 using OBUF.
+Mapping port lgn_fsm.o118 using OBUF.
+Mapping port lgn_fsm.o119 using OBUF.
+Mapping port lgn_fsm.o12 using OBUF.
+Mapping port lgn_fsm.o120 using OBUF.
+Mapping port lgn_fsm.o121 using OBUF.
+Mapping port lgn_fsm.o122 using OBUF.
+Mapping port lgn_fsm.o123 using OBUF.
+Mapping port lgn_fsm.o124 using OBUF.
+Mapping port lgn_fsm.o125 using OBUF.
+Mapping port lgn_fsm.o126 using OBUF.
+Mapping port lgn_fsm.o127 using OBUF.
+Mapping port lgn_fsm.o128 using OBUF.
+Mapping port lgn_fsm.o129 using OBUF.
+Mapping port lgn_fsm.o13 using OBUF.
+Mapping port lgn_fsm.o130 using OBUF.
+Mapping port lgn_fsm.o131 using OBUF.
+Mapping port lgn_fsm.o132 using OBUF.
+Mapping port lgn_fsm.o133 using OBUF.
+Mapping port lgn_fsm.o134 using OBUF.
+Mapping port lgn_fsm.o135 using OBUF.
+Mapping port lgn_fsm.o136 using OBUF.
+Mapping port lgn_fsm.o137 using OBUF.
+Mapping port lgn_fsm.o138 using OBUF.
+Mapping port lgn_fsm.o139 using OBUF.
+Mapping port lgn_fsm.o14 using OBUF.
+Mapping port lgn_fsm.o140 using OBUF.
+Mapping port lgn_fsm.o141 using OBUF.
+Mapping port lgn_fsm.o142 using OBUF.
+Mapping port lgn_fsm.o143 using OBUF.
+Mapping port lgn_fsm.o144 using OBUF.
+Mapping port lgn_fsm.o145 using OBUF.
+Mapping port lgn_fsm.o146 using OBUF.
+Mapping port lgn_fsm.o147 using OBUF.
+Mapping port lgn_fsm.o148 using OBUF.
+Mapping port lgn_fsm.o149 using OBUF.
+Mapping port lgn_fsm.o15 using OBUF.
+Mapping port lgn_fsm.o150 using OBUF.
+Mapping port lgn_fsm.o151 using OBUF.
+Mapping port lgn_fsm.o152 using OBUF.
+Mapping port lgn_fsm.o153 using OBUF.
+Mapping port lgn_fsm.o154 using OBUF.
+Mapping port lgn_fsm.o155 using OBUF.
+Mapping port lgn_fsm.o156 using OBUF.
+Mapping port lgn_fsm.o157 using OBUF.
+Mapping port lgn_fsm.o158 using OBUF.
+Mapping port lgn_fsm.o159 using OBUF.
+Mapping port lgn_fsm.o16 using OBUF.
+Mapping port lgn_fsm.o160 using OBUF.
+Mapping port lgn_fsm.o161 using OBUF.
+Mapping port lgn_fsm.o162 using OBUF.
+Mapping port lgn_fsm.o163 using OBUF.
+Mapping port lgn_fsm.o164 using OBUF.
+Mapping port lgn_fsm.o165 using OBUF.
+Mapping port lgn_fsm.o166 using OBUF.
+Mapping port lgn_fsm.o167 using OBUF.
+Mapping port lgn_fsm.o168 using OBUF.
+Mapping port lgn_fsm.o169 using OBUF.
+Mapping port lgn_fsm.o17 using OBUF.
+Mapping port lgn_fsm.o170 using OBUF.
+Mapping port lgn_fsm.o171 using OBUF.
+Mapping port lgn_fsm.o172 using OBUF.
+Mapping port lgn_fsm.o173 using OBUF.
+Mapping port lgn_fsm.o174 using OBUF.
+Mapping port lgn_fsm.o175 using OBUF.
+Mapping port lgn_fsm.o176 using OBUF.
+Mapping port lgn_fsm.o177 using OBUF.
+Mapping port lgn_fsm.o178 using OBUF.
+Mapping port lgn_fsm.o179 using OBUF.
+Mapping port lgn_fsm.o18 using OBUF.
+Mapping port lgn_fsm.o180 using OBUF.
+Mapping port lgn_fsm.o181 using OBUF.
+Mapping port lgn_fsm.o182 using OBUF.
+Mapping port lgn_fsm.o183 using OBUF.
+Mapping port lgn_fsm.o184 using OBUF.
+Mapping port lgn_fsm.o185 using OBUF.
+Mapping port lgn_fsm.o186 using OBUF.
+Mapping port lgn_fsm.o187 using OBUF.
+Mapping port lgn_fsm.o188 using OBUF.
+Mapping port lgn_fsm.o189 using OBUF.
+Mapping port lgn_fsm.o19 using OBUF.
+Mapping port lgn_fsm.o190 using OBUF.
+Mapping port lgn_fsm.o191 using OBUF.
+Mapping port lgn_fsm.o192 using OBUF.
+Mapping port lgn_fsm.o193 using OBUF.
+Mapping port lgn_fsm.o194 using OBUF.
+Mapping port lgn_fsm.o195 using OBUF.
+Mapping port lgn_fsm.o196 using OBUF.
+Mapping port lgn_fsm.o197 using OBUF.
+Mapping port lgn_fsm.o198 using OBUF.
+Mapping port lgn_fsm.o199 using OBUF.
+Mapping port lgn_fsm.o2 using OBUF.
+Mapping port lgn_fsm.o20 using OBUF.
+Mapping port lgn_fsm.o200 using OBUF.
+Mapping port lgn_fsm.o201 using OBUF.
+Mapping port lgn_fsm.o202 using OBUF.
+Mapping port lgn_fsm.o203 using OBUF.
+Mapping port lgn_fsm.o204 using OBUF.
+Mapping port lgn_fsm.o205 using OBUF.
+Mapping port lgn_fsm.o206 using OBUF.
+Mapping port lgn_fsm.o207 using OBUF.
+Mapping port lgn_fsm.o208 using OBUF.
+Mapping port lgn_fsm.o209 using OBUF.
+Mapping port lgn_fsm.o21 using OBUF.
+Mapping port lgn_fsm.o210 using OBUF.
+Mapping port lgn_fsm.o211 using OBUF.
+Mapping port lgn_fsm.o212 using OBUF.
+Mapping port lgn_fsm.o213 using OBUF.
+Mapping port lgn_fsm.o214 using OBUF.
+Mapping port lgn_fsm.o215 using OBUF.
+Mapping port lgn_fsm.o216 using OBUF.
+Mapping port lgn_fsm.o217 using OBUF.
+Mapping port lgn_fsm.o218 using OBUF.
+Mapping port lgn_fsm.o219 using OBUF.
+Mapping port lgn_fsm.o22 using OBUF.
+Mapping port lgn_fsm.o220 using OBUF.
+Mapping port lgn_fsm.o221 using OBUF.
+Mapping port lgn_fsm.o222 using OBUF.
+Mapping port lgn_fsm.o223 using OBUF.
+Mapping port lgn_fsm.o224 using OBUF.
+Mapping port lgn_fsm.o225 using OBUF.
+Mapping port lgn_fsm.o226 using OBUF.
+Mapping port lgn_fsm.o227 using OBUF.
+Mapping port lgn_fsm.o228 using OBUF.
+Mapping port lgn_fsm.o229 using OBUF.
+Mapping port lgn_fsm.o23 using OBUF.
+Mapping port lgn_fsm.o230 using OBUF.
+Mapping port lgn_fsm.o231 using OBUF.
+Mapping port lgn_fsm.o232 using OBUF.
+Mapping port lgn_fsm.o233 using OBUF.
+Mapping port lgn_fsm.o234 using OBUF.
+Mapping port lgn_fsm.o235 using OBUF.
+Mapping port lgn_fsm.o236 using OBUF.
+Mapping port lgn_fsm.o237 using OBUF.
+Mapping port lgn_fsm.o238 using OBUF.
+Mapping port lgn_fsm.o239 using OBUF.
+Mapping port lgn_fsm.o24 using OBUF.
+Mapping port lgn_fsm.o240 using OBUF.
+Mapping port lgn_fsm.o241 using OBUF.
+Mapping port lgn_fsm.o242 using OBUF.
+Mapping port lgn_fsm.o243 using OBUF.
+Mapping port lgn_fsm.o244 using OBUF.
+Mapping port lgn_fsm.o245 using OBUF.
+Mapping port lgn_fsm.o246 using OBUF.
+Mapping port lgn_fsm.o247 using OBUF.
+Mapping port lgn_fsm.o248 using OBUF.
+Mapping port lgn_fsm.o249 using OBUF.
+Mapping port lgn_fsm.o25 using OBUF.
+Mapping port lgn_fsm.o250 using OBUF.
+Mapping port lgn_fsm.o251 using OBUF.
+Mapping port lgn_fsm.o252 using OBUF.
+Mapping port lgn_fsm.o253 using OBUF.
+Mapping port lgn_fsm.o254 using OBUF.
+Mapping port lgn_fsm.o255 using OBUF.
+Mapping port lgn_fsm.o256 using OBUF.
+Mapping port lgn_fsm.o257 using OBUF.
+Mapping port lgn_fsm.o258 using OBUF.
+Mapping port lgn_fsm.o259 using OBUF.
+Mapping port lgn_fsm.o26 using OBUF.
+Mapping port lgn_fsm.o260 using OBUF.
+Mapping port lgn_fsm.o261 using OBUF.
+Mapping port lgn_fsm.o262 using OBUF.
+Mapping port lgn_fsm.o263 using OBUF.
+Mapping port lgn_fsm.o264 using OBUF.
+Mapping port lgn_fsm.o265 using OBUF.
+Mapping port lgn_fsm.o266 using OBUF.
+Mapping port lgn_fsm.o267 using OBUF.
+Mapping port lgn_fsm.o268 using OBUF.
+Mapping port lgn_fsm.o269 using OBUF.
+Mapping port lgn_fsm.o27 using OBUF.
+Mapping port lgn_fsm.o270 using OBUF.
+Mapping port lgn_fsm.o271 using OBUF.
+Mapping port lgn_fsm.o272 using OBUF.
+Mapping port lgn_fsm.o273 using OBUF.
+Mapping port lgn_fsm.o274 using OBUF.
+Mapping port lgn_fsm.o275 using OBUF.
+Mapping port lgn_fsm.o276 using OBUF.
+Mapping port lgn_fsm.o277 using OBUF.
+Mapping port lgn_fsm.o278 using OBUF.
+Mapping port lgn_fsm.o279 using OBUF.
+Mapping port lgn_fsm.o28 using OBUF.
+Mapping port lgn_fsm.o280 using OBUF.
+Mapping port lgn_fsm.o281 using OBUF.
+Mapping port lgn_fsm.o282 using OBUF.
+Mapping port lgn_fsm.o283 using OBUF.
+Mapping port lgn_fsm.o284 using OBUF.
+Mapping port lgn_fsm.o285 using OBUF.
+Mapping port lgn_fsm.o286 using OBUF.
+Mapping port lgn_fsm.o287 using OBUF.
+Mapping port lgn_fsm.o288 using OBUF.
+Mapping port lgn_fsm.o289 using OBUF.
+Mapping port lgn_fsm.o29 using OBUF.
+Mapping port lgn_fsm.o290 using OBUF.
+Mapping port lgn_fsm.o291 using OBUF.
+Mapping port lgn_fsm.o292 using OBUF.
+Mapping port lgn_fsm.o293 using OBUF.
+Mapping port lgn_fsm.o294 using OBUF.
+Mapping port lgn_fsm.o295 using OBUF.
+Mapping port lgn_fsm.o296 using OBUF.
+Mapping port lgn_fsm.o297 using OBUF.
+Mapping port lgn_fsm.o298 using OBUF.
+Mapping port lgn_fsm.o299 using OBUF.
+Mapping port lgn_fsm.o3 using OBUF.
+Mapping port lgn_fsm.o30 using OBUF.
+Mapping port lgn_fsm.o300 using OBUF.
+Mapping port lgn_fsm.o301 using OBUF.
+Mapping port lgn_fsm.o302 using OBUF.
+Mapping port lgn_fsm.o303 using OBUF.
+Mapping port lgn_fsm.o304 using OBUF.
+Mapping port lgn_fsm.o305 using OBUF.
+Mapping port lgn_fsm.o306 using OBUF.
+Mapping port lgn_fsm.o307 using OBUF.
+Mapping port lgn_fsm.o308 using OBUF.
+Mapping port lgn_fsm.o309 using OBUF.
+Mapping port lgn_fsm.o31 using OBUF.
+Mapping port lgn_fsm.o310 using OBUF.
+Mapping port lgn_fsm.o311 using OBUF.
+Mapping port lgn_fsm.o312 using OBUF.
+Mapping port lgn_fsm.o313 using OBUF.
+Mapping port lgn_fsm.o314 using OBUF.
+Mapping port lgn_fsm.o315 using OBUF.
+Mapping port lgn_fsm.o316 using OBUF.
+Mapping port lgn_fsm.o317 using OBUF.
+Mapping port lgn_fsm.o318 using OBUF.
+Mapping port lgn_fsm.o319 using OBUF.
+Mapping port lgn_fsm.o32 using OBUF.
+Mapping port lgn_fsm.o320 using OBUF.
+Mapping port lgn_fsm.o321 using OBUF.
+Mapping port lgn_fsm.o322 using OBUF.
+Mapping port lgn_fsm.o323 using OBUF.
+Mapping port lgn_fsm.o324 using OBUF.
+Mapping port lgn_fsm.o325 using OBUF.
+Mapping port lgn_fsm.o326 using OBUF.
+Mapping port lgn_fsm.o327 using OBUF.
+Mapping port lgn_fsm.o328 using OBUF.
+Mapping port lgn_fsm.o329 using OBUF.
+Mapping port lgn_fsm.o33 using OBUF.
+Mapping port lgn_fsm.o330 using OBUF.
+Mapping port lgn_fsm.o331 using OBUF.
+Mapping port lgn_fsm.o332 using OBUF.
+Mapping port lgn_fsm.o333 using OBUF.
+Mapping port lgn_fsm.o334 using OBUF.
+Mapping port lgn_fsm.o335 using OBUF.
+Mapping port lgn_fsm.o336 using OBUF.
+Mapping port lgn_fsm.o337 using OBUF.
+Mapping port lgn_fsm.o338 using OBUF.
+Mapping port lgn_fsm.o339 using OBUF.
+Mapping port lgn_fsm.o34 using OBUF.
+Mapping port lgn_fsm.o340 using OBUF.
+Mapping port lgn_fsm.o341 using OBUF.
+Mapping port lgn_fsm.o342 using OBUF.
+Mapping port lgn_fsm.o343 using OBUF.
+Mapping port lgn_fsm.o344 using OBUF.
+Mapping port lgn_fsm.o345 using OBUF.
+Mapping port lgn_fsm.o346 using OBUF.
+Mapping port lgn_fsm.o347 using OBUF.
+Mapping port lgn_fsm.o348 using OBUF.
+Mapping port lgn_fsm.o349 using OBUF.
+Mapping port lgn_fsm.o35 using OBUF.
+Mapping port lgn_fsm.o350 using OBUF.
+Mapping port lgn_fsm.o351 using OBUF.
+Mapping port lgn_fsm.o352 using OBUF.
+Mapping port lgn_fsm.o353 using OBUF.
+Mapping port lgn_fsm.o354 using OBUF.
+Mapping port lgn_fsm.o355 using OBUF.
+Mapping port lgn_fsm.o356 using OBUF.
+Mapping port lgn_fsm.o357 using OBUF.
+Mapping port lgn_fsm.o358 using OBUF.
+Mapping port lgn_fsm.o359 using OBUF.
+Mapping port lgn_fsm.o36 using OBUF.
+Mapping port lgn_fsm.o360 using OBUF.
+Mapping port lgn_fsm.o361 using OBUF.
+Mapping port lgn_fsm.o362 using OBUF.
+Mapping port lgn_fsm.o363 using OBUF.
+Mapping port lgn_fsm.o364 using OBUF.
+Mapping port lgn_fsm.o365 using OBUF.
+Mapping port lgn_fsm.o366 using OBUF.
+Mapping port lgn_fsm.o367 using OBUF.
+Mapping port lgn_fsm.o368 using OBUF.
+Mapping port lgn_fsm.o369 using OBUF.
+Mapping port lgn_fsm.o37 using OBUF.
+Mapping port lgn_fsm.o370 using OBUF.
+Mapping port lgn_fsm.o371 using OBUF.
+Mapping port lgn_fsm.o372 using OBUF.
+Mapping port lgn_fsm.o373 using OBUF.
+Mapping port lgn_fsm.o374 using OBUF.
+Mapping port lgn_fsm.o375 using OBUF.
+Mapping port lgn_fsm.o376 using OBUF.
+Mapping port lgn_fsm.o377 using OBUF.
+Mapping port lgn_fsm.o378 using OBUF.
+Mapping port lgn_fsm.o379 using OBUF.
+Mapping port lgn_fsm.o38 using OBUF.
+Mapping port lgn_fsm.o380 using OBUF.
+Mapping port lgn_fsm.o381 using OBUF.
+Mapping port lgn_fsm.o382 using OBUF.
+Mapping port lgn_fsm.o383 using OBUF.
+Mapping port lgn_fsm.o384 using OBUF.
+Mapping port lgn_fsm.o385 using OBUF.
+Mapping port lgn_fsm.o386 using OBUF.
+Mapping port lgn_fsm.o387 using OBUF.
+Mapping port lgn_fsm.o388 using OBUF.
+Mapping port lgn_fsm.o389 using OBUF.
+Mapping port lgn_fsm.o39 using OBUF.
+Mapping port lgn_fsm.o390 using OBUF.
+Mapping port lgn_fsm.o391 using OBUF.
+Mapping port lgn_fsm.o392 using OBUF.
+Mapping port lgn_fsm.o393 using OBUF.
+Mapping port lgn_fsm.o394 using OBUF.
+Mapping port lgn_fsm.o395 using OBUF.
+Mapping port lgn_fsm.o396 using OBUF.
+Mapping port lgn_fsm.o397 using OBUF.
+Mapping port lgn_fsm.o398 using OBUF.
+Mapping port lgn_fsm.o399 using OBUF.
+Mapping port lgn_fsm.o4 using OBUF.
+Mapping port lgn_fsm.o40 using OBUF.
+Mapping port lgn_fsm.o400 using OBUF.
+Mapping port lgn_fsm.o401 using OBUF.
+Mapping port lgn_fsm.o402 using OBUF.
+Mapping port lgn_fsm.o403 using OBUF.
+Mapping port lgn_fsm.o404 using OBUF.
+Mapping port lgn_fsm.o405 using OBUF.
+Mapping port lgn_fsm.o406 using OBUF.
+Mapping port lgn_fsm.o407 using OBUF.
+Mapping port lgn_fsm.o408 using OBUF.
+Mapping port lgn_fsm.o409 using OBUF.
+Mapping port lgn_fsm.o41 using OBUF.
+Mapping port lgn_fsm.o410 using OBUF.
+Mapping port lgn_fsm.o411 using OBUF.
+Mapping port lgn_fsm.o412 using OBUF.
+Mapping port lgn_fsm.o413 using OBUF.
+Mapping port lgn_fsm.o414 using OBUF.
+Mapping port lgn_fsm.o415 using OBUF.
+Mapping port lgn_fsm.o416 using OBUF.
+Mapping port lgn_fsm.o417 using OBUF.
+Mapping port lgn_fsm.o418 using OBUF.
+Mapping port lgn_fsm.o419 using OBUF.
+Mapping port lgn_fsm.o42 using OBUF.
+Mapping port lgn_fsm.o420 using OBUF.
+Mapping port lgn_fsm.o421 using OBUF.
+Mapping port lgn_fsm.o422 using OBUF.
+Mapping port lgn_fsm.o423 using OBUF.
+Mapping port lgn_fsm.o424 using OBUF.
+Mapping port lgn_fsm.o425 using OBUF.
+Mapping port lgn_fsm.o426 using OBUF.
+Mapping port lgn_fsm.o427 using OBUF.
+Mapping port lgn_fsm.o428 using OBUF.
+Mapping port lgn_fsm.o429 using OBUF.
+Mapping port lgn_fsm.o43 using OBUF.
+Mapping port lgn_fsm.o430 using OBUF.
+Mapping port lgn_fsm.o431 using OBUF.
+Mapping port lgn_fsm.o432 using OBUF.
+Mapping port lgn_fsm.o433 using OBUF.
+Mapping port lgn_fsm.o434 using OBUF.
+Mapping port lgn_fsm.o435 using OBUF.
+Mapping port lgn_fsm.o436 using OBUF.
+Mapping port lgn_fsm.o437 using OBUF.
+Mapping port lgn_fsm.o438 using OBUF.
+Mapping port lgn_fsm.o439 using OBUF.
+Mapping port lgn_fsm.o44 using OBUF.
+Mapping port lgn_fsm.o440 using OBUF.
+Mapping port lgn_fsm.o441 using OBUF.
+Mapping port lgn_fsm.o442 using OBUF.
+Mapping port lgn_fsm.o443 using OBUF.
+Mapping port lgn_fsm.o444 using OBUF.
+Mapping port lgn_fsm.o445 using OBUF.
+Mapping port lgn_fsm.o446 using OBUF.
+Mapping port lgn_fsm.o447 using OBUF.
+Mapping port lgn_fsm.o448 using OBUF.
+Mapping port lgn_fsm.o449 using OBUF.
+Mapping port lgn_fsm.o45 using OBUF.
+Mapping port lgn_fsm.o450 using OBUF.
+Mapping port lgn_fsm.o451 using OBUF.
+Mapping port lgn_fsm.o452 using OBUF.
+Mapping port lgn_fsm.o453 using OBUF.
+Mapping port lgn_fsm.o454 using OBUF.
+Mapping port lgn_fsm.o455 using OBUF.
+Mapping port lgn_fsm.o456 using OBUF.
+Mapping port lgn_fsm.o457 using OBUF.
+Mapping port lgn_fsm.o458 using OBUF.
+Mapping port lgn_fsm.o459 using OBUF.
+Mapping port lgn_fsm.o46 using OBUF.
+Mapping port lgn_fsm.o460 using OBUF.
+Mapping port lgn_fsm.o461 using OBUF.
+Mapping port lgn_fsm.o462 using OBUF.
+Mapping port lgn_fsm.o463 using OBUF.
+Mapping port lgn_fsm.o464 using OBUF.
+Mapping port lgn_fsm.o465 using OBUF.
+Mapping port lgn_fsm.o466 using OBUF.
+Mapping port lgn_fsm.o467 using OBUF.
+Mapping port lgn_fsm.o468 using OBUF.
+Mapping port lgn_fsm.o469 using OBUF.
+Mapping port lgn_fsm.o47 using OBUF.
+Mapping port lgn_fsm.o470 using OBUF.
+Mapping port lgn_fsm.o471 using OBUF.
+Mapping port lgn_fsm.o472 using OBUF.
+Mapping port lgn_fsm.o473 using OBUF.
+Mapping port lgn_fsm.o474 using OBUF.
+Mapping port lgn_fsm.o475 using OBUF.
+Mapping port lgn_fsm.o476 using OBUF.
+Mapping port lgn_fsm.o477 using OBUF.
+Mapping port lgn_fsm.o478 using OBUF.
+Mapping port lgn_fsm.o479 using OBUF.
+Mapping port lgn_fsm.o48 using OBUF.
+Mapping port lgn_fsm.o480 using OBUF.
+Mapping port lgn_fsm.o481 using OBUF.
+Mapping port lgn_fsm.o482 using OBUF.
+Mapping port lgn_fsm.o483 using OBUF.
+Mapping port lgn_fsm.o484 using OBUF.
+Mapping port lgn_fsm.o485 using OBUF.
+Mapping port lgn_fsm.o486 using OBUF.
+Mapping port lgn_fsm.o487 using OBUF.
+Mapping port lgn_fsm.o488 using OBUF.
+Mapping port lgn_fsm.o489 using OBUF.
+Mapping port lgn_fsm.o49 using OBUF.
+Mapping port lgn_fsm.o490 using OBUF.
+Mapping port lgn_fsm.o491 using OBUF.
+Mapping port lgn_fsm.o492 using OBUF.
+Mapping port lgn_fsm.o493 using OBUF.
+Mapping port lgn_fsm.o494 using OBUF.
+Mapping port lgn_fsm.o495 using OBUF.
+Mapping port lgn_fsm.o496 using OBUF.
+Mapping port lgn_fsm.o497 using OBUF.
+Mapping port lgn_fsm.o498 using OBUF.
+Mapping port lgn_fsm.o499 using OBUF.
+Mapping port lgn_fsm.o5 using OBUF.
+Mapping port lgn_fsm.o50 using OBUF.
+Mapping port lgn_fsm.o500 using OBUF.
+Mapping port lgn_fsm.o501 using OBUF.
+Mapping port lgn_fsm.o502 using OBUF.
+Mapping port lgn_fsm.o503 using OBUF.
+Mapping port lgn_fsm.o504 using OBUF.
+Mapping port lgn_fsm.o505 using OBUF.
+Mapping port lgn_fsm.o506 using OBUF.
+Mapping port lgn_fsm.o507 using OBUF.
+Mapping port lgn_fsm.o508 using OBUF.
+Mapping port lgn_fsm.o509 using OBUF.
+Mapping port lgn_fsm.o51 using OBUF.
+Mapping port lgn_fsm.o510 using OBUF.
+Mapping port lgn_fsm.o511 using OBUF.
+Mapping port lgn_fsm.o512 using OBUF.
+Mapping port lgn_fsm.o513 using OBUF.
+Mapping port lgn_fsm.o514 using OBUF.
+Mapping port lgn_fsm.o515 using OBUF.
+Mapping port lgn_fsm.o516 using OBUF.
+Mapping port lgn_fsm.o517 using OBUF.
+Mapping port lgn_fsm.o518 using OBUF.
+Mapping port lgn_fsm.o519 using OBUF.
+Mapping port lgn_fsm.o52 using OBUF.
+Mapping port lgn_fsm.o520 using OBUF.
+Mapping port lgn_fsm.o521 using OBUF.
+Mapping port lgn_fsm.o522 using OBUF.
+Mapping port lgn_fsm.o523 using OBUF.
+Mapping port lgn_fsm.o524 using OBUF.
+Mapping port lgn_fsm.o525 using OBUF.
+Mapping port lgn_fsm.o526 using OBUF.
+Mapping port lgn_fsm.o527 using OBUF.
+Mapping port lgn_fsm.o528 using OBUF.
+Mapping port lgn_fsm.o529 using OBUF.
+Mapping port lgn_fsm.o53 using OBUF.
+Mapping port lgn_fsm.o530 using OBUF.
+Mapping port lgn_fsm.o531 using OBUF.
+Mapping port lgn_fsm.o532 using OBUF.
+Mapping port lgn_fsm.o533 using OBUF.
+Mapping port lgn_fsm.o534 using OBUF.
+Mapping port lgn_fsm.o535 using OBUF.
+Mapping port lgn_fsm.o536 using OBUF.
+Mapping port lgn_fsm.o537 using OBUF.
+Mapping port lgn_fsm.o538 using OBUF.
+Mapping port lgn_fsm.o539 using OBUF.
+Mapping port lgn_fsm.o54 using OBUF.
+Mapping port lgn_fsm.o540 using OBUF.
+Mapping port lgn_fsm.o541 using OBUF.
+Mapping port lgn_fsm.o542 using OBUF.
+Mapping port lgn_fsm.o543 using OBUF.
+Mapping port lgn_fsm.o544 using OBUF.
+Mapping port lgn_fsm.o545 using OBUF.
+Mapping port lgn_fsm.o546 using OBUF.
+Mapping port lgn_fsm.o547 using OBUF.
+Mapping port lgn_fsm.o548 using OBUF.
+Mapping port lgn_fsm.o549 using OBUF.
+Mapping port lgn_fsm.o55 using OBUF.
+Mapping port lgn_fsm.o550 using OBUF.
+Mapping port lgn_fsm.o551 using OBUF.
+Mapping port lgn_fsm.o552 using OBUF.
+Mapping port lgn_fsm.o553 using OBUF.
+Mapping port lgn_fsm.o554 using OBUF.
+Mapping port lgn_fsm.o555 using OBUF.
+Mapping port lgn_fsm.o556 using OBUF.
+Mapping port lgn_fsm.o557 using OBUF.
+Mapping port lgn_fsm.o558 using OBUF.
+Mapping port lgn_fsm.o559 using OBUF.
+Mapping port lgn_fsm.o56 using OBUF.
+Mapping port lgn_fsm.o560 using OBUF.
+Mapping port lgn_fsm.o561 using OBUF.
+Mapping port lgn_fsm.o562 using OBUF.
+Mapping port lgn_fsm.o563 using OBUF.
+Mapping port lgn_fsm.o564 using OBUF.
+Mapping port lgn_fsm.o565 using OBUF.
+Mapping port lgn_fsm.o566 using OBUF.
+Mapping port lgn_fsm.o567 using OBUF.
+Mapping port lgn_fsm.o568 using OBUF.
+Mapping port lgn_fsm.o569 using OBUF.
+Mapping port lgn_fsm.o57 using OBUF.
+Mapping port lgn_fsm.o570 using OBUF.
+Mapping port lgn_fsm.o571 using OBUF.
+Mapping port lgn_fsm.o572 using OBUF.
+Mapping port lgn_fsm.o573 using OBUF.
+Mapping port lgn_fsm.o574 using OBUF.
+Mapping port lgn_fsm.o575 using OBUF.
+Mapping port lgn_fsm.o576 using OBUF.
+Mapping port lgn_fsm.o577 using OBUF.
+Mapping port lgn_fsm.o578 using OBUF.
+Mapping port lgn_fsm.o579 using OBUF.
+Mapping port lgn_fsm.o58 using OBUF.
+Mapping port lgn_fsm.o580 using OBUF.
+Mapping port lgn_fsm.o581 using OBUF.
+Mapping port lgn_fsm.o582 using OBUF.
+Mapping port lgn_fsm.o583 using OBUF.
+Mapping port lgn_fsm.o584 using OBUF.
+Mapping port lgn_fsm.o585 using OBUF.
+Mapping port lgn_fsm.o586 using OBUF.
+Mapping port lgn_fsm.o587 using OBUF.
+Mapping port lgn_fsm.o588 using OBUF.
+Mapping port lgn_fsm.o589 using OBUF.
+Mapping port lgn_fsm.o59 using OBUF.
+Mapping port lgn_fsm.o590 using OBUF.
+Mapping port lgn_fsm.o591 using OBUF.
+Mapping port lgn_fsm.o592 using OBUF.
+Mapping port lgn_fsm.o593 using OBUF.
+Mapping port lgn_fsm.o594 using OBUF.
+Mapping port lgn_fsm.o595 using OBUF.
+Mapping port lgn_fsm.o596 using OBUF.
+Mapping port lgn_fsm.o597 using OBUF.
+Mapping port lgn_fsm.o598 using OBUF.
+Mapping port lgn_fsm.o599 using OBUF.
+Mapping port lgn_fsm.o6 using OBUF.
+Mapping port lgn_fsm.o60 using OBUF.
+Mapping port lgn_fsm.o600 using OBUF.
+Mapping port lgn_fsm.o601 using OBUF.
+Mapping port lgn_fsm.o602 using OBUF.
+Mapping port lgn_fsm.o603 using OBUF.
+Mapping port lgn_fsm.o604 using OBUF.
+Mapping port lgn_fsm.o605 using OBUF.
+Mapping port lgn_fsm.o606 using OBUF.
+Mapping port lgn_fsm.o607 using OBUF.
+Mapping port lgn_fsm.o608 using OBUF.
+Mapping port lgn_fsm.o609 using OBUF.
+Mapping port lgn_fsm.o61 using OBUF.
+Mapping port lgn_fsm.o610 using OBUF.
+Mapping port lgn_fsm.o611 using OBUF.
+Mapping port lgn_fsm.o612 using OBUF.
+Mapping port lgn_fsm.o613 using OBUF.
+Mapping port lgn_fsm.o614 using OBUF.
+Mapping port lgn_fsm.o615 using OBUF.
+Mapping port lgn_fsm.o616 using OBUF.
+Mapping port lgn_fsm.o617 using OBUF.
+Mapping port lgn_fsm.o618 using OBUF.
+Mapping port lgn_fsm.o619 using OBUF.
+Mapping port lgn_fsm.o62 using OBUF.
+Mapping port lgn_fsm.o620 using OBUF.
+Mapping port lgn_fsm.o621 using OBUF.
+Mapping port lgn_fsm.o622 using OBUF.
+Mapping port lgn_fsm.o623 using OBUF.
+Mapping port lgn_fsm.o624 using OBUF.
+Mapping port lgn_fsm.o625 using OBUF.
+Mapping port lgn_fsm.o626 using OBUF.
+Mapping port lgn_fsm.o627 using OBUF.
+Mapping port lgn_fsm.o628 using OBUF.
+Mapping port lgn_fsm.o629 using OBUF.
+Mapping port lgn_fsm.o63 using OBUF.
+Mapping port lgn_fsm.o630 using OBUF.
+Mapping port lgn_fsm.o631 using OBUF.
+Mapping port lgn_fsm.o632 using OBUF.
+Mapping port lgn_fsm.o633 using OBUF.
+Mapping port lgn_fsm.o634 using OBUF.
+Mapping port lgn_fsm.o635 using OBUF.
+Mapping port lgn_fsm.o636 using OBUF.
+Mapping port lgn_fsm.o637 using OBUF.
+Mapping port lgn_fsm.o638 using OBUF.
+Mapping port lgn_fsm.o639 using OBUF.
+Mapping port lgn_fsm.o64 using OBUF.
+Mapping port lgn_fsm.o640 using OBUF.
+Mapping port lgn_fsm.o641 using OBUF.
+Mapping port lgn_fsm.o642 using OBUF.
+Mapping port lgn_fsm.o643 using OBUF.
+Mapping port lgn_fsm.o644 using OBUF.
+Mapping port lgn_fsm.o645 using OBUF.
+Mapping port lgn_fsm.o646 using OBUF.
+Mapping port lgn_fsm.o647 using OBUF.
+Mapping port lgn_fsm.o648 using OBUF.
+Mapping port lgn_fsm.o649 using OBUF.
+Mapping port lgn_fsm.o65 using OBUF.
+Mapping port lgn_fsm.o650 using OBUF.
+Mapping port lgn_fsm.o651 using OBUF.
+Mapping port lgn_fsm.o652 using OBUF.
+Mapping port lgn_fsm.o653 using OBUF.
+Mapping port lgn_fsm.o654 using OBUF.
+Mapping port lgn_fsm.o655 using OBUF.
+Mapping port lgn_fsm.o656 using OBUF.
+Mapping port lgn_fsm.o657 using OBUF.
+Mapping port lgn_fsm.o658 using OBUF.
+Mapping port lgn_fsm.o659 using OBUF.
+Mapping port lgn_fsm.o66 using OBUF.
+Mapping port lgn_fsm.o660 using OBUF.
+Mapping port lgn_fsm.o661 using OBUF.
+Mapping port lgn_fsm.o662 using OBUF.
+Mapping port lgn_fsm.o663 using OBUF.
+Mapping port lgn_fsm.o664 using OBUF.
+Mapping port lgn_fsm.o665 using OBUF.
+Mapping port lgn_fsm.o666 using OBUF.
+Mapping port lgn_fsm.o667 using OBUF.
+Mapping port lgn_fsm.o668 using OBUF.
+Mapping port lgn_fsm.o669 using OBUF.
+Mapping port lgn_fsm.o67 using OBUF.
+Mapping port lgn_fsm.o670 using OBUF.
+Mapping port lgn_fsm.o671 using OBUF.
+Mapping port lgn_fsm.o672 using OBUF.
+Mapping port lgn_fsm.o673 using OBUF.
+Mapping port lgn_fsm.o674 using OBUF.
+Mapping port lgn_fsm.o675 using OBUF.
+Mapping port lgn_fsm.o676 using OBUF.
+Mapping port lgn_fsm.o677 using OBUF.
+Mapping port lgn_fsm.o678 using OBUF.
+Mapping port lgn_fsm.o679 using OBUF.
+Mapping port lgn_fsm.o68 using OBUF.
+Mapping port lgn_fsm.o680 using OBUF.
+Mapping port lgn_fsm.o681 using OBUF.
+Mapping port lgn_fsm.o682 using OBUF.
+Mapping port lgn_fsm.o683 using OBUF.
+Mapping port lgn_fsm.o684 using OBUF.
+Mapping port lgn_fsm.o685 using OBUF.
+Mapping port lgn_fsm.o686 using OBUF.
+Mapping port lgn_fsm.o687 using OBUF.
+Mapping port lgn_fsm.o688 using OBUF.
+Mapping port lgn_fsm.o689 using OBUF.
+Mapping port lgn_fsm.o69 using OBUF.
+Mapping port lgn_fsm.o690 using OBUF.
+Mapping port lgn_fsm.o691 using OBUF.
+Mapping port lgn_fsm.o692 using OBUF.
+Mapping port lgn_fsm.o693 using OBUF.
+Mapping port lgn_fsm.o694 using OBUF.
+Mapping port lgn_fsm.o695 using OBUF.
+Mapping port lgn_fsm.o696 using OBUF.
+Mapping port lgn_fsm.o697 using OBUF.
+Mapping port lgn_fsm.o698 using OBUF.
+Mapping port lgn_fsm.o699 using OBUF.
+Mapping port lgn_fsm.o7 using OBUF.
+Mapping port lgn_fsm.o70 using OBUF.
+Mapping port lgn_fsm.o700 using OBUF.
+Mapping port lgn_fsm.o701 using OBUF.
+Mapping port lgn_fsm.o702 using OBUF.
+Mapping port lgn_fsm.o703 using OBUF.
+Mapping port lgn_fsm.o704 using OBUF.
+Mapping port lgn_fsm.o705 using OBUF.
+Mapping port lgn_fsm.o706 using OBUF.
+Mapping port lgn_fsm.o707 using OBUF.
+Mapping port lgn_fsm.o708 using OBUF.
+Mapping port lgn_fsm.o709 using OBUF.
+Mapping port lgn_fsm.o71 using OBUF.
+Mapping port lgn_fsm.o710 using OBUF.
+Mapping port lgn_fsm.o711 using OBUF.
+Mapping port lgn_fsm.o712 using OBUF.
+Mapping port lgn_fsm.o713 using OBUF.
+Mapping port lgn_fsm.o714 using OBUF.
+Mapping port lgn_fsm.o715 using OBUF.
+Mapping port lgn_fsm.o716 using OBUF.
+Mapping port lgn_fsm.o717 using OBUF.
+Mapping port lgn_fsm.o718 using OBUF.
+Mapping port lgn_fsm.o719 using OBUF.
+Mapping port lgn_fsm.o72 using OBUF.
+Mapping port lgn_fsm.o720 using OBUF.
+Mapping port lgn_fsm.o721 using OBUF.
+Mapping port lgn_fsm.o722 using OBUF.
+Mapping port lgn_fsm.o723 using OBUF.
+Mapping port lgn_fsm.o724 using OBUF.
+Mapping port lgn_fsm.o725 using OBUF.
+Mapping port lgn_fsm.o726 using OBUF.
+Mapping port lgn_fsm.o727 using OBUF.
+Mapping port lgn_fsm.o728 using OBUF.
+Mapping port lgn_fsm.o729 using OBUF.
+Mapping port lgn_fsm.o73 using OBUF.
+Mapping port lgn_fsm.o730 using OBUF.
+Mapping port lgn_fsm.o731 using OBUF.
+Mapping port lgn_fsm.o732 using OBUF.
+Mapping port lgn_fsm.o733 using OBUF.
+Mapping port lgn_fsm.o734 using OBUF.
+Mapping port lgn_fsm.o735 using OBUF.
+Mapping port lgn_fsm.o736 using OBUF.
+Mapping port lgn_fsm.o737 using OBUF.
+Mapping port lgn_fsm.o738 using OBUF.
+Mapping port lgn_fsm.o739 using OBUF.
+Mapping port lgn_fsm.o74 using OBUF.
+Mapping port lgn_fsm.o740 using OBUF.
+Mapping port lgn_fsm.o741 using OBUF.
+Mapping port lgn_fsm.o742 using OBUF.
+Mapping port lgn_fsm.o743 using OBUF.
+Mapping port lgn_fsm.o744 using OBUF.
+Mapping port lgn_fsm.o745 using OBUF.
+Mapping port lgn_fsm.o746 using OBUF.
+Mapping port lgn_fsm.o747 using OBUF.
+Mapping port lgn_fsm.o748 using OBUF.
+Mapping port lgn_fsm.o749 using OBUF.
+Mapping port lgn_fsm.o75 using OBUF.
+Mapping port lgn_fsm.o750 using OBUF.
+Mapping port lgn_fsm.o751 using OBUF.
+Mapping port lgn_fsm.o752 using OBUF.
+Mapping port lgn_fsm.o753 using OBUF.
+Mapping port lgn_fsm.o754 using OBUF.
+Mapping port lgn_fsm.o755 using OBUF.
+Mapping port lgn_fsm.o756 using OBUF.
+Mapping port lgn_fsm.o757 using OBUF.
+Mapping port lgn_fsm.o758 using OBUF.
+Mapping port lgn_fsm.o759 using OBUF.
+Mapping port lgn_fsm.o76 using OBUF.
+Mapping port lgn_fsm.o760 using OBUF.
+Mapping port lgn_fsm.o761 using OBUF.
+Mapping port lgn_fsm.o762 using OBUF.
+Mapping port lgn_fsm.o763 using OBUF.
+Mapping port lgn_fsm.o764 using OBUF.
+Mapping port lgn_fsm.o765 using OBUF.
+Mapping port lgn_fsm.o766 using OBUF.
+Mapping port lgn_fsm.o767 using OBUF.
+Mapping port lgn_fsm.o768 using OBUF.
+Mapping port lgn_fsm.o769 using OBUF.
+Mapping port lgn_fsm.o77 using OBUF.
+Mapping port lgn_fsm.o770 using OBUF.
+Mapping port lgn_fsm.o771 using OBUF.
+Mapping port lgn_fsm.o772 using OBUF.
+Mapping port lgn_fsm.o773 using OBUF.
+Mapping port lgn_fsm.o774 using OBUF.
+Mapping port lgn_fsm.o775 using OBUF.
+Mapping port lgn_fsm.o776 using OBUF.
+Mapping port lgn_fsm.o777 using OBUF.
+Mapping port lgn_fsm.o778 using OBUF.
+Mapping port lgn_fsm.o779 using OBUF.
+Mapping port lgn_fsm.o78 using OBUF.
+Mapping port lgn_fsm.o780 using OBUF.
+Mapping port lgn_fsm.o781 using OBUF.
+Mapping port lgn_fsm.o782 using OBUF.
+Mapping port lgn_fsm.o783 using OBUF.
+Mapping port lgn_fsm.o784 using OBUF.
+Mapping port lgn_fsm.o785 using OBUF.
+Mapping port lgn_fsm.o786 using OBUF.
+Mapping port lgn_fsm.o787 using OBUF.
+Mapping port lgn_fsm.o788 using OBUF.
+Mapping port lgn_fsm.o789 using OBUF.
+Mapping port lgn_fsm.o79 using OBUF.
+Mapping port lgn_fsm.o790 using OBUF.
+Mapping port lgn_fsm.o791 using OBUF.
+Mapping port lgn_fsm.o792 using OBUF.
+Mapping port lgn_fsm.o793 using OBUF.
+Mapping port lgn_fsm.o794 using OBUF.
+Mapping port lgn_fsm.o795 using OBUF.
+Mapping port lgn_fsm.o796 using OBUF.
+Mapping port lgn_fsm.o797 using OBUF.
+Mapping port lgn_fsm.o798 using OBUF.
+Mapping port lgn_fsm.o799 using OBUF.
+Mapping port lgn_fsm.o8 using OBUF.
+Mapping port lgn_fsm.o80 using OBUF.
+Mapping port lgn_fsm.o800 using OBUF.
+Mapping port lgn_fsm.o801 using OBUF.
+Mapping port lgn_fsm.o802 using OBUF.
+Mapping port lgn_fsm.o803 using OBUF.
+Mapping port lgn_fsm.o804 using OBUF.
+Mapping port lgn_fsm.o805 using OBUF.
+Mapping port lgn_fsm.o806 using OBUF.
+Mapping port lgn_fsm.o807 using OBUF.
+Mapping port lgn_fsm.o808 using OBUF.
+Mapping port lgn_fsm.o809 using OBUF.
+Mapping port lgn_fsm.o81 using OBUF.
+Mapping port lgn_fsm.o810 using OBUF.
+Mapping port lgn_fsm.o811 using OBUF.
+Mapping port lgn_fsm.o812 using OBUF.
+Mapping port lgn_fsm.o813 using OBUF.
+Mapping port lgn_fsm.o814 using OBUF.
+Mapping port lgn_fsm.o815 using OBUF.
+Mapping port lgn_fsm.o816 using OBUF.
+Mapping port lgn_fsm.o817 using OBUF.
+Mapping port lgn_fsm.o818 using OBUF.
+Mapping port lgn_fsm.o819 using OBUF.
+Mapping port lgn_fsm.o82 using OBUF.
+Mapping port lgn_fsm.o820 using OBUF.
+Mapping port lgn_fsm.o821 using OBUF.
+Mapping port lgn_fsm.o822 using OBUF.
+Mapping port lgn_fsm.o823 using OBUF.
+Mapping port lgn_fsm.o824 using OBUF.
+Mapping port lgn_fsm.o825 using OBUF.
+Mapping port lgn_fsm.o826 using OBUF.
+Mapping port lgn_fsm.o827 using OBUF.
+Mapping port lgn_fsm.o828 using OBUF.
+Mapping port lgn_fsm.o829 using OBUF.
+Mapping port lgn_fsm.o83 using OBUF.
+Mapping port lgn_fsm.o830 using OBUF.
+Mapping port lgn_fsm.o831 using OBUF.
+Mapping port lgn_fsm.o832 using OBUF.
+Mapping port lgn_fsm.o833 using OBUF.
+Mapping port lgn_fsm.o834 using OBUF.
+Mapping port lgn_fsm.o835 using OBUF.
+Mapping port lgn_fsm.o836 using OBUF.
+Mapping port lgn_fsm.o837 using OBUF.
+Mapping port lgn_fsm.o838 using OBUF.
+Mapping port lgn_fsm.o839 using OBUF.
+Mapping port lgn_fsm.o84 using OBUF.
+Mapping port lgn_fsm.o840 using OBUF.
+Mapping port lgn_fsm.o841 using OBUF.
+Mapping port lgn_fsm.o842 using OBUF.
+Mapping port lgn_fsm.o843 using OBUF.
+Mapping port lgn_fsm.o844 using OBUF.
+Mapping port lgn_fsm.o845 using OBUF.
+Mapping port lgn_fsm.o846 using OBUF.
+Mapping port lgn_fsm.o847 using OBUF.
+Mapping port lgn_fsm.o848 using OBUF.
+Mapping port lgn_fsm.o849 using OBUF.
+Mapping port lgn_fsm.o85 using OBUF.
+Mapping port lgn_fsm.o850 using OBUF.
+Mapping port lgn_fsm.o851 using OBUF.
+Mapping port lgn_fsm.o852 using OBUF.
+Mapping port lgn_fsm.o853 using OBUF.
+Mapping port lgn_fsm.o854 using OBUF.
+Mapping port lgn_fsm.o855 using OBUF.
+Mapping port lgn_fsm.o856 using OBUF.
+Mapping port lgn_fsm.o857 using OBUF.
+Mapping port lgn_fsm.o858 using OBUF.
+Mapping port lgn_fsm.o859 using OBUF.
+Mapping port lgn_fsm.o86 using OBUF.
+Mapping port lgn_fsm.o860 using OBUF.
+Mapping port lgn_fsm.o861 using OBUF.
+Mapping port lgn_fsm.o862 using OBUF.
+Mapping port lgn_fsm.o863 using OBUF.
+Mapping port lgn_fsm.o864 using OBUF.
+Mapping port lgn_fsm.o865 using OBUF.
+Mapping port lgn_fsm.o866 using OBUF.
+Mapping port lgn_fsm.o867 using OBUF.
+Mapping port lgn_fsm.o868 using OBUF.
+Mapping port lgn_fsm.o869 using OBUF.
+Mapping port lgn_fsm.o87 using OBUF.
+Mapping port lgn_fsm.o870 using OBUF.
+Mapping port lgn_fsm.o871 using OBUF.
+Mapping port lgn_fsm.o872 using OBUF.
+Mapping port lgn_fsm.o873 using OBUF.
+Mapping port lgn_fsm.o874 using OBUF.
+Mapping port lgn_fsm.o875 using OBUF.
+Mapping port lgn_fsm.o876 using OBUF.
+Mapping port lgn_fsm.o877 using OBUF.
+Mapping port lgn_fsm.o878 using OBUF.
+Mapping port lgn_fsm.o879 using OBUF.
+Mapping port lgn_fsm.o88 using OBUF.
+Mapping port lgn_fsm.o880 using OBUF.
+Mapping port lgn_fsm.o881 using OBUF.
+Mapping port lgn_fsm.o882 using OBUF.
+Mapping port lgn_fsm.o883 using OBUF.
+Mapping port lgn_fsm.o884 using OBUF.
+Mapping port lgn_fsm.o885 using OBUF.
+Mapping port lgn_fsm.o886 using OBUF.
+Mapping port lgn_fsm.o887 using OBUF.
+Mapping port lgn_fsm.o888 using OBUF.
+Mapping port lgn_fsm.o889 using OBUF.
+Mapping port lgn_fsm.o89 using OBUF.
+Mapping port lgn_fsm.o890 using OBUF.
+Mapping port lgn_fsm.o891 using OBUF.
+Mapping port lgn_fsm.o892 using OBUF.
+Mapping port lgn_fsm.o893 using OBUF.
+Mapping port lgn_fsm.o894 using OBUF.
+Mapping port lgn_fsm.o895 using OBUF.
+Mapping port lgn_fsm.o896 using OBUF.
+Mapping port lgn_fsm.o897 using OBUF.
+Mapping port lgn_fsm.o898 using OBUF.
+Mapping port lgn_fsm.o899 using OBUF.
+Mapping port lgn_fsm.o9 using OBUF.
+Mapping port lgn_fsm.o90 using OBUF.
+Mapping port lgn_fsm.o900 using OBUF.
+Mapping port lgn_fsm.o901 using OBUF.
+Mapping port lgn_fsm.o902 using OBUF.
+Mapping port lgn_fsm.o903 using OBUF.
+Mapping port lgn_fsm.o904 using OBUF.
+Mapping port lgn_fsm.o905 using OBUF.
+Mapping port lgn_fsm.o906 using OBUF.
+Mapping port lgn_fsm.o907 using OBUF.
+Mapping port lgn_fsm.o908 using OBUF.
+Mapping port lgn_fsm.o909 using OBUF.
+Mapping port lgn_fsm.o91 using OBUF.
+Mapping port lgn_fsm.o910 using OBUF.
+Mapping port lgn_fsm.o911 using OBUF.
+Mapping port lgn_fsm.o912 using OBUF.
+Mapping port lgn_fsm.o913 using OBUF.
+Mapping port lgn_fsm.o914 using OBUF.
+Mapping port lgn_fsm.o915 using OBUF.
+Mapping port lgn_fsm.o916 using OBUF.
+Mapping port lgn_fsm.o917 using OBUF.
+Mapping port lgn_fsm.o918 using OBUF.
+Mapping port lgn_fsm.o919 using OBUF.
+Mapping port lgn_fsm.o92 using OBUF.
+Mapping port lgn_fsm.o920 using OBUF.
+Mapping port lgn_fsm.o921 using OBUF.
+Mapping port lgn_fsm.o922 using OBUF.
+Mapping port lgn_fsm.o923 using OBUF.
+Mapping port lgn_fsm.o924 using OBUF.
+Mapping port lgn_fsm.o925 using OBUF.
+Mapping port lgn_fsm.o926 using OBUF.
+Mapping port lgn_fsm.o927 using OBUF.
+Mapping port lgn_fsm.o928 using OBUF.
+Mapping port lgn_fsm.o929 using OBUF.
+Mapping port lgn_fsm.o93 using OBUF.
+Mapping port lgn_fsm.o930 using OBUF.
+Mapping port lgn_fsm.o931 using OBUF.
+Mapping port lgn_fsm.o932 using OBUF.
+Mapping port lgn_fsm.o933 using OBUF.
+Mapping port lgn_fsm.o934 using OBUF.
+Mapping port lgn_fsm.o935 using OBUF.
+Mapping port lgn_fsm.o936 using OBUF.
+Mapping port lgn_fsm.o937 using OBUF.
+Mapping port lgn_fsm.o938 using OBUF.
+Mapping port lgn_fsm.o939 using OBUF.
+Mapping port lgn_fsm.o94 using OBUF.
+Mapping port lgn_fsm.o940 using OBUF.
+Mapping port lgn_fsm.o941 using OBUF.
+Mapping port lgn_fsm.o942 using OBUF.
+Mapping port lgn_fsm.o943 using OBUF.
+Mapping port lgn_fsm.o944 using OBUF.
+Mapping port lgn_fsm.o945 using OBUF.
+Mapping port lgn_fsm.o946 using OBUF.
+Mapping port lgn_fsm.o947 using OBUF.
+Mapping port lgn_fsm.o948 using OBUF.
+Mapping port lgn_fsm.o949 using OBUF.
+Mapping port lgn_fsm.o95 using OBUF.
+Mapping port lgn_fsm.o950 using OBUF.
+Mapping port lgn_fsm.o951 using OBUF.
+Mapping port lgn_fsm.o952 using OBUF.
+Mapping port lgn_fsm.o953 using OBUF.
+Mapping port lgn_fsm.o954 using OBUF.
+Mapping port lgn_fsm.o955 using OBUF.
+Mapping port lgn_fsm.o956 using OBUF.
+Mapping port lgn_fsm.o957 using OBUF.
+Mapping port lgn_fsm.o958 using OBUF.
+Mapping port lgn_fsm.o959 using OBUF.
+Mapping port lgn_fsm.o96 using OBUF.
+Mapping port lgn_fsm.o960 using OBUF.
+Mapping port lgn_fsm.o961 using OBUF.
+Mapping port lgn_fsm.o962 using OBUF.
+Mapping port lgn_fsm.o963 using OBUF.
+Mapping port lgn_fsm.o964 using OBUF.
+Mapping port lgn_fsm.o965 using OBUF.
+Mapping port lgn_fsm.o966 using OBUF.
+Mapping port lgn_fsm.o967 using OBUF.
+Mapping port lgn_fsm.o968 using OBUF.
+Mapping port lgn_fsm.o969 using OBUF.
+Mapping port lgn_fsm.o97 using OBUF.
+Mapping port lgn_fsm.o970 using OBUF.
+Mapping port lgn_fsm.o971 using OBUF.
+Mapping port lgn_fsm.o972 using OBUF.
+Mapping port lgn_fsm.o973 using OBUF.
+Mapping port lgn_fsm.o974 using OBUF.
+Mapping port lgn_fsm.o975 using OBUF.
+Mapping port lgn_fsm.o976 using OBUF.
+Mapping port lgn_fsm.o977 using OBUF.
+Mapping port lgn_fsm.o978 using OBUF.
+Mapping port lgn_fsm.o979 using OBUF.
+Mapping port lgn_fsm.o98 using OBUF.
+Mapping port lgn_fsm.o980 using OBUF.
+Mapping port lgn_fsm.o981 using OBUF.
+Mapping port lgn_fsm.o982 using OBUF.
+Mapping port lgn_fsm.o983 using OBUF.
+Mapping port lgn_fsm.o984 using OBUF.
+Mapping port lgn_fsm.o985 using OBUF.
+Mapping port lgn_fsm.o986 using OBUF.
+Mapping port lgn_fsm.o987 using OBUF.
+Mapping port lgn_fsm.o988 using OBUF.
+Mapping port lgn_fsm.o989 using OBUF.
+Mapping port lgn_fsm.o99 using OBUF.
+Mapping port lgn_fsm.o990 using OBUF.
+Mapping port lgn_fsm.o991 using OBUF.
+Mapping port lgn_fsm.o992 using OBUF.
+Mapping port lgn_fsm.o993 using OBUF.
+Mapping port lgn_fsm.o994 using OBUF.
+Mapping port lgn_fsm.o995 using OBUF.
+Mapping port lgn_fsm.o996 using OBUF.
+Mapping port lgn_fsm.o997 using OBUF.
+Mapping port lgn_fsm.o998 using OBUF.
+Mapping port lgn_fsm.o999 using OBUF.
+Mapping port lgn_fsm.x0 using IBUF.
+Mapping port lgn_fsm.x1 using IBUF.
+Mapping port lgn_fsm.x2 using IBUF.
+Mapping port lgn_fsm.x3 using IBUF.
+Mapping port lgn_fsm.x4 using IBUF.
+Mapping port lgn_fsm.x5 using IBUF.
+Mapping port lgn_fsm.x6 using IBUF.
+Mapping port lgn_fsm.x7 using IBUF.
+Mapping port lgn_fsm.x8 using IBUF.
+
+2.39. Executing TECHMAP pass (map to technology primitives).
+
+2.39.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/techmap.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu_brent_kung'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `$__div_mod_u'.
+Generating RTLIL representation for module `$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Generating RTLIL representation for module `$connect'.
+Generating RTLIL representation for module `$input_port'.
+Successfully finished Verilog frontend.
+
+2.39.2. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/cells_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/cells_map.v' to AST representation.
+Generating RTLIL representation for module `$__SHREG_'.
+Generating RTLIL representation for module `$__XILINX_SHREG_'.
+Generating RTLIL representation for module `$__XILINX_MUXF78'.
+Successfully finished Verilog frontend.
+
+2.39.3. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~80 debug messages>
+Removed 0 unused cells and 1027 unused wires.
+
+2.40. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+
+2.41. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lgn_fsm.
+<suppressed ~615 debug messages>
+
+2.42. Executing ABC pass (technology mapping using ABC).
+
+2.42.1. Extracting gate netlist of module `\lgn_fsm' to `<abc-temp-dir>/input.blif'..
+
+2.42.1.1. Executed ABC.
+Extracted 5564 gates and 6584 wires to a netlist network with 1018 inputs and 900 outputs.
+Running ABC script: <abc-temp-dir>/abc.script
+ABC: UC Berkeley, ABC 1.01 (compiled Jul 10 2026 04:38:35)
+ABC: abc 01> empty
+ABC: abc 01> source <abc-temp-dir>/abc.script
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lut <abc-temp-dir>/lutdefs.txt 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + dch -f 
+ABC: + if 
+ABC: + mfs2 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+ABC: 
+ABC: YOSYS_ABC_DONE 
+
+2.42.1.2. Re-integrating ABC results.
+ABC RESULTS:              $lut cells:     1054
+ABC RESULTS:        internal signals:     4666
+ABC RESULTS:           input signals:     1018
+ABC RESULTS:          output signals:      900
+Removing temp directory.
+Removing global temp directory.
+Removed 0 unused cells and 7278 unused wires.
+
+2.43. Executing TECHMAP pass (map to technology primitives).
+
+2.43.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/ff_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/ff_map.v' to AST representation.
+Generating RTLIL representation for module `$_DFFE_NP0P_'.
+Generating RTLIL representation for module `$_DFFE_PP0P_'.
+Generating RTLIL representation for module `$_DFFE_NP1P_'.
+Generating RTLIL representation for module `$_DFFE_PP1P_'.
+Generating RTLIL representation for module `$_DFFSRE_NPPP_'.
+Generating RTLIL representation for module `$_DFFSRE_PPPP_'.
+Generating RTLIL representation for module `$_SDFFE_NP0P_'.
+Generating RTLIL representation for module `$_SDFFE_PP0P_'.
+Generating RTLIL representation for module `$_SDFFE_NP1P_'.
+Generating RTLIL representation for module `$_SDFFE_PP1P_'.
+Generating RTLIL representation for module `$_DLATCH_NP0_'.
+Generating RTLIL representation for module `$_DLATCH_PP0_'.
+Generating RTLIL representation for module `$_DLATCH_NP1_'.
+Generating RTLIL representation for module `$_DLATCH_PP1_'.
+Generating RTLIL representation for module `$_DLATCH_NPP_'.
+Generating RTLIL representation for module `$_DLATCH_PPP_'.
+Successfully finished Verilog frontend.
+
+2.43.2. Continuing TECHMAP pass.
+Using template $paramod$_SDFFE_PP0P_\_TECHMAP_WIREINIT_Q_=1'0 for cells of type $_SDFFE_PP0P_.
+No more expansions possible.
+<suppressed ~1048 debug messages>
+
+2.44. Executing XILINX_SRL pass (Xilinx shift register extraction).
+
+2.45. Executing TECHMAP pass (map to technology primitives).
+
+2.45.1. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/lut_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/lut_map.v' to AST representation.
+Generating RTLIL representation for module `$lut'.
+Successfully finished Verilog frontend.
+
+2.45.2. Executing Verilog-2005 frontend: /root/oss-cad-suite/lib/../share/yosys/xilinx/cells_map.v
+Parsing Verilog input from `/root/oss-cad-suite/lib/../share/yosys/xilinx/cells_map.v' to AST representation.
+Generating RTLIL representation for module `$__SHREG_'.
+Generating RTLIL representation for module `$__XILINX_SHREG_'.
+Generating RTLIL representation for module `$__XILINX_MUXF78'.
+Successfully finished Verilog frontend.
+
+2.45.3. Continuing TECHMAP pass.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000001\LUT=2'01 for cells of type $lut.
+Using template $paramod$749cd32ff5f11d2eee0f157d3a6e03711dee9be0$lut for cells of type $lut.
+Using template $paramod$fccccf8bb2add7667329c686feec7546eb9a3ae3$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11001010 for cells of type $lut.
+Using template $paramod$359cb6afe4e6e570167442c934318dab0fe523d9$lut for cells of type $lut.
+Using template $paramod$953688dadfe06f923e2dd0ec2aa5395d033b99f7$lut for cells of type $lut.
+Using template $paramod$be8282095362741f5a910d91024b3d35dc5717ac$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00001011 for cells of type $lut.
+Using template $paramod$e94b513e11f4ba8fd98bae3cc70fc7647da3463d$lut for cells of type $lut.
+Using template $paramod$c01d67386ea15c145569c17fe3979d5365a49934$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00111010 for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0110 for cells of type $lut.
+Using template $paramod$a737e69eba18111618475cc33b4092e509496697$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010000 for cells of type $lut.
+Using template $paramod$5f96ab1cba726635a0805000d51dfb092b3f0479$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0100 for cells of type $lut.
+Using template $paramod$02eb14034a6341c884f4a49731602cba05e302aa$lut for cells of type $lut.
+Using template $paramod$45d617c2ce0041e27b541f62b0fc3c3ce441a616$lut for cells of type $lut.
+Using template $paramod$00c52a03f3c9cd6cac05b38476bd7628cbcaf777$lut for cells of type $lut.
+Using template $paramod$4a2a103cdafdb4cab639050890e3ce1ac7b90724$lut for cells of type $lut.
+Using template $paramod$8f6b402809042307d8fd670b1a40ac1323885e5e$lut for cells of type $lut.
+Using template $paramod$b606d5345587198d89525f4d536ce92084038452$lut for cells of type $lut.
+Using template $paramod$6d6beead1425af15cf78b27fd9b11b41b5d4bce8$lut for cells of type $lut.
+Using template $paramod$151c3231f42734cd591e0f979899331a55c54eaa$lut for cells of type $lut.
+Using template $paramod$8390591d38c359bbc916c657c6e7a78596ff1b27$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00000001 for cells of type $lut.
+Using template $paramod$b08866866f3c9c75642303dc45f5239f2f7256e9$lut for cells of type $lut.
+Using template $paramod$cb420e48f5bbc3d241ec8ea5fa1b0da05dfd3cab$lut for cells of type $lut.
+Using template $paramod$ae9b8abdb4f811ce37985dd5106af9cd21223954$lut for cells of type $lut.
+Using template $paramod$2e7a95e82db1d690ae9ba5d10f68b175fa2cb467$lut for cells of type $lut.
+Using template $paramod$23f62642ed814b3106cc4f7abd5f03151a5bd59d$lut for cells of type $lut.
+Using template $paramod$77fcb98fa42d8660e12bad05fcce49da015a9941$lut for cells of type $lut.
+Using template $paramod$aa030d3c0c5c051b1f1c52024cd4d3b9258d8fe7$lut for cells of type $lut.
+Using template $paramod$5706ca500acce467a2710425e6d83952cd49c4f2$lut for cells of type $lut.
+Using template $paramod$c35ad3063d5038410210ddc72c1fd5fed46413b4$lut for cells of type $lut.
+Using template $paramod$150c528fe508ee28b3d848314e5ee1946cbc2e77$lut for cells of type $lut.
+Using template $paramod$fcfbcad3e564f768dad0390f5ec73d709de34943$lut for cells of type $lut.
+Using template $paramod$ed806735d2197b40122c7ff0eca4aefeb6334c63$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00000111 for cells of type $lut.
+Using template $paramod$42d834cfe4b16261e87a198f774a2b2d990838ae$lut for cells of type $lut.
+Using template $paramod$0ff341cd7191764b06caeada4f473502c509ae22$lut for cells of type $lut.
+Using template $paramod$daac18a73e25b051a19bccaac2ec9aa18030ab11$lut for cells of type $lut.
+Using template $paramod$ff44bbf82c1f34c03bed60228faf08910d4e5c06$lut for cells of type $lut.
+Using template $paramod$3c8e1ac1c82c07a5a681f1f9b7af52715caade31$lut for cells of type $lut.
+Using template $paramod$50535c0899cae89ab6b0681a61113d5589a91fdf$lut for cells of type $lut.
+Using template $paramod$9edf43226868de62fcbffb4d0ff4bc5a6691428f$lut for cells of type $lut.
+Using template $paramod$7353b8f8f5c67837efae9e6aa2a3249e346bbdf5$lut for cells of type $lut.
+Using template $paramod$619edfca20b57de92150c8241532a5a34183f0ba$lut for cells of type $lut.
+Using template $paramod$e57e4eb81617ee3c06bb851c72566d16fca4c99d$lut for cells of type $lut.
+Using template $paramod$1f708f21eb2d8be153626930efb767fc7b4769fe$lut for cells of type $lut.
+Using template $paramod$bb4fff1cc3b827238aa40993cafede1c5beecbe3$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0001 for cells of type $lut.
+Using template $paramod$3537465078db57ea744323538f3bc8f24cf41d9a$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1000 for cells of type $lut.
+Using template $paramod$fd04bbcb34094330d0cedb8c68b8592c93ec66f5$lut for cells of type $lut.
+Using template $paramod$00399ccd345e86e4f97482640618082fb629724e$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11000101 for cells of type $lut.
+Using template $paramod$c2490949398dcbb3eac04c89343b16e18ae6efd0$lut for cells of type $lut.
+Using template $paramod$e0bde73e598487237493c8a43ca52c95a3727354$lut for cells of type $lut.
+Using template $paramod$7b9c662cbb019cf8195aeecbf2896376a7907553$lut for cells of type $lut.
+Using template $paramod$053c72851da2a2407d3cacab78ff023a35f4aece$lut for cells of type $lut.
+Using template $paramod$aff3a645bb9f572421a4f0f49cf8987ceb4bcdc5$lut for cells of type $lut.
+Using template $paramod$c5b694ec89d7629b942ccf6a9be1d39e24f8edec$lut for cells of type $lut.
+Using template $paramod$6538cccca8b8b14ea39de3ad25eee98ad2c0e1f4$lut for cells of type $lut.
+Using template $paramod$0c774715ceee59e002bc9856d5ad0e24362e9b05$lut for cells of type $lut.
+Using template $paramod$e6d292e8a120b103bbc95c1207cef4ffaf5bbea9$lut for cells of type $lut.
+Using template $paramod$d7f4570f04f68175b1fa25c1bac92938027a2c96$lut for cells of type $lut.
+Using template $paramod$d3bc48922aa7399b4237887c1d70d6b6a0c9731a$lut for cells of type $lut.
+Using template $paramod$e3c06e7536945410e07fa60529cc46821de7b6cf$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1110 for cells of type $lut.
+Using template $paramod$a6e59b77f543ec2c8d48bb1f5e9ef99f480f9fbf$lut for cells of type $lut.
+Using template $paramod$8c24dc0cdd336b7fb88bbf7eed45cec5cbae862b$lut for cells of type $lut.
+Using template $paramod$e9ef11bc3a88237219d748a5e537b888a59dda8d$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10110000 for cells of type $lut.
+Using template $paramod$297c3385eff724e6995b840e525ea0ffd4f308d7$lut for cells of type $lut.
+Using template $paramod$65eabafa84c27da6cd057b2617e50519d3cc5e71$lut for cells of type $lut.
+Using template $paramod$021829276656ee6b9d09afdaf74221bf190ffb04$lut for cells of type $lut.
+Using template $paramod$5f521017cfb7d7c0a25df2c484714cf958b80120$lut for cells of type $lut.
+Using template $paramod$66bd62e29133047b3a2db0927fb64413a30f918e$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10101100 for cells of type $lut.
+Using template $paramod$4685bd76b86e63a7673afc1b48c70bed06b8ddfb$lut for cells of type $lut.
+Using template $paramod$df0dc775e9f83dec2a7960afdd8913ed283e9459$lut for cells of type $lut.
+Using template $paramod$3349984f73a412a3b1849588f3e13841a0db3d8a$lut for cells of type $lut.
+Using template $paramod$7ea938ba138d4861840be1d72fba17b321428629$lut for cells of type $lut.
+Using template $paramod$a1662ec661849bb84b4b182afaa5b7785b5b9be3$lut for cells of type $lut.
+Using template $paramod$7113d1d50b2002e26014a7486133a28672604414$lut for cells of type $lut.
+Using template $paramod$158cb5e8b210898b7c898130928998be40403848$lut for cells of type $lut.
+Using template $paramod$b5206c17ed2c55331b1e531aaa128336dce9c9ee$lut for cells of type $lut.
+Using template $paramod$11e4d596b631569d9e8b3a5ac777884e84da7048$lut for cells of type $lut.
+Using template $paramod$14ed8913a2630e06ff6061cbc7bfa93c13e65c81$lut for cells of type $lut.
+Using template $paramod$41564726d63f5d6890697b28ab23850972fb9f5c$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1001 for cells of type $lut.
+Using template $paramod$6a397d4d92891be99972a9ce531698f975ca73d8$lut for cells of type $lut.
+Using template $paramod$d784d513b9940d6defd2b1e999fc95225776625e$lut for cells of type $lut.
+Using template $paramod$e0c907e1c2460743bbc5851bfa33020b978ac2af$lut for cells of type $lut.
+Using template $paramod$8c5b7259c9d9cd17395950154a06a8b3c48fdd5f$lut for cells of type $lut.
+Using template $paramod$2945ba775c97482fc80212ed1a4231a1f71632a3$lut for cells of type $lut.
+Using template $paramod$ef8e59dd76f5a15df34ddde348df24c04b5f0a93$lut for cells of type $lut.
+Using template $paramod$06197d40fa0b75a53e0eb0a63ae371f66ab43a87$lut for cells of type $lut.
+Using template $paramod$5c4321825b4e4d9c1a136d0261d531e9ada96fa1$lut for cells of type $lut.
+Using template $paramod$3f2e624443016bf54100da5e89034976887788fb$lut for cells of type $lut.
+Using template $paramod$1d1bcbfb7cfd5b98c1bcd088c39da9efc81311d0$lut for cells of type $lut.
+Using template $paramod$863f3d3fe9e26e04b87c84ad8cbd10e56c6e11d9$lut for cells of type $lut.
+Using template $paramod$02778fed43b96441d5ce1c0ba413f7cea80ef7b5$lut for cells of type $lut.
+Using template $paramod$6765e43c0c42474204e1cb7f8fe4bb6a21074acb$lut for cells of type $lut.
+Using template $paramod$99dcb75f8c652e6b29173a879f08b490582fdcc4$lut for cells of type $lut.
+Using template $paramod$2d6fae636640ca92cde9fb82060ffcee093de506$lut for cells of type $lut.
+Using template $paramod$170ebcd33c51a2f3c211c757c0a63c0fb792d778$lut for cells of type $lut.
+Using template $paramod$8465a11185dcc3606d53f61f9e800b3fabc44849$lut for cells of type $lut.
+Using template $paramod$a097d497e5f864255428361c5353e167f08e9b99$lut for cells of type $lut.
+Using template $paramod$4cadbda3d2b8f17257cd1b61f4b693aec067d994$lut for cells of type $lut.
+Using template $paramod$19d5811987f77b7910e61741b5cd10ceb60f865d$lut for cells of type $lut.
+Using template $paramod$d381e5af2bd6fc513ae20a467a5ea75470395d8c$lut for cells of type $lut.
+Using template $paramod$3170739bc4947243a516a1093aa1624b3ee783cf$lut for cells of type $lut.
+Using template $paramod$d4fae2c0d9ad2966369cd4e39b81c71bcd1327c9$lut for cells of type $lut.
+Using template $paramod$b2a4f46c0b51b2664ea2e96ed3547eb087b4836b$lut for cells of type $lut.
+Using template $paramod$297f33511f02a4c3f0d61466e3c34b6454998992$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01001011 for cells of type $lut.
+Using template $paramod$d85e94834be48f3915461ff5d7278edbf92de7b3$lut for cells of type $lut.
+Using template $paramod$db476dd41f06cb6eb3a0b42e6bca18e86792b91d$lut for cells of type $lut.
+Using template $paramod$99794797430147786d0538f1e31a2fd0220123a6$lut for cells of type $lut.
+Using template $paramod$07ca64d62670fcee0c31bd63ed4c7092857b0b43$lut for cells of type $lut.
+Using template $paramod$8a47ec1529951882624548f5f6f1da5ffb15dedb$lut for cells of type $lut.
+Using template $paramod$10e9cac7c12ddc627f9a2430542d2ffdc861fb47$lut for cells of type $lut.
+Using template $paramod$23573cce9d590b184085671533b0a6cf3031cca5$lut for cells of type $lut.
+Using template $paramod$19ec49f31a8d230a567aa44ce3ea81a03c101e2b$lut for cells of type $lut.
+Using template $paramod$4a3a2230b72140230ab6fadbd4d8a33e2d2dcf29$lut for cells of type $lut.
+Using template $paramod$c0aca92cee40fcbf0f0d8e3cf9cd1ea26644fd3c$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00001110 for cells of type $lut.
+Using template $paramod$0879a41edba91d0dde9c84f59453a287b09db750$lut for cells of type $lut.
+Using template $paramod$9adb32fa08b0a2e7837a6c280243016e052cdf6f$lut for cells of type $lut.
+Using template $paramod$075272369a6c120fd048b8c72647aef4fb3e4d45$lut for cells of type $lut.
+Using template $paramod$3c4f67303a724e9b8b62d3f3c3cd58f4dfcd4291$lut for cells of type $lut.
+Using template $paramod$e53adc6d435695700f36a22087048825884a48a4$lut for cells of type $lut.
+Using template $paramod$8608b3fea426b104abdd6e643849199ed7babf94$lut for cells of type $lut.
+Using template $paramod$9e5bb6f5b5e1274eb77e5d13a20eadca2c4428e7$lut for cells of type $lut.
+Using template $paramod$15a81918e5a17c565b64dbd89044edd951e1f018$lut for cells of type $lut.
+Using template $paramod$e053a22d78e6bd5ea33183ea69976f0db741be0e$lut for cells of type $lut.
+Using template $paramod$3adcd81206a4edc16bcb0df04f2564cb953b1cb9$lut for cells of type $lut.
+Using template $paramod$75dfc61750aedbf7f5cf9dc328c81d4cd06ab264$lut for cells of type $lut.
+Using template $paramod$aaf9c4863d0342eeb0fb0c2ec91a8995ded6c7b7$lut for cells of type $lut.
+Using template $paramod$4cc770ef5f5d025a36e6f2f715356307901b86f7$lut for cells of type $lut.
+Using template $paramod$41099da3ef03690385eacab6d0c65fb7f188dd26$lut for cells of type $lut.
+Using template $paramod$519d9160cdbeb7d55cafc33710c0434c0f32a5b1$lut for cells of type $lut.
+Using template $paramod$2cfebd105d3814a87fe9b5674c1bb54bf7a3648a$lut for cells of type $lut.
+Using template $paramod$6b64ef92c81728d21be79bc73e7bc817d9d40840$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11100000 for cells of type $lut.
+Using template $paramod$06596f88322f9878708038cb710a7c4bd98ba00e$lut for cells of type $lut.
+Using template $paramod$42fddac0c11e32a5c945f1a3edd01305e5c80d60$lut for cells of type $lut.
+Using template $paramod$979c5b81335c43ad1d84e5942dbdba6a9c1ad93e$lut for cells of type $lut.
+Using template $paramod$f8c6812106fa197cbe9f7c78de9504deaaab6965$lut for cells of type $lut.
+Using template $paramod$d13eae9d961e0453afa87fe22b9af0086311fa4f$lut for cells of type $lut.
+Using template $paramod$f3203abc0645d1b54ad4f45ecc85457227bd0ed1$lut for cells of type $lut.
+Using template $paramod$b6a2beb109dfa346ffae0582e15604ea80c4bc5f$lut for cells of type $lut.
+Using template $paramod$dc92e53fff6be4577acb702ae6d16ff8eea8d0ec$lut for cells of type $lut.
+Using template $paramod$7ccd8ac9c7e351dfccd1a21ea2c6be65bc8d9407$lut for cells of type $lut.
+Using template $paramod$4d1e9c711cfd29e5503e71d2ea5b676b384fe872$lut for cells of type $lut.
+Using template $paramod$d831af77fcb37e2428873479aabf7500207bf92d$lut for cells of type $lut.
+Using template $paramod$17ea533d87660e3896c0e9373cefa79f72ca2f97$lut for cells of type $lut.
+Using template $paramod$5d5eac54a770f75b39561b7deb0eefa8f59c474d$lut for cells of type $lut.
+Using template $paramod$a3d9d50a26c80b5c42d9b864ac52f329113a426e$lut for cells of type $lut.
+Using template $paramod$1825a82940fcf707864cdeab35282411304a2422$lut for cells of type $lut.
+Using template $paramod$680fd8d179aaa2b94b3b7c0dab400ac18bb55c38$lut for cells of type $lut.
+Using template $paramod$88d62cf3f14e49fc5a963ae5f62b54c9ee5dfb69$lut for cells of type $lut.
+Using template $paramod$d3976baf299b3a8427c594ba57977294bb8f810d$lut for cells of type $lut.
+Using template $paramod$f2f231183ba9d654dd321b03486d4d721d8c2106$lut for cells of type $lut.
+Using template $paramod$fe4f08959e5b9da507a9f2eaae09a86946e5b14c$lut for cells of type $lut.
+Using template $paramod$02b740f821976e6d6eac38ef21eeb4d52d7b9019$lut for cells of type $lut.
+Using template $paramod$320d0379ebda9c1db1946edd058f14a035e5cf06$lut for cells of type $lut.
+Using template $paramod$b647f61231d18ce0227cab60529baa1b44ab5e94$lut for cells of type $lut.
+Using template $paramod$e0854a88c4e3a14c8bdd98b23d9ff51be90fa1e8$lut for cells of type $lut.
+Using template $paramod$a56fa0231f8f2c31d56d48d4bc2b77f213e678cb$lut for cells of type $lut.
+Using template $paramod$9fb38b4400953081d051af8189846c040da20390$lut for cells of type $lut.
+Using template $paramod$b9625088b996a310c53a80ffa8e311db2944a84d$lut for cells of type $lut.
+Using template $paramod$677eac2adf8864702546a7bba2a1fae56a8f6c2d$lut for cells of type $lut.
+Using template $paramod$efcb2498790bc3c1741d92cc0f96c6b0cdb139d1$lut for cells of type $lut.
+Using template $paramod$c557738c64c958297eae7ae077a8f4264fff3406$lut for cells of type $lut.
+Using template $paramod$520f2ccd8dfd908abb3d47a4c243213409147817$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11111000 for cells of type $lut.
+Using template $paramod$b6a9565ed1266f30179ef06950de0a69281483cf$lut for cells of type $lut.
+Using template $paramod$78cec525d8423c69074d6463bbe8154ff775ca96$lut for cells of type $lut.
+Using template $paramod$bd79a7e67af1dbb0fe7582c8ae9d6504bb8b66df$lut for cells of type $lut.
+Using template $paramod$7a4e28243abd464bad1eccbeab10770aa8f585f3$lut for cells of type $lut.
+Using template $paramod$487c528fbb1557bc7d5c64980dbf6e5848358dd3$lut for cells of type $lut.
+Using template $paramod$83cd40ce6da2b0def205dcbd0168340409e7883f$lut for cells of type $lut.
+Using template $paramod$928343592c4b103f65140f016edc24f6357b56ac$lut for cells of type $lut.
+Using template $paramod$31954f5c1b58dcaa8a8a309a9a5f856f95fb229d$lut for cells of type $lut.
+Using template $paramod$49ee1f76bc859bdc37616c6200f64c1d24cbe670$lut for cells of type $lut.
+Using template $paramod$8228d69dbd2186e33b74b1c09ab9ca27c709bacd$lut for cells of type $lut.
+Using template $paramod$4c08000634d34179c07b942cede8478890e3aac4$lut for cells of type $lut.
+Using template $paramod$f89aacdb05b59fa1bb8f06e6b55f6e93d098486a$lut for cells of type $lut.
+Using template $paramod$ef24dd20e7dd9ae5606c3d1c5b56d00bf536c4da$lut for cells of type $lut.
+Using template $paramod$20f80ee61133e2605fec2feabaa9bf8ffd0d63a4$lut for cells of type $lut.
+Using template $paramod$b93d1ea7a612a32c185108f67a153d44ffb9aac2$lut for cells of type $lut.
+Using template $paramod$1faa8bbeffd733b5724a390b89e8e2c193d761a4$lut for cells of type $lut.
+Using template $paramod$0103187c22911bb0b9b869c57e69970e25ecec6d$lut for cells of type $lut.
+Using template $paramod$f6b69ff1a16ab2d42c118402d08f7d266ee5bd6e$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10100011 for cells of type $lut.
+Using template $paramod$4195f6f2552de83743fbb9e93103f0f8066aa055$lut for cells of type $lut.
+Using template $paramod$6eeb64675210b00f6cdad29672a0d8c32a899732$lut for cells of type $lut.
+Using template $paramod$39897fa6ad5a2d6a4d82b31133e0850eecf4675a$lut for cells of type $lut.
+Using template $paramod$2ce9dff85b23ecdf58912fc178413555d8eac91c$lut for cells of type $lut.
+Using template $paramod$fce83061ab96227babb0417f1b108ef25ac7968c$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01000001 for cells of type $lut.
+Using template $paramod$4d58ef7fa5e3c2b72c26b06f986f8ece66bbcffb$lut for cells of type $lut.
+Using template $paramod$c44be955f4d5d00a75245fb2b4abdc0a59b127f5$lut for cells of type $lut.
+Using template $paramod$15b66a5b22a13e23a8c2dc6db077c79d4a641f9c$lut for cells of type $lut.
+Using template $paramod$31706f62f032e855bd0ba3362c72f8c6ad50d386$lut for cells of type $lut.
+Using template $paramod$5595f0f804335389af452d04c802ebe1e7aab0f7$lut for cells of type $lut.
+Using template $paramod$e9ee31b117c55518e03d0fa2672ecdd0af52619b$lut for cells of type $lut.
+Using template $paramod$ae0e5b7d5ddb21ec0b2d7e1d5413c3201470afe2$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01011100 for cells of type $lut.
+Using template $paramod$0e62e5eb664c8f0a5eca52744ac4c35323e5cf27$lut for cells of type $lut.
+Using template $paramod$82ac4228e04c92c7b8c133bfa256dd480e0cef1d$lut for cells of type $lut.
+Using template $paramod$8fb9462be43baf61e8ef97ab54f2b9b0c6cf14bc$lut for cells of type $lut.
+Using template $paramod$bba554c1735e727e5259cf87fef8d62c0385761e$lut for cells of type $lut.
+Using template $paramod$f1fa79be6816572361f5c70f0ef5162beaa2b748$lut for cells of type $lut.
+Using template $paramod$d1c1e8cb195a72341ef0252f0cbff14c860bbb39$lut for cells of type $lut.
+Using template $paramod$f8a775092e03cfdb44bcc93faef87ad73ecbe3af$lut for cells of type $lut.
+Using template $paramod$ab6a911219cbb5193f45e26b3644b50c6fdc9faa$lut for cells of type $lut.
+Using template $paramod$67dfffdf8661c5482a1a30c33588e5a7a65a3e64$lut for cells of type $lut.
+Using template $paramod$770911d87f6cdae069e19b7da04ce3034c6b729c$lut for cells of type $lut.
+Using template $paramod$4fae1c52ca5619552d4523a8e7eaed0b12e6f222$lut for cells of type $lut.
+Using template $paramod$4dee29a1cb8f4eb066d92da4b55194c5c44f019c$lut for cells of type $lut.
+Using template $paramod$3d380af18ce4606514c43184d1e1722bde1ec7cb$lut for cells of type $lut.
+Using template $paramod$36c7ba1b1b98d50ef301f68741b4e44c73cfe020$lut for cells of type $lut.
+Using template $paramod$7515a992aa72dfd4f5c0f62f469d16489619542b$lut for cells of type $lut.
+Using template $paramod$e9ea2aedf99b84ae678acaeb750f0a98cd04aff6$lut for cells of type $lut.
+Using template $paramod$016e060efb34c853eeb98a62fce31fe15a3a8c3c$lut for cells of type $lut.
+Using template $paramod$f3efaa7f5835e274a640aafc31c4f117f6f8dffb$lut for cells of type $lut.
+Using template $paramod$78bcebfe0e82e4f74c26e19a10ba548464a3637d$lut for cells of type $lut.
+Using template $paramod$6a362589c21f6b8158e4764e6e7e1024e0900636$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01000000 for cells of type $lut.
+Using template $paramod$8a9b0e2896f79ed7b450bbdc5e8cf91c3674d5b5$lut for cells of type $lut.
+Using template $paramod$dad36f48ef611a71bf9e5e1c2a7edaf8707e7b5f$lut for cells of type $lut.
+Using template $paramod$4ac14ddb6fac08f79eb01a17848a5cbeed13ed45$lut for cells of type $lut.
+Using template $paramod$e6e8589d090a19de915f8e92aeb50b0d72fc54be$lut for cells of type $lut.
+Using template $paramod$cfa9577fbb8f3bf41ef97034527e65185cc68702$lut for cells of type $lut.
+Using template $paramod$9989ab54b0456442ec955bd80b34d9f0d3c74464$lut for cells of type $lut.
+Using template $paramod$a0110ffcad984c8a190b4246c453a50168ed201c$lut for cells of type $lut.
+Using template $paramod$fa960b0ced687dd93c15ed8130e27eea044c58f6$lut for cells of type $lut.
+Using template $paramod$3ff825589164af9b1d4f4c9f3382198f7503f2cc$lut for cells of type $lut.
+Using template $paramod$5fdbc35a2a947cee468979c3e1140ea223556ca1$lut for cells of type $lut.
+Using template $paramod$ff6079e046b5d2503bad8eccc9f8ba2077c20476$lut for cells of type $lut.
+Using template $paramod$9cf3fc71ba13e1192b85062e25f941c7bcda7ef7$lut for cells of type $lut.
+Using template $paramod$812d6fc36e110e5dddfe0998e45231ba0e361a1c$lut for cells of type $lut.
+Using template $paramod$79317a83d4af4eac0f4531e6e644bfbd4641d262$lut for cells of type $lut.
+Using template $paramod$48197e4f4f95aefec837cc1bdd8d046d138fdf57$lut for cells of type $lut.
+Using template $paramod$13bcf36c0b9c74a8f445d09f8661aa4ba3249dc3$lut for cells of type $lut.
+Using template $paramod$9a64b0039d9a41b51ce61cbe73d3e2955de8b789$lut for cells of type $lut.
+Using template $paramod$d6cf0a4b6f6ccd87588da28c41b5b6c258da2509$lut for cells of type $lut.
+Using template $paramod$a805713874efb98e43e6f6e688b2fc188ff1c575$lut for cells of type $lut.
+Using template $paramod$3557b1fb710fcf06000a5e5c2f7f35bf2fc4540c$lut for cells of type $lut.
+Using template $paramod$7130d8d6874d861fc04c0cbbf80a33d278537aa3$lut for cells of type $lut.
+Using template $paramod$933f4f3e373a784da64d137def3625bdd36d1695$lut for cells of type $lut.
+Using template $paramod$ee4cf35bc22814421adfe304eb0937995e8aaf1c$lut for cells of type $lut.
+Using template $paramod$1168ee00b30189c3b9a6cf5b87c706e9f10baba7$lut for cells of type $lut.
+Using template $paramod$272652f6c6fbe9a75eff76e45cc7e2788835518b$lut for cells of type $lut.
+Using template $paramod$901da0fd4a1e2f9e22a6fd57db228b42f33313b9$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1011 for cells of type $lut.
+Using template $paramod$7cf08313b57228efdd2a632e6978157a46231248$lut for cells of type $lut.
+Using template $paramod$a3cdc1eb771a2c6a16f64da161e11100ac409d2b$lut for cells of type $lut.
+Using template $paramod$f02a2745b670ca946922b040d3aba66fd7f4a398$lut for cells of type $lut.
+Using template $paramod$6c3e7afdda572a15e10f9cf1b81fc4cd69886297$lut for cells of type $lut.
+Using template $paramod$7e6c8e8e5c5e25f8f4d0b8fa1c62d5cf6e44e873$lut for cells of type $lut.
+Using template $paramod$8d261c994c78b6383b6e94ac200a2f4b8653a775$lut for cells of type $lut.
+Using template $paramod$afc7f663d6fba916ffc7ae9d00d316c32a7a3583$lut for cells of type $lut.
+Using template $paramod$d11de94b0524961f0c4218fd95a297c9d88f4c75$lut for cells of type $lut.
+Using template $paramod$84b23a4171effc4501fab02d97b20ae373bd8719$lut for cells of type $lut.
+Using template $paramod$805112994b2a6065356d2049c39ef75be37b0cdd$lut for cells of type $lut.
+Using template $paramod$716b812e900146954af1fdecaa0b7d52f491c50d$lut for cells of type $lut.
+Using template $paramod$27a2d5c65ded815fab81a13136f0149bc8fc68bf$lut for cells of type $lut.
+Using template $paramod$e6f385942d5b0fd855ffcaf93d797dcbcaad15cc$lut for cells of type $lut.
+Using template $paramod$0f0bbe5805ef628ace9fa9349041dae091a218d0$lut for cells of type $lut.
+Using template $paramod$b71fe557e6ae4ed6e4ee78ea119172ae6ff67339$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11110100 for cells of type $lut.
+Using template $paramod$b7bdc3da9f08a481aaaac17b0713d9fe0f6b84a1$lut for cells of type $lut.
+Using template $paramod$157a57917943611101c8630363f1afe02a70c131$lut for cells of type $lut.
+Using template $paramod$4470ca921c07329f310fe7e024041a7d05718244$lut for cells of type $lut.
+Using template $paramod$2d73cf21e7a3b53006ebbae47ecc48e73975ec46$lut for cells of type $lut.
+Using template $paramod$cefe0fff250f79b49bae993371db47ccbae6564d$lut for cells of type $lut.
+Using template $paramod$30a8f747cba2b9de4fc782cb95c941eddebf2219$lut for cells of type $lut.
+Using template $paramod$1afa88f1b88be89fa13118dfb28768bd2de473d5$lut for cells of type $lut.
+Using template $paramod$80cbd08923107235732b36a5d5a7181977144217$lut for cells of type $lut.
+Using template $paramod$c42213e5b361db3586e585d016cf070fe52d57eb$lut for cells of type $lut.
+Using template $paramod$9726712412a4beabd0e6dca584969a0ed489e715$lut for cells of type $lut.
+Using template $paramod$8ceda7556d494eb2b6064bb2eef22e3b3dda3e82$lut for cells of type $lut.
+Using template $paramod$e94afd183fcbde4c849d3e6c314d64883b2488d5$lut for cells of type $lut.
+Using template $paramod$c0a25e7cf650f02e16cd6be3d7b47fba4dc8c274$lut for cells of type $lut.
+Using template $paramod$596ad422b395b579c1cd790fb3b39b6e9c4d26fa$lut for cells of type $lut.
+Using template $paramod$2b36d96a88e65af711fc067c371aaa6ef0f77b61$lut for cells of type $lut.
+Using template $paramod$e4f4d9686b53295bd33a0bad2bfaa9386af8d934$lut for cells of type $lut.
+Using template $paramod$51f0ddcbf77cb3f45956051fc2a487822b06f7cc$lut for cells of type $lut.
+Using template $paramod$4961fc8bb94dd90bcb91ec974c8cc3bb23e480ea$lut for cells of type $lut.
+Using template $paramod$f205b458e2e1a59540acea0504cdcfc5c00d7f8f$lut for cells of type $lut.
+Using template $paramod$adc021f08bbbecc66f82ab33aff9dab63bda7031$lut for cells of type $lut.
+Using template $paramod$dc9654702c8aeec5740e2ea32391cdc18128c310$lut for cells of type $lut.
+Using template $paramod$d9f692cd9e0b223cefbd2569acaa6a4ea48ede83$lut for cells of type $lut.
+Using template $paramod$f393c9b4eed2702beaa48431c5b1504dcdfc3d32$lut for cells of type $lut.
+Using template $paramod$0d2b2dc72844c2fa643e46abf26009fbfc70bbf4$lut for cells of type $lut.
+Using template $paramod$95872ae93a13f5e16ad78a7b09fa518c52dad0c6$lut for cells of type $lut.
+Using template $paramod$f6276add1707215d4189a55a47c9bf0a6f2acc0b$lut for cells of type $lut.
+Using template $paramod$64675fdde1093e084dc5ef372d64bba90645bb42$lut for cells of type $lut.
+Using template $paramod$ffef80d62820475651e4a1fb07bd399c11cf2d97$lut for cells of type $lut.
+Using template $paramod$f0f81daad02b437579d924f0953ed479e7509eca$lut for cells of type $lut.
+Using template $paramod$1d561a6575c3ab79390ee18151c39fa65d8162d9$lut for cells of type $lut.
+Using template $paramod$c701a97df242681c48432d4a55674ed2d7272c0a$lut for cells of type $lut.
+Using template $paramod$23e522e0038a3a8ecdb422c07bde72dddf32fd81$lut for cells of type $lut.
+Using template $paramod$40887f7580f370053939856e1b56bdfed401926b$lut for cells of type $lut.
+Using template $paramod$f7a4c813cb9891e03e90296d9c035b31361635bd$lut for cells of type $lut.
+Using template $paramod$bf26bf5101b6f2603de87df63483ea4996150b6b$lut for cells of type $lut.
+Using template $paramod$60d5eacae6ea6f2f2d8493888c8de71c696cf9db$lut for cells of type $lut.
+Using template $paramod$887feb74b9e0ee745ea287d805444f39cb51b90f$lut for cells of type $lut.
+Using template $paramod$1d4ccb13f34d83b5b720a4194aaeb15c1223e8aa$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010100 for cells of type $lut.
+Using template $paramod$aae7ac9f26030b444213a74e13e6336d2c776e34$lut for cells of type $lut.
+Using template $paramod$ceb3947d97f278737202b2c193ba98290bcc3c6b$lut for cells of type $lut.
+Using template $paramod$7dedcc69aa361b27a4c32c2daa6fecd8dc4c7f08$lut for cells of type $lut.
+Using template $paramod$b7c93d989bda3dd1c0c98ae2d9b8d6eeb6ca988c$lut for cells of type $lut.
+Using template $paramod$e2ae2373c270fb043ca3cbf10be9f2dcea8e2eeb$lut for cells of type $lut.
+Using template $paramod$04b9fb600cb8799fd5e89ace3789e32c49ac6c5d$lut for cells of type $lut.
+Using template $paramod$24af7f06b790ed225d4bc2f3903d56f9d17670c5$lut for cells of type $lut.
+Using template $paramod$b78cb747268f1405b916847cae0acef002e22034$lut for cells of type $lut.
+Using template $paramod$ae266e58bcf8f14cfdc79c4308ac18612751e5bf$lut for cells of type $lut.
+Using template $paramod$04653cb816edc3160fb0bc6227db1bdcbc6074b9$lut for cells of type $lut.
+Using template $paramod$890097bcf4c0d03e1819020edc4270c95ea53cd0$lut for cells of type $lut.
+Using template $paramod$d391ec4d95508c24b4a7bcaf1fd84f8871d3e029$lut for cells of type $lut.
+Using template $paramod$23bd5f59922cd9fb46cdef15ee979020797004c2$lut for cells of type $lut.
+Using template $paramod$ef26adabe6060e01077b576cfe34e95e55a26aef$lut for cells of type $lut.
+Using template $paramod$adf4294bb24f289133a98899758248276e340000$lut for cells of type $lut.
+Using template $paramod$06e1eeb32422cc00f3b68578eb168f9dabe9b98f$lut for cells of type $lut.
+Using template $paramod$04168d81ad6ef35cb6bf251661a8372b283801bb$lut for cells of type $lut.
+Using template $paramod$fec225614df3e2049d46c961acd3d962fb4b64ca$lut for cells of type $lut.
+Using template $paramod$58b4ad6b8fa03e8ccc7509ec6e1ec32352f176ae$lut for cells of type $lut.
+Using template $paramod$fdd9866fc27cf2774b9f73e1abf01482f83e8ee1$lut for cells of type $lut.
+Using template $paramod$9dada55e72662c9e3ab0b8d567adecef77c7f1b3$lut for cells of type $lut.
+Using template $paramod$7bd758e3c99a5a8aee5f1ea8f2ac06df7876e03b$lut for cells of type $lut.
+Using template $paramod$6a0b849d3e7f16883c0dcd90fff5ef3f14339c7a$lut for cells of type $lut.
+Using template $paramod$4d6225b72e6e7067004edcab025344c4f0865237$lut for cells of type $lut.
+Using template $paramod$d7bb8625dc6a74d1c6ba2766e65c6788b30aa6ea$lut for cells of type $lut.
+Using template $paramod$1a5b0a1fcc9ca9690143ff95a5fc21b33d4258cb$lut for cells of type $lut.
+Using template $paramod$fc7b2e52dd582728b1b497fe1745e9592bb32ec9$lut for cells of type $lut.
+Using template $paramod$93a231b39ebc7eed030680d65b5ca3d859cb51fe$lut for cells of type $lut.
+Using template $paramod$4ca991d6f207ce20d9d5fa6a5d8e1535e22e9c5d$lut for cells of type $lut.
+Using template $paramod$77181291f4f25eff4fe01c2f5e6341ed4bb54d92$lut for cells of type $lut.
+Using template $paramod$c471af5667a682bd131a5b479e58e470d1b2b7cd$lut for cells of type $lut.
+Using template $paramod$8608ba190b7fc7d6bd93fa5318659fd0f3f2b5f0$lut for cells of type $lut.
+Using template $paramod$9933c7bea9983b6a66d98613fe44db3c6d2058d5$lut for cells of type $lut.
+Using template $paramod$eee2971d70efaf21fb1c81916ad5fa9ceb213b58$lut for cells of type $lut.
+Using template $paramod$e13e53b2ea0f5f563492a310a8aa78ba0eb79ce3$lut for cells of type $lut.
+Using template $paramod$7674a97a75e2ea17dfe188dfd2241a7f86e94d50$lut for cells of type $lut.
+Using template $paramod$451e618783bd1dbf253bf8336bbac20221830553$lut for cells of type $lut.
+Using template $paramod$d36f7a60cac29b6c6f54db6bc986b3e8db620b06$lut for cells of type $lut.
+Using template $paramod$61b7640f5a849b04cf5ef53a2362a3efd460905b$lut for cells of type $lut.
+Using template $paramod$64669a7e87c28e39425dffff48145545533b4971$lut for cells of type $lut.
+Using template $paramod$5f10faf8866a7a3fc6887d27e0ea6257f7cf4f5a$lut for cells of type $lut.
+Using template $paramod$fdedd5fb332ca3384e45a13526426ff671323b1c$lut for cells of type $lut.
+Using template $paramod$bde766e6f6baa8836c241e1e2f07ee10dcaa25a1$lut for cells of type $lut.
+Using template $paramod$d4d6387fbbcdd6c530c7687cfee950450ffee6e1$lut for cells of type $lut.
+Using template $paramod$722d3053cfab73c432c9d53f6307fd00e7332c14$lut for cells of type $lut.
+Using template $paramod$7ea41346c60a09b4ba3d324b570e8b363667db86$lut for cells of type $lut.
+Using template $paramod$3bb09c6848cc2d091034eea62b865a361dbbb5af$lut for cells of type $lut.
+Using template $paramod$42a101ad991d170619a0ec08983aa402358f429f$lut for cells of type $lut.
+Using template $paramod$426d7c34e4d6339444f42f93b677a53f4eb723e0$lut for cells of type $lut.
+Using template $paramod$daa1677fc892361bfb4945757f9e37819e8bc2c2$lut for cells of type $lut.
+Using template $paramod$6eeda3fe798faf4d2040fd6d688ba2e11c0758e5$lut for cells of type $lut.
+Using template $paramod$0c73af1a9feaffe96fbba0a9584d4485dd299de2$lut for cells of type $lut.
+Using template $paramod$a78e570dd5065d72732a16acf68cf6e745e15b18$lut for cells of type $lut.
+Using template $paramod$bbc4cbcf778cd88a413e492285c036a7127fe2d0$lut for cells of type $lut.
+Using template $paramod$95ee31475ffae6e30a06c39ea95d95fc06944ea6$lut for cells of type $lut.
+Using template $paramod$afcb4d3d62ae08ea419efe44097e1a32f7949ce6$lut for cells of type $lut.
+Using template $paramod$07fb1ef150959aaf1eb0c986354896d5a2a44a5d$lut for cells of type $lut.
+Using template $paramod$62d99f1b73bbd32dbeb456e0ad7e0045326c861b$lut for cells of type $lut.
+Using template $paramod$d886ef46177e0a8c0eff4e75eecd12900da9f255$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11010000 for cells of type $lut.
+Using template $paramod$3f185cc45b2d54a2c596344f96d15eee4ef8d418$lut for cells of type $lut.
+Using template $paramod$5e3301833c50972dd3773c14e24c9ef108b0c376$lut for cells of type $lut.
+Using template $paramod$10cf8d9dfd2b573b3201707bfe5564242164e5e5$lut for cells of type $lut.
+Using template $paramod$0913dcaf3ad4aa271798c5fb5f73ff9891792597$lut for cells of type $lut.
+Using template $paramod$090ba9c2f91e8fd46da36f17fe98b517563fd094$lut for cells of type $lut.
+Using template $paramod$16328233722e0b9a016b37d5eb5e1e2564937b64$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01101001 for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11101111 for cells of type $lut.
+Using template $paramod$f29db3d6cd78fe4a187c72f5cdd2503da5045fed$lut for cells of type $lut.
+Using template $paramod$705e8a6b43951d779f50c7d84c8b7eccc523f1b2$lut for cells of type $lut.
+Using template $paramod$dda7cf14c12b46e251668c9299d600a1307bf5a4$lut for cells of type $lut.
+Using template $paramod$71ba2981426b106ea2139008566f7b29580ece72$lut for cells of type $lut.
+Using template $paramod$1b9c285dd08c5030d8a64b62dc05616fc89c95b8$lut for cells of type $lut.
+Using template $paramod$2bd20064bfdf446642ff984904477d3a1983afc5$lut for cells of type $lut.
+Using template $paramod$782a9f871206ff2a38b6c1156c7f7e9348f7c22c$lut for cells of type $lut.
+Using template $paramod$8a1a55e95f204d82a3a430cf674a56a08ad7eb3e$lut for cells of type $lut.
+Using template $paramod$a0a801bf8e7df05234e98d7a84bee45901b5e91a$lut for cells of type $lut.
+Using template $paramod$40083e613ac8c71883957600ff1ac302494fd805$lut for cells of type $lut.
+Using template $paramod$a2e63ab3545dc81be737e6b734b3453c7c07f025$lut for cells of type $lut.
+Using template $paramod$95bf7def38c70d1855e4044d3e7494428863376a$lut for cells of type $lut.
+Using template $paramod$b198552ae96b163fd7d593996bdfa1bd318d7cf4$lut for cells of type $lut.
+Using template $paramod$a68eee2d73f4d23df081caeba7c19924bb4acf50$lut for cells of type $lut.
+Using template $paramod$83f1210e164b1c374a6e77bb3c84c8d32b6253c8$lut for cells of type $lut.
+Using template $paramod$854b1f860c84b0b11305fd24e940a24399d61a27$lut for cells of type $lut.
+Using template $paramod$984bf76700e34227d9a3653eeadb1c922ac80880$lut for cells of type $lut.
+Using template $paramod$2bdf56936f8e72a90d548ba49f96a902c7c43ec0$lut for cells of type $lut.
+Using template $paramod$92deb97d7787eb6da5f0f90fdd9aa3dc43121a84$lut for cells of type $lut.
+Using template $paramod$b92dde6ac05efd742686fe6679e6887ad88c3d02$lut for cells of type $lut.
+Using template $paramod$88826118c2d2bd27a7e7b62f136ae8e56ed98b7a$lut for cells of type $lut.
+Using template $paramod$448d8bb031f55dfe3041e1560d65883e4f9bec0d$lut for cells of type $lut.
+Using template $paramod$fa519b6e8a01de6014ce92bb3fb17b4ddc51cd1b$lut for cells of type $lut.
+Using template $paramod$e418026972929adf93666190edfc467fb1075ab0$lut for cells of type $lut.
+Using template $paramod$73fd6b802d90094cdba290863a69e45e99fa35d2$lut for cells of type $lut.
+Using template $paramod$f28db37a0143a00bc8cb933cec378cccbe571085$lut for cells of type $lut.
+Using template $paramod$2f8871fa6a69e370b8d6bb469b8a29699f04d4ac$lut for cells of type $lut.
+Using template $paramod$41326ad8644342a66dfb051d050f2b6fbf15015b$lut for cells of type $lut.
+Using template $paramod$2667c1f2f9ae15deab8151831b685fdf2dfea5af$lut for cells of type $lut.
+Using template $paramod$7afc458acafad22040ec218a4c6be2cb3e9c43ef$lut for cells of type $lut.
+Using template $paramod$e5dbfb473104df7837d9f20398142901055563cf$lut for cells of type $lut.
+Using template $paramod$997f44659c7e514cab7ace9a29204b1e6c955578$lut for cells of type $lut.
+Using template $paramod$bd1a6e9584a1daf4e7e6c849f69c71729b77378b$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01100000 for cells of type $lut.
+Using template $paramod$0cf2b0c29a5df8a270c83700b3cfc7987de412ac$lut for cells of type $lut.
+Using template $paramod$65c2f4cad8debeeb4b93be3adfe795a5aba59855$lut for cells of type $lut.
+Using template $paramod$ccc731b9ecbcea3c8762a07ac8d17eef1c7d3d93$lut for cells of type $lut.
+Using template $paramod$d8a4b9d505af213a3bc67f9362c27c34fcbfacdd$lut for cells of type $lut.
+Using template $paramod$63ae38aea22b877eb072d0d288b9be5cbc609fba$lut for cells of type $lut.
+Using template $paramod$0b0c7b4c6357aed32eb6e0c26b5bf2b9428803c9$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10000000 for cells of type $lut.
+Using template $paramod$81d8a60fd95b1a9f9ef71c12a774ae6988cb9fd5$lut for cells of type $lut.
+Using template $paramod$575b200168b9e109c2ed99df4359056f2c6696ac$lut for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11100001 for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01111000 for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10110100 for cells of type $lut.
+Using template $paramod$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10111111 for cells of type $lut.
+Using template $paramod$deb4f121bbf3d55ed9a98f692fd112e0918f51b5$lut for cells of type $lut.
+No more expansions possible.
+<suppressed ~6663 debug messages>
+
+2.46. Executing XILINX_DFFOPT pass (optimize FF control signal usage).
+Optimizing FFs in lgn_fsm.
+
+2.47. Executing OPT_LUT_INS pass (discard unused LUT inputs).
+Optimizing LUTs in lgn_fsm.
+
+2.48. Executing CLKBUFMAP pass (inserting clock buffers).
+Inserting BUFG on lgn_fsm.$iopadmap$clk[0].
+Removed 0 unused cells and 8231 unused wires.
+
+2.49. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `lgn_fsm'. Setting top module to lgn_fsm.
+
+2.49.1. Analyzing design hierarchy..
+Top module:  \lgn_fsm
+
+2.49.2. Analyzing design hierarchy..
+Top module:  \lgn_fsm
+Removed 0 unused modules.
+
+2.50. Printing statistics.
+
+=== lgn_fsm ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     5003 wires
+     5658 wire bits
+     4848 public wires
+     4848 public wire bits
+     1034 ports
+     1034 port bits
+     2089 cells
+        1   BUFG
+       10   IBUF
+       34   INV
+      143   LUT2
+      150   LUT3
+      167   LUT4
+      201   LUT5
+      359   LUT6
+     1024   OBUF
+     1019 submodules
+     1019   FDRE
+
+   Estimated number of LCs:        877
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+     2089 lgn_fsm
+
+        +----------Count including submodules.
+        | 
+     5003 wires
+     5658 wire bits
+     4848 public wires
+     4848 public wire bits
+     1034 ports
+     1034 port bits
+        - memories
+        - memory bits
+        - processes
+     2089 cells
+        1   BUFG
+       10   IBUF
+       34   INV
+      143   LUT2
+      150   LUT3
+      167   LUT4
+      201   LUT5
+      359   LUT6
+     1024   OBUF
+     1019 submodules
+     1019   FDRE
+
+   Estimated number of LCs:        877
+
+2.51. Executing CHECK pass (checking for obvious problems).
+Checking module lgn_fsm...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== lgn_fsm ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     5003 wires
+     5658 wire bits
+     4848 public wires
+     4848 public wire bits
+     1034 ports
+     1034 port bits
+     3108 cells
+        1   BUFG
+     1019   FDRE
+       10   IBUF
+       34   INV
+      143   LUT2
+      150   LUT3
+      167   LUT4
+      201   LUT5
+      359   LUT6
+     1024   OBUF
+
+End of script. Logfile hash: c59939a8cc, time: 10.69s, user: 9.29s, system: 0.79s, MEM: 170.06 MB peak
+Yosys 0.67+4 (git sha1 b88b73a99, Release, Clang /usr/bin/clang++ 18.1.8)
+Time spent: 33% 17x read_verilog (3 sec), 10% 14x opt_expr (1 sec), ...
