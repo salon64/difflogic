@@ -37,9 +37,13 @@ So `extract.rebuild_model` re-seeds and regenerates each layer's two randperms i
 2. the extracted netlist must match the torch model **bit-for-bit** (per-timestep
    state trajectories + predictions) on real data (`sim.equivalence_check`).
 
-(Forward fix — registering `indices` as persistent buffers — intentionally NOT in
-v0: it changes the checkpoint format and touches upstream `difflogic/difflogic.py`;
-do it as its own change once the falsifier verdict is in.)
+(Forward fix — DONE 2026-07-10 pm: `LogicLayer.indices` is now a property backed by
+persistent `conn_a`/`conn_b` buffers in `difflogic/difflogic.py`. New checkpoints are
+self-contained (wiring saved and restored on load, overriding constructed wiring —
+so `--init-from` warm-starts now restore wiring too); OLD checkpoints still load
+under `strict=True` and keep the replay semantics above. Tests:
+`python -m mlgn.netlist.test_indices_buffers`. The RNG replay remains necessary
+only for pre-fix checkpoints.)
 
 ## Files
 
@@ -47,10 +51,15 @@ do it as its own change once the falsifier verdict is in.)
 |---|---|
 | `extract.py` | RunSpec from a results JSON (+ `--alphabet` etc. from run_queue.sh, which the JSONs don't record); RNG-replay rebuild; accuracy gate |
 | `ir.py` | flat topological gate IR (16-op vocabulary, layer slices, latches); `extract_netlist(model)`; remap-replay helper for property construction |
-| `sim.py` | vectorized numpy simulator; bit-exact equivalence vs torch; copy-protocol trajectory analysis (settle time + decode) |
+| `sim.py` | vectorized numpy simulator; bit-exact equivalence vs torch; copy-protocol trajectory analysis; `exhaustive_x0` closed-system case analysis |
+| `head.py` | in-netlist GroupSum head: popcount adder trees, unsigned comparators, `decode_ok` with torch's exact first-max-wins argmax tie-break (tests: `python -m mlgn.netlist.test_head`) |
 | `props.py` | property miters, one `bad` output each (see below) |
 | `blif.py` | BLIF emission (`.names` covers per gate, `.latch` per state bit) for ABC |
-| `falsify.py` | CLI: end-to-end run → `out/<ckpt>/report.json` + BLIFs + ABC logs |
+| `verilog.py` | synthesizable Verilog-2001 emitter (clk/rst/x → registered q), names matching `blif.signal_name` |
+| `falsify.py` | CLI: end-to-end run → `out/<ckpt>/report.json` + BLIFs + ABC logs (`--engines pdr,bmc3,tempor_pdr`) |
+| `run_distractor_study.py` | free-input verification campaign: BFS closures + ABC + bit-exact cex replay (results: `out/distractor_study/`) |
+| `synth/` | Verilog/BLIF export, iverilog golden-vector equivalence, yosys `synth_xilinx` reports (`synth/report.md`) |
+| `test_indices_buffers.py` | tests for the upstream indices-as-buffers checkpoint fix |
 
 ## Properties
 
@@ -60,11 +69,16 @@ do it as its own change once the falsifier verdict is in.)
 | `seq_hold` | on all reachable states from reset, with free inputs: blank ⇒ hold? | `pdr` / `bmc3` |
 | `protocol_hold` | copy protocol (legal cue+one-hot write at t=0, forced blanks after): does the state stop changing within K steps of the write, **forever**? | `pdr` / `bmc3` |
 | `protocol_hold_anyx0` | same, but after ANY first input incl. garbage (robustness bonus) | `pdr` / `bmc3` |
+| `protocol_decode` | full functional correctness as ONE query: legal write, blanks forever — is the GroupSum-argmax readout the written symbol at EVERY frame ≥ K? (shadow register + in-netlist popcount head) | recipe |
+| `distractor_hold` fs0/fs1 | after the write, inputs range over {blank} ∪ {non-cued one-hot tokens} (free every frame): does the state stay frozen? fs0 = tokens only after arming, fs1 = also during settling | `bmc3` (+recipe) |
+| `distractor_decode` fs0/fs1 | same input freedom: does the READOUT stay correct? | `bmc3` (+recipe) |
 
 The **settle window K** exists because of the first mechanistic finding (below).
-`protocol_hold` PROVED + the 8 simulated write trajectories decoding correctly at
-their fixed points = a complete functional-correctness theorem for the deployed
-circuit at **arbitrary** delay ≥ K — strictly beyond any bounded testing.
+`protocol_decode` PROVED = a complete write→settle→readout correctness theorem for
+the deployed circuit at **arbitrary** delay ≥ K — strictly beyond bounded testing.
+Property netlists must always be simulation-checked with a **non-vacuity control**
+(corrupt the shadow → bad must fire at exactly the armed frames): a vacuously-true
+bad also "proves".
 
 ## Usage
 
@@ -165,13 +179,59 @@ Verdict tables and raw ABC logs: `out/ckpt_cp50A_curr_c35/` (primary, incl. the
 naive-engine record: pdr UNDECIDED @900 s, bmc3 clean to 124 frames, recipe PROVED
 in 3 s), `out/ckpt_cpB_gated_oracle/` (contrast run).
 
+## Round 2 (2026-07-10 pm, multi-agent build+verify): head, distractors, RTL, buffers
+
+All four items from the original next-steps list landed, each adversarially
+re-verified by an independent reviewer:
+
+1. **In-netlist GroupSum head + `protocol_decode` THEOREM.** `head.py` (popcount
+   trees, comparators, exact first-max argmax; 11,735 gates for the (8,128) head;
+   unit-tested bit-for-bit against numpy incl. engineered ties, exhaustive small
+   heads, and toy-net timing probes). On the combo copy-35 circuit,
+   `protocol_decode` (19k gates, 1049 latches) is **PROVED** by the recipe in
+   ~15 s: *for every legal write and every readout time ≥ 16, the deployed
+   circuit's argmax readout equals the written symbol* — write→settle→readout
+   correctness at arbitrary delay as one machine-checked query. A latent
+   same-layer-read bug in `protocol_hold`/`seq_hold` (harmless to ABC, garbage
+   under python simulation) was caught by the mandated non-vacuity control and
+   fixed.
+2. **Distractor campaign (`out/distractor_study/report.md`) — the free-input
+   verdict.** The copy-trained combo register is **provably not distractor-robust
+   in any variant**: one echo of the written symbol moves the state (hold CEX @
+   first armed frame); a 14-token stream corrupts the readout (decode fs1 CEX);
+   and the deepest result — decode fs0 CEX @ frame 30 for sym5, found by
+   BFS-guided `bmc3 -F 40` in 276 s **after exhaustive enumeration escaped its
+   200k-state cap with zero wrong states found and random testing (224 frames)
+   found nothing**: random sim < systematic enumeration < directed bounded MC is
+   a strict hierarchy here. Gated fails everything at frame 22, distractor-free.
+   Method split: the `tempor→scorr→pdr` recipe is for TRUE properties (with free
+   inputs scorr no longer collapses the cone — 806 latches survive — and pdr
+   stalls); false ones need simulation-guided bounded MC. All 9 counterexamples
+   replay-confirmed bit-exactly; BFS↔MC cross-validation: 0 contradictions.
+3. **RTL + synthesis (`synth/report.md`) — the hardware timestamp.** `verilog.py`
+   emitter, iverilog golden-vector equivalence 8/8 symbols (327,680 state bits, 0
+   mismatches; post-synthesis netlist re-passes), yosys `synth_xilinx`:
+   **901 LUTs + 885 FDRE** (Verilog flow; BLIF cross-check 1020/1019) = **8.7–9.8%
+   of XC7A15T LUTs, 4.3–4.9% of its FFs**, zero BRAM/DSP/carry — the research/20
+   §D2 "fits" arithmetic confirmed with ~4× margin by real numbers. Toolchain:
+   OSS CAD Suite in WSL (`~/oss-cad-suite`). Caveats: no P&R/Fmax yet; deployment
+   needs the in-fabric head (build exists, synthesis of it pending).
+4. **Self-contained checkpoints.** `difflogic/difflogic.py`: wiring buffers +
+   strict-load back-compat (see the wiring section above).
+
 ## Next steps
 
-- popcount/GroupSum comparator head in-netlist → symbolic-decode properties
-  (needed for distcopy: "no distractor placement can corrupt the readout").
-- AIGER emission + `dsec`/`&pdr` variants; Verilog emitter → yosys synthesis report
-  (the P3b seed / Kyushu artifact).
-- register `LogicLayer.indices` as persistent buffers upstream (checkpoint-format
-  change; do after the falsifier verdict).
-- run the pipeline on a clatch checkpoint (only combo/gated exist locally; clatch
-  ckpts need a DUST re-run with `--save-model`).
+- ~~ladder study~~ DONE — `out/ladder_summary.md`. Headline: **three solution
+  families at identical 1.0000 accuracy, distinguishable only by verification.**
+  Seed 2 = fixed points from the first rung (hold PROVED everywhere); seed 0 =
+  progressive crystallization (cycles 48→32→0 along the curriculum); seed 1 =
+  permanent oscillator (period-2/6 limit cycles through c35, hold genuinely
+  FALSE) — yet its **decode theorem PROVES at every rung**: the orbit decodes
+  correctly forever. Hold-type specs separate the families; the decode-type
+  certificate is the right deployment spec.
+- synthesize the FSM **with** the popcount head (deployment-realistic LUT count);
+  nextpnr/Vivado for Fmax + the Kyushu board demo.
+- distcopy-trained checkpoints (DUST, `--save-model`) → same campaign on circuits
+  trained WITH distractors: does training buy provable robustness? (the natural
+  P3a headline experiment) + clatch checkpoints for the P2-native theorems.
+- AIGER emission for engine breadth (`&pdr`, rIC3, Pono).

@@ -13,6 +13,58 @@ Template:
 
 ---
 
+## 2026-07-10 (pm) — P3a round 2 (8-agent build+verify): decode THEOREM proved; combo provably NOT distractor-robust; 901-LUT synthesis; self-contained checkpoints
+- **Setup:** multi-agent workflow (4 build/experiment chains, each adversarially reviewed by an
+  independent agent that re-ran every gate; 455k tokens, ~2h). All results below survived review.
+- **(1) In-netlist GroupSum head + the full-correctness theorem.** New `mlgn/netlist/head.py`
+  (popcount adder trees + comparators + exact torch first-max argmax; 11,735 gates for the (8,128)
+  head; bit-exact vs numpy on 20k+ cases incl. engineered ties + exhaustive small heads).
+  **`protocol_decode` PROVED on combo copy-35** (19k gates / 1,049 latches; recipe ~15 s): for every
+  legal write and EVERY readout time ≥ 16, the deployed circuit's readout equals the written symbol —
+  write→settle→readout correctness at arbitrary delay as ONE model-checking query. Bonus: the
+  mandated non-vacuity control caught a latent same-layer-read bug in protocol_hold/seq_hold
+  (invisible to ABC, garbage under python sim) — fixed; lesson: ALWAYS ship a corrupt-shadow control.
+- **(2) Distractor campaign (`mlgn/netlist/out/distractor_study/report.md`) — the P3a free-input
+  experiment.** Copy-trained combo is **provably not distractor-robust in ANY variant**: hold CEX at
+  the first armed frame (one echo of the written symbol moves the state); decode-during-settling CEX;
+  headline = decode-after-settling **CEX @ frame 30 (sym5) found by BFS-guided bmc3 -F 40 in 276 s
+  after exhaustive enumeration ESCAPED its 200k cap with zero wrong states and random testing found
+  nothing** — random sim < enumeration < directed bounded MC, a strict hierarchy on the same circuit.
+  Gated fails everything at frame 22 without distractors. Method split confirmed: tempor→scorr→pdr
+  proves TRUE properties; with free inputs scorr stops collapsing (806 latches survive, pdr stalls) —
+  FALSE properties need simulation-guided bounded MC. 9/9 cexes replay-confirmed bit-exact;
+  BFS↔MC cross-validation 0 contradictions. So the combo certificate is precisely: "correct at any
+  delay iff the channel stays silent" — an envelope statement no L=35 test set could expose.
+- **(3) RTL + synthesis (`mlgn/netlist/synth/report.md`) — hardware timestamp re-armed with real
+  numbers.** `verilog.py` emitter; iverilog golden-vector equivalence 8/8 symbols (327,680 state
+  bits, 0 mismatches; post-synth netlist re-passes); yosys synth_xilinx: **901 LUTs + 885 FDRE**
+  (BLIF cross-flow 1,020/1,019) = **8.7–9.8% of XC7A15T LUTs / 4.3–4.9% FFs, zero BRAM/DSP/carry** —
+  the §D2 "4k gates + 1k FF fits" estimate confirmed w/ ~4× margin. OSS CAD Suite in WSL. No P&R/Fmax
+  yet; head-included synthesis pending.
+- **(4) Footgun #2 CLOSED upstream:** `difflogic/difflogic.py` LogicLayer.indices → property backed
+  by persistent conn_a/conn_b buffers; old ckpts load under strict=True unchanged (replay semantics
+  kept); NEW checkpoints are self-contained and `--init-from` now restores wiring too; CUDA backward
+  helper refreshed on wiring change (stale-scatter-gradient hazard found and averted). 7/7 tests +
+  end-to-end falsify regression + reviewer probes (deepcopy/pickle/prefix handling) all pass.
+- **(5) Ladder study COMPLETE (9 ckpts, all gates 1.0000; `mlgn/netlist/out/ladder_summary.md`):
+  three solution families at IDENTICAL discrete accuracy, distinguishable only by verification.**
+  Seed 2: fixed points from the first rung — hold + anyx0 PROVED at c8/c20/c35 (2–5 s each).
+  Seed 0 (cp50A): progressive crystallization — cycling inputs 48 → 32 → 0 along the curriculum;
+  hold provable from c20, anyx0 only at c35. Seed 1 (cp4_s1): NEVER crystallizes — period-2/6
+  limit cycles persist through c35 (48 → 28 → 40 cycling inputs), hold genuinely FALSE (CEX at the
+  first armed frame, sim-confirmed; an apparent sim↔MC contradiction en route was my misread —
+  max-settle printed over the settled subset only). **BUT the decode theorem PROVES on the
+  oscillator seed at every rung (~1 s + bmc3 clean 131+ frames): the state never stops moving for
+  5/8 writes, yet every reachable orbit state decodes to the written symbol forever.** ⇒ Hold-type
+  certificates separate solution families; the decode-type certificate (needs the in-netlist head)
+  is the right deployment spec — a P3a thesis statement. Also: settle depth does NOT shrink along
+  the curriculum (12–15 everywhere); curriculum changes orbit STRUCTURE, not transient length; the
+  L=8 rungs read out at t=7, before their own settle — early-curriculum circuits are orbit decoders.
+- **Read:** P3a now has its method core (recipe + hierarchy + envelope certificates), its
+  quantitative contrast (combo vs gated), its hardware leg, and a natural headline experiment
+  (train distcopy → does training buy provable robustness?). Next: clatch + distcopy checkpoints
+  from DUST; head-included synthesis; Fmax.
+
 ## 2026-07-10 — P3a falsifier EXECUTED: exporter works; two theorems PROVED; naive IC3 fails, tempor recipe closes it
 - **Hypothesis (research/20 §D1 gate):** export one disc=1.000 copy checkpoint → ABC
   `pdr`/`bmc3` on a hold invariant; one afternoon de-risks or reframes P3a.
