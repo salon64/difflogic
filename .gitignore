@@ -12,3 +12,5 @@ build/
 */.vscode
 */.idea
 */.claude
+# ABC model checker drops a history file in its working directory
+abc.history
