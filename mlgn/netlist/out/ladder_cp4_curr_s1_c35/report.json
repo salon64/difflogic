@@ -1,0 +1,285 @@
+{
+  "ckpt": "mlgn/seqlgn/results/ckpt_cp4_curr_s1_c35.pt",
+  "json": "mlgn/seqlgn/results/copy_combo_cp4_curr_s1_c35_20260704-212040.json",
+  "spec": {
+    "task": "copy",
+    "mechanism": "combo",
+    "seq_len": 35,
+    "hidden": 1024,
+    "cell_layers": 2,
+    "keep_bias": 1.0,
+    "tau": 30.0,
+    "seed": 1,
+    "alphabet": 8,
+    "latch_kind": "sr",
+    "hard_state": true,
+    "hard_control": false,
+    "batch_size": 128,
+    "n_distractors": 8,
+    "sel_flag": false,
+    "test_acc": 1.0,
+    "test_soft": 1.0
+  },
+  "accuracy_gate": {
+    "rebuilt_test_acc": 1.0,
+    "recorded_test_acc": 1.0,
+    "full_test_set": true,
+    "gate_passed": true,
+    "seconds": 58.2
+  },
+  "netlist": {
+    "pis": 9,
+    "latches": 1024,
+    "gates": 7168
+  },
+  "equivalence": {
+    "samples": 384,
+    "mismatched_predictions": 0,
+    "trajectory_bits_checked": 9175040,
+    "trajectory_bits_mismatched": 0,
+    "bit_exact": true
+  },
+  "protocol_analysis": [
+    {
+      "symbol": 0,
+      "settled": false,
+      "settle_step": null,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        5,
+        5,
+        5,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "symbol": 1,
+      "settled": false,
+      "settle_step": null,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        6,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "symbol": 2,
+      "settled": false,
+      "settle_step": null,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        5,
+        5,
+        5,
+        0,
+        2,
+        0
+      ]
+    },
+    {
+      "symbol": 3,
+      "settled": false,
+      "settle_step": null,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "symbol": 4,
+      "settled": true,
+      "settle_step": 10,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "symbol": 5,
+      "settled": true,
+      "settle_step": 11,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "symbol": 6,
+      "settled": false,
+      "settle_step": null,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "symbol": 7,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        4,
+        4,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ]
+    }
+  ],
+  "exhaustive_x0": {
+    "legal": {
+      "n": 8,
+      "settled": 3,
+      "max_settle": 12,
+      "unsettled": 5
+    },
+    "legal_decode_correct": 3,
+    "garbage": {
+      "n": 504,
+      "settled": 469,
+      "max_settle": 14,
+      "unsettled": 35
+    },
+    "limit_cycles": [
+      2,
+      6,
+      12
+    ],
+    "n_cycling": 40,
+    "settle_hist_legal": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "settle_hist_garbage": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      16,
+      164,
+      80,
+      91,
+      63,
+      27,
+      24,
+      4
+    ]
+  },
+  "settle_legal": 13,
+  "settle_any": 13,
+  "abc": {
+    "comb_hold": {
+      "sat": {
+        "verdict": "CEX",
+        "detail": "SAT: some state exists where a blank step rewrites bits",
+        "aig": {
+          "pi": 1024,
+          "po": 1,
+          "latches": 0,
+          "ands": 8630,
+          "levels": 18
+        },
+        "seconds": 6.8
+      }
+    },
+    "seq_hold": {
+      "tempor_pdr": {
+        "verdict": "CEX",
+        "detail": "counterexample at frame 0",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1024,
+          "ands": 8715,
+          "levels": 19
+        },
+        "seconds": 1.6
+      }
+    },
+    "protocol_hold": {
+      "tempor_pdr": {
+        "verdict": "CEX",
+        "detail": "counterexample at frame 13",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1038,
+          "ands": 8796,
+          "levels": 20
+        },
+        "seconds": 302.0
+      }
+    },
+    "protocol_hold_anyx0": {
+      "tempor_pdr": {
+        "verdict": "CEX",
+        "detail": "counterexample at frame 13",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1038,
+          "ands": 8731,
+          "levels": 20
+        },
+        "seconds": 301.7
+      }
+    }
+  }
+}

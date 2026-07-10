@@ -1,0 +1,19 @@
+[1/6] rebuild: copy/combo L=20 hidden=1024 seed=1 (recorded test_acc=1.0)
+[2/6] accuracy gate: rebuilt=1.0000 recorded=1.0 full_set=True (45.1s)
+[3/6] netlist: 9 PIs, 1024 latches, 7168 gates
+      equivalence vs torch: bit_exact=True (samples=384, pred_mismatch=0, traj_bits_mismatch=0/5242880)
+[4/6] protocol trajectories: 6/8 symbols reach a fixed point (settle steps [10, 11, 12, 13, 15]), 8/8 decode correctly there
+      symbol 3: settled=False step=None decodes=[4, 4, 3, 3, 3, 3, 3, 3]
+      symbol 6: settled=False step=None decodes=[4, 6, 6, 6, 6, 6, 6, 6]
+      exhaustive x0 (all 512): legal settled 6/8 (max 15, decode ok 6), garbage settled 478/504 (max 15), cycling 28
+      protocol arming delay K: legal=16 anyx0=16
+[5/6] emitted comb_hold.blif  (1024 PIs, 0 latches, 9215 gates)
+[5/6] emitted seq_hold.blif  (9 PIs, 1024 latches, 9225 gates)
+[5/6] emitted protocol_hold.blif  (9 PIs, 1041 latches, 9309 gates)
+[5/6] emitted protocol_hold_anyx0.blif  (9 PIs, 1041 latches, 9245 gates)
+[6/6] comb_hold              sat   -> CEX            (8.8s)  SAT: some state exists where a blank step rewrites bits
+[6/6] seq_hold               tempor_pdr -> CEX            (2.5s)  counterexample at frame 0
+[6/6] protocol_hold          tempor_pdr -> CEX            (302.9s)  counterexample at frame 16
+[6/6] protocol_hold_anyx0    tempor_pdr -> CEX            (304.1s)  counterexample at frame 16
+
+report -> mlgn/netlist/out/ladder_cp4_curr_s1_c20\report.json

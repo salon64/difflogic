@@ -1,0 +1,8 @@
+======== ABC command line "read_blif protocol_hold_anyx0.blif; strash; print_stats; tempor -F 17; scorr; dc2; print_stats; pdr -T 300"
+[1;37mckpt_cp50A_curr_c20_protocol_hold_anyx0:[0m i/o =    9/    1  lat = 1040  and =   8127  lev = 19
+Using user-given frame number (17).
+Output 0 of miter "ckpt_cp50A_curr_c20_protocol_hold_anyx0" was asserted in frame 15. Time =     0.16 sec
+A cex found in the first 17 frames.
+[1;37mckpt_cp50A_curr_c20_protocol_hold_anyx0:[0m i/o =    9/    1  lat =  830  and =   6289  lev = 18
+Reached timeout (300 seconds) in frame 15.
+Property UNDECIDED.  Time =   300.03 sec

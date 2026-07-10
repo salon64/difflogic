@@ -1,0 +1,9 @@
+======== ABC command line "read_blif protocol_hold.blif; strash; print_stats; tempor -F 17; scorr; dc2; print_stats; pdr -T 300"
+[1;37mckpt_cp4_curr_s2_c35_protocol_hold:[0m i/o =    9/    1  lat = 1040  and =   8022  lev = 20
+Using user-given frame number (17).
+No output failed in 16 frames.  Time =     0.22 sec
+Reached limit on the number of timeframes (17).
+[1;37mckpt_cp4_curr_s2_c35_protocol_hold:[0m i/o =  162/    1  lat =    0  and =      0  lev =  0
+Invariant F[1] : 0 clauses with 0 flops (out of 1) (cex = 0, ave = -nan)
+Verification of invariant with 0 clauses was successful.  Time =     0.00 sec
+Property proved.  Time =     0.01 sec

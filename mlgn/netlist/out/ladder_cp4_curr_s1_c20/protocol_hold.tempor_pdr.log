@@ -1,0 +1,8 @@
+======== ABC command line "read_blif protocol_hold.blif; strash; print_stats; tempor -F 18; scorr; dc2; print_stats; pdr -T 300"
+[1;37mckpt_cp4_curr_s1_c20_protocol_hold:[0m i/o =    9/    1  lat = 1041  and =   8783  lev = 20
+Using user-given frame number (18).
+Output 0 of miter "ckpt_cp4_curr_s1_c20_protocol_hold" was asserted in frame 16. Time =     0.33 sec
+A cex found in the first 18 frames.
+[1;37mckpt_cp4_curr_s1_c20_protocol_hold:[0m i/o =    9/    1  lat =  968  and =   8176  lev = 19
+Reached timeout (300 seconds) in frame 16.
+Property UNDECIDED.  Time =   300.04 sec
