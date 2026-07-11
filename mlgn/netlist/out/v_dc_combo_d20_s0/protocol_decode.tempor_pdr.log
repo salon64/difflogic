@@ -1,0 +1,9 @@
+======== ABC command line "read_blif protocol_decode.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600"
+[1;37mckpt_v_dc_combo_d20_s0_protocol_decode:[0m i/o =    9/    1  lat = 1046  and =  18737  lev = 49
+Using user-given frame number (15).
+No output failed in 14 frames.  Time =     0.20 sec
+Reached limit on the number of timeframes (15).
+[1;37mckpt_v_dc_combo_d20_s0_protocol_decode:[0m i/o =  144/    1  lat =    0  and =      0  lev =  0
+Invariant F[1] : 0 clauses with 0 flops (out of 1) (cex = 0, ave = -nan)
+Verification of invariant with 0 clauses was successful.  Time =     0.00 sec
+Property proved.  Time =     0.01 sec

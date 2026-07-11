@@ -1,0 +1,8 @@
+======== ABC command line "read_blif protocol_decode.blif; strash; print_stats; tempor -F 20; scorr; dc2; print_stats; pdr -T 600"
+[1;37mckpt_v_dc_clatch_d20_s1_protocol_decode:[0m i/o =    9/    1  lat = 1051  and =  18532  lev = 49
+Using user-given frame number (20).
+Output 0 of miter "ckpt_v_dc_clatch_d20_s1_protocol_decode" was asserted in frame 18. Time =     0.20 sec
+A cex found in the first 20 frames.
+[1;37mckpt_v_dc_clatch_d20_s1_protocol_decode:[0m i/o =    9/    1  lat =  734  and =   8964  lev = 44
+Reached timeout (600 seconds) in frame 18.
+Property UNDECIDED.  Time =   600.26 sec

@@ -1,0 +1,305 @@
+{
+  "ckpt": "mlgn/seqlgn/results/ckpt_v_dc_clatch_d8_s0.pt",
+  "json": "mlgn/seqlgn/results/distcopy_clatch_v_dc_clatch_d8_s0_20260710-192106.json",
+  "spec": {
+    "task": "distcopy",
+    "mechanism": "clatch",
+    "seq_len": 50,
+    "hidden": 1024,
+    "cell_layers": 2,
+    "keep_bias": 3.0,
+    "tau": 30.0,
+    "seed": 0,
+    "alphabet": 8,
+    "latch_kind": "sr",
+    "hard_state": true,
+    "hard_control": false,
+    "batch_size": 128,
+    "n_distractors": 8,
+    "sel_flag": false,
+    "test_acc": 0.9999,
+    "test_soft": 0.8782
+  },
+  "accuracy_gate": {
+    "rebuilt_test_acc": 0.9999,
+    "recorded_test_acc": 0.9999,
+    "full_test_set": true,
+    "gate_passed": true,
+    "seconds": 79.7
+  },
+  "netlist": {
+    "pis": 9,
+    "latches": 1024,
+    "gates": 7168
+  },
+  "equivalence": {
+    "samples": 384,
+    "mismatched_predictions": 0,
+    "trajectory_bits_checked": 13107200,
+    "trajectory_bits_mismatched": 0,
+    "bit_exact": true
+  },
+  "protocol_analysis": [
+    {
+      "symbol": 0,
+      "settled": true,
+      "settle_step": 11,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "symbol": 1,
+      "settled": true,
+      "settle_step": 16,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        7,
+        3,
+        3,
+        6
+      ]
+    },
+    {
+      "symbol": 2,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "symbol": 3,
+      "settled": true,
+      "settle_step": 17,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        7,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "symbol": 4,
+      "settled": true,
+      "settle_step": 14,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "symbol": 5,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "symbol": 6,
+      "settled": true,
+      "settle_step": 18,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "symbol": 7,
+      "settled": true,
+      "settle_step": 17,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        7,
+        3,
+        3,
+        6
+      ]
+    }
+  ],
+  "exhaustive_x0": {
+    "legal": {
+      "n": 8,
+      "settled": 8,
+      "max_settle": 18,
+      "unsettled": 0
+    },
+    "legal_decode_correct": 8,
+    "garbage": {
+      "n": 504,
+      "settled": 504,
+      "max_settle": 18,
+      "unsettled": 0
+    },
+    "limit_cycles": [],
+    "n_cycling": 0,
+    "settle_hist_legal": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      0,
+      1,
+      0,
+      1,
+      2,
+      1
+    ],
+    "settle_hist_garbage": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      56,
+      88,
+      176,
+      31,
+      102,
+      16,
+      15,
+      0,
+      7,
+      6,
+      7
+    ]
+  },
+  "settle_legal": 19,
+  "settle_any": 19,
+  "abc": {
+    "comb_hold": {
+      "sat": {
+        "verdict": "CEX",
+        "detail": "SAT: some state exists where a blank step rewrites bits",
+        "aig": {
+          "pi": 1024,
+          "po": 1,
+          "latches": 0,
+          "ands": 7849,
+          "levels": 17
+        },
+        "seconds": 7.5
+      }
+    },
+    "seq_hold": {
+      "tempor_pdr": {
+        "verdict": "CEX",
+        "detail": "counterexample at frame 0",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1024,
+          "ands": 7941,
+          "levels": 18
+        },
+        "seconds": 1.9
+      }
+    },
+    "protocol_hold": {
+      "tempor_pdr": {
+        "verdict": "PROVED",
+        "detail": "invariant holds on all reachable states",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1044,
+          "ands": 8028,
+          "levels": 18
+        },
+        "seconds": 9.0
+      }
+    },
+    "protocol_hold_anyx0": {
+      "tempor_pdr": {
+        "verdict": "PROVED",
+        "detail": "invariant holds on all reachable states",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1044,
+          "ands": 7963,
+          "levels": 18
+        },
+        "seconds": 9.7
+      }
+    },
+    "protocol_decode": {
+      "tempor_pdr": {
+        "verdict": "BOUNDED_CLEAN",
+        "detail": "no cex within explored bound (2 frames)",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1052,
+          "ands": 18724,
+          "levels": 49
+        },
+        "seconds": 629.9
+      }
+    }
+  }
+}

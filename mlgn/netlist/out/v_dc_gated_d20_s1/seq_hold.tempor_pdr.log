@@ -1,0 +1,7 @@
+======== ABC command line "read_blif seq_hold.blif; strash; print_stats; tempor -F 3; scorr; dc2; print_stats; pdr -T 600"
+[1;37mckpt_v_dc_gated_d20_s1_seq_hold:[0m i/o =    9/    1  lat = 1024  and =   7253  lev = 19
+Using user-given frame number (3).
+Output 0 of miter "ckpt_v_dc_gated_d20_s1_seq_hold" was asserted in frame 0. Time =     0.01 sec
+A cex found in the first 3 frames.
+[1;37mckpt_v_dc_gated_d20_s1_seq_hold:[0m i/o =    9/    1  lat =  722  and =   5181  lev = 18
+Output 0 of miter "ckpt_v_dc_gated_d20_s1_seq_hold" was asserted in frame 0.  Time =     0.02 sec

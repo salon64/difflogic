@@ -1,0 +1,8 @@
+======== ABC command line "read_blif protocol_decode.blif; strash; print_stats; tempor -F 3; scorr; dc2; print_stats; pdr -T 600"
+[1;37mckpt_v_dc_clatch_d8_s0_protocol_decode:[0m i/o =    9/    1  lat = 1052  and =  18724  lev = 49
+Using user-given frame number (3).
+No output failed in 2 frames.  Time =     0.01 sec
+Reached limit on the number of timeframes (3).
+[1;37mckpt_v_dc_clatch_d8_s0_protocol_decode:[0m i/o =   36/    1  lat =  818  and =  11445  lev = 48
+Reached timeout (600 seconds) in frame 16.
+Property UNDECIDED.  Time =   600.17 sec

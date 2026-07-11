@@ -1,0 +1,3 @@
+======== ABC command line "read_blif comb_hold.blif; strash; print_stats; sat -C 1000000"
+[1;37mckpt_v_dc_clatch_d20_s0_comb_hold:[0m i/o = 1024/    1  lat =    0  and =   7941  lev = 18
+SATISFIABLE    Time =     0.01 sec

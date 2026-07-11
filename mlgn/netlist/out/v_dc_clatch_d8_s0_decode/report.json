@@ -1,0 +1,242 @@
+{
+  "ckpt": "mlgn/seqlgn/results/ckpt_v_dc_clatch_d8_s0.pt",
+  "json": "mlgn/seqlgn/results/distcopy_clatch_v_dc_clatch_d8_s0_20260710-192106.json",
+  "spec": {
+    "task": "distcopy",
+    "mechanism": "clatch",
+    "seq_len": 50,
+    "hidden": 1024,
+    "cell_layers": 2,
+    "keep_bias": 3.0,
+    "tau": 30.0,
+    "seed": 0,
+    "alphabet": 8,
+    "latch_kind": "sr",
+    "hard_state": true,
+    "hard_control": false,
+    "batch_size": 128,
+    "n_distractors": 8,
+    "sel_flag": false,
+    "test_acc": 0.9999,
+    "test_soft": 0.8782
+  },
+  "accuracy_gate": {
+    "rebuilt_test_acc": 1.0,
+    "recorded_test_acc": 0.9999,
+    "full_test_set": false,
+    "gate_passed": true,
+    "seconds": 3.2
+  },
+  "netlist": {
+    "pis": 9,
+    "latches": 1024,
+    "gates": 7168
+  },
+  "protocol_analysis": [
+    {
+      "symbol": 0,
+      "settled": true,
+      "settle_step": 11,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "symbol": 1,
+      "settled": true,
+      "settle_step": 16,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        7,
+        3,
+        3,
+        6
+      ]
+    },
+    {
+      "symbol": 2,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "symbol": 3,
+      "settled": true,
+      "settle_step": 17,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        7,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "symbol": 4,
+      "settled": true,
+      "settle_step": 14,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "symbol": 5,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "symbol": 6,
+      "settled": true,
+      "settle_step": 18,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "symbol": 7,
+      "settled": true,
+      "settle_step": 17,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        7,
+        3,
+        3,
+        6
+      ]
+    }
+  ],
+  "exhaustive_x0": {
+    "legal": {
+      "n": 8,
+      "settled": 8,
+      "max_settle": 18,
+      "unsettled": 0
+    },
+    "legal_decode_correct": 8,
+    "garbage": {
+      "n": 504,
+      "settled": 504,
+      "max_settle": 18,
+      "unsettled": 0
+    },
+    "limit_cycles": [],
+    "n_cycling": 0,
+    "settle_hist_legal": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      0,
+      1,
+      0,
+      1,
+      2,
+      1
+    ],
+    "settle_hist_garbage": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      56,
+      88,
+      176,
+      31,
+      102,
+      16,
+      15,
+      0,
+      7,
+      6,
+      7
+    ]
+  },
+  "settle_legal": 19,
+  "settle_any": 19,
+  "abc": {
+    "protocol_decode": {
+      "tempor_pdr": {
+        "verdict": "PROVED",
+        "detail": "invariant holds on all reachable states",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1052,
+          "ands": 18724,
+          "levels": 49
+        },
+        "seconds": 16.3
+      }
+    }
+  }
+}

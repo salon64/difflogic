@@ -1,0 +1,295 @@
+{
+  "ckpt": "mlgn/seqlgn/results/ckpt_v_dc_combo_d8_s0.pt",
+  "json": "mlgn/seqlgn/results/distcopy_combo_v_dc_combo_d8_s0_20260710-212633.json",
+  "spec": {
+    "task": "distcopy",
+    "mechanism": "combo",
+    "seq_len": 50,
+    "hidden": 1024,
+    "cell_layers": 2,
+    "keep_bias": 1.0,
+    "tau": 30.0,
+    "seed": 0,
+    "alphabet": 8,
+    "latch_kind": "sr",
+    "hard_state": true,
+    "hard_control": false,
+    "batch_size": 128,
+    "n_distractors": 8,
+    "sel_flag": false,
+    "test_acc": 1.0,
+    "test_soft": 1.0
+  },
+  "accuracy_gate": {
+    "rebuilt_test_acc": 1.0,
+    "recorded_test_acc": 1.0,
+    "full_test_set": true,
+    "gate_passed": true,
+    "seconds": 75.5
+  },
+  "netlist": {
+    "pis": 9,
+    "latches": 1024,
+    "gates": 7168
+  },
+  "equivalence": {
+    "samples": 384,
+    "mismatched_predictions": 0,
+    "trajectory_bits_checked": 13107200,
+    "trajectory_bits_mismatched": 0,
+    "bit_exact": true
+  },
+  "protocol_analysis": [
+    {
+      "symbol": 0,
+      "settled": true,
+      "settle_step": 11,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "symbol": 1,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        2,
+        7,
+        6,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "symbol": 2,
+      "settled": true,
+      "settle_step": 10,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "symbol": 3,
+      "settled": true,
+      "settle_step": 13,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        2,
+        7,
+        6,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "symbol": 4,
+      "settled": true,
+      "settle_step": 11,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "symbol": 5,
+      "settled": true,
+      "settle_step": 12,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "symbol": 6,
+      "settled": true,
+      "settle_step": 11,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        2,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "symbol": 7,
+      "settled": true,
+      "settle_step": 13,
+      "decode_correct_at_settle": true,
+      "decode_trajectory_head": [
+        5,
+        4,
+        2,
+        7,
+        7,
+        6,
+        7,
+        7
+      ]
+    }
+  ],
+  "exhaustive_x0": {
+    "legal": {
+      "n": 8,
+      "settled": 8,
+      "max_settle": 13,
+      "unsettled": 0
+    },
+    "legal_decode_correct": 8,
+    "garbage": {
+      "n": 504,
+      "settled": 504,
+      "max_settle": 13,
+      "unsettled": 0
+    },
+    "limit_cycles": [],
+    "n_cycling": 0,
+    "settle_hist_legal": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      3,
+      2,
+      2
+    ],
+    "settle_hist_garbage": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      32,
+      152,
+      151,
+      135,
+      28,
+      6
+    ]
+  },
+  "settle_legal": 14,
+  "settle_any": 14,
+  "abc": {
+    "comb_hold": {
+      "sat": {
+        "verdict": "CEX",
+        "detail": "SAT: some state exists where a blank step rewrites bits",
+        "aig": {
+          "pi": 1024,
+          "po": 1,
+          "latches": 0,
+          "ands": 8096,
+          "levels": 18
+        },
+        "seconds": 6.6
+      }
+    },
+    "seq_hold": {
+      "tempor_pdr": {
+        "verdict": "CEX",
+        "detail": "counterexample at frame 0",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1024,
+          "ands": 8190,
+          "levels": 19
+        },
+        "seconds": 1.5
+      }
+    },
+    "protocol_hold": {
+      "tempor_pdr": {
+        "verdict": "PROVED",
+        "detail": "invariant holds on all reachable states",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1039,
+          "ands": 8272,
+          "levels": 19
+        },
+        "seconds": 6.9
+      }
+    },
+    "protocol_hold_anyx0": {
+      "tempor_pdr": {
+        "verdict": "PROVED",
+        "detail": "invariant holds on all reachable states",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1039,
+          "ands": 8207,
+          "levels": 19
+        },
+        "seconds": 6.7
+      }
+    },
+    "protocol_decode": {
+      "tempor_pdr": {
+        "verdict": "PROVED",
+        "detail": "invariant holds on all reachable states",
+        "aig": {
+          "pi": 9,
+          "po": 1,
+          "latches": 1047,
+          "ands": 19091,
+          "levels": 49
+        },
+        "seconds": 13.3
+      }
+    }
+  }
+}
