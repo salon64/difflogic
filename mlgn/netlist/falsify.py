@@ -100,6 +100,8 @@ def main() -> int:
     ap.add_argument("--ckpt", required=True)
     ap.add_argument("--json", required=True, help="the run's results JSON (spec + recorded test_acc)")
     ap.add_argument("--alphabet", type=int, default=8, help="NOT recorded in the JSON; from run_queue.sh")
+    ap.add_argument("--distractors", type=int, default=8,
+                    help="distcopy only; NOT recorded in the JSON — needed to regenerate the test set")
     ap.add_argument("--out", default=None, help="output dir (default mlgn/netlist/out/<ckpt-stem>)")
     ap.add_argument("--eval-batches", type=int, default=None, help="accuracy gate on N batches only (default: full test set)")
     ap.add_argument("--equiv-batches", type=int, default=10, help="equivalence-check batches (default 10; 0 = skip)")
@@ -123,7 +125,7 @@ def main() -> int:
     report: dict = {"ckpt": args.ckpt, "json": args.json}
 
     # 1. rebuild -------------------------------------------------------------------
-    spec = spec_from_json(args.json, alphabet=args.alphabet)
+    spec = spec_from_json(args.json, alphabet=args.alphabet, n_distractors=args.distractors)
     report["spec"] = spec.__dict__.copy()
     print(f"[1/6] rebuild: {spec.task}/{spec.mechanism} L={spec.seq_len} hidden={spec.hidden} "
           f"seed={spec.seed} (recorded test_acc={spec.test_acc})")
@@ -220,7 +222,8 @@ def main() -> int:
 
     # 6. ABC ---------------------------------------------------------------------------
     results = {}
-    prop_settle = {"protocol_hold": settle_legal, "protocol_hold_anyx0": settle_any}
+    prop_settle = {"protocol_hold": settle_legal, "protocol_hold_anyx0": settle_any,
+                   "protocol_decode": settle_legal}
     for name, (path, comb) in paths.items():
         fname = os.path.basename(path)
         engines = ["sat"] if comb else [e.strip() for e in args.engines.split(",") if e.strip()]

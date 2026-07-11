@@ -368,4 +368,5 @@ def build_all(net: Netlist, alphabet: int, settle_legal: int = 1,
         "seq_hold": (seq_hold(net), False),
         "protocol_hold": (protocol_hold(net, alphabet, settle_legal), False),
         "protocol_hold_anyx0": (protocol_hold(net, None, settle_any), False),
+        "protocol_decode": (protocol_decode(net, alphabet, settle_legal), False),
     }

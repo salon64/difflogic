@@ -91,6 +91,35 @@ CIRCUITS = {
         "acc_tol": 0.06,
         "anchor": {"protocol_decode": "CEX"},
     },
+    # ── distcopy-TRAINED circuits (2026-07-11, DUST run_queue_p3a) — the headline question:
+    # does training WITH distractors buy provable distractor robustness? settle values and
+    # protocol_decode anchors come from the falsify runs in out/v_dc_* (all full-set gates
+    # passed exactly). dc_combo_d20 is a MIXED family (7 fixpoints + 1 correctly-decoding
+    # orbit, 16 cycling inputs) — its hold props are known-CEX; decode is the question.
+    "dc_combo_d20": {
+        "ckpt": os.path.join(RESULTS, "ckpt_v_dc_combo_d20_s0.pt"),
+        "json": os.path.join(RESULTS, "distcopy_combo_v_dc_combo_d20_s0_20260710-212712.json"),
+        "settle": 13, "acc_tol": 1e-9, "distractors": 20,
+        "anchor": {"protocol_decode": "PROVED"},
+    },
+    "dc_combo_d8": {
+        "ckpt": os.path.join(RESULTS, "ckpt_v_dc_combo_d8_s0.pt"),
+        "json": os.path.join(RESULTS, "distcopy_combo_v_dc_combo_d8_s0_20260710-212633.json"),
+        "settle": 14, "acc_tol": 1e-9, "distractors": 8,
+        "anchor": {"protocol_decode": "PROVED"},
+    },
+    "dc_gated_d8": {
+        "ckpt": os.path.join(RESULTS, "ckpt_v_dc_gated_d8_s0.pt"),
+        "json": os.path.join(RESULTS, "distcopy_gated_v_dc_gated_d8_s0_20260710-192124.json"),
+        "settle": 29, "acc_tol": 1e-9, "distractors": 8,
+        "anchor": {"protocol_decode": "PROVED"},
+    },
+    "dc_clatch_d8": {
+        "ckpt": os.path.join(RESULTS, "ckpt_v_dc_clatch_d8_s0.pt"),
+        "json": os.path.join(RESULTS, "distcopy_clatch_v_dc_clatch_d8_s0_20260710-192106.json"),
+        "settle": 19, "acc_tol": 1e-3, "distractors": 8,  # recorded 0.9999
+        "anchor": {"protocol_decode": "PROVED"},
+    },
 }
 
 PROP_ORDER = ["protocol_decode",
@@ -127,15 +156,26 @@ def bfs_closure(net, sym: int, cap: int, chunk: int = 4096, settle_horizon: int 
     x0[0, ALPHABET] = True                      # cue
     state = np.tile(np.asarray(net.init, dtype=bool), (1, 1))
     state = sim.step(net, x0, state)            # the write step -> h_1
+    # Follow blanks to the post-write ATTRACTOR: a fixed point (period 1) or a limit
+    # cycle (mixed-family circuits, e.g. dc_combo_d20 sym0 — period-N orbit). The BFS
+    # is seeded with ALL attractor states, so the closure semantics are unchanged:
+    # "every state reachable from the settled behavior under the distractor alphabet".
+    seen: dict[bytes, int] = {}
+    hist: list[np.ndarray] = []
+    orbit = None
     settle_t = None
-    for t in range(1, settle_horizon):
-        nxt = sim.step(net, blank1, state)
-        if (nxt == state).all():
-            settle_t = t
+    for t in range(settle_horizon):
+        k = np.packbits(state[0]).tobytes()
+        if k in seen:
+            orbit = np.stack(hist[seen[k]:])
+            settle_t = seen[k]                  # first step the attractor is entered
             break
-        state = nxt
-    assert settle_t is not None, f"symbol {sym}: no fixed point within {settle_horizon} blank steps"
-    fp = state[0].copy()
+        seen[k] = t
+        hist.append(state[0].copy())
+        state = sim.step(net, blank1, state)
+    assert orbit is not None, f"symbol {sym}: no attractor within {settle_horizon} blank steps"
+    period = len(orbit)
+    fp = orbit[0].copy()                        # representative state (the fixed point when period 1)
     fp_decode = int(sim.head_scores(net, fp[None, :]).argmax(-1)[0])
 
     inputs = np.zeros((ALPHABET + 1, n_pi), dtype=bool)   # row 0 = blank; cue always 0
@@ -145,10 +185,12 @@ def bfs_closure(net, sym: int, cap: int, chunk: int = 4096, settle_horizon: int 
     def keys_of(arr2d: np.ndarray) -> list[bytes]:
         return [row.tobytes() for row in np.packbits(arr2d, axis=1)]
 
-    visited = {keys_of(fp[None, :])[0]}
-    n_wrong = 1 if fp_decode != sym else 0
-    wrong_examples = ([{"decoded": fp_decode, "bfs_depth": 0}] if fp_decode != sym else [])
-    frontier = fp[None, :]
+    visited = set(keys_of(orbit))
+    orbit_dec = sim.head_scores(net, orbit).argmax(-1)
+    n_wrong = int((orbit_dec != sym).sum())
+    wrong_examples = [{"decoded": int(d), "bfs_depth": 0}
+                      for d in orbit_dec[orbit_dec != sym][:3]]
+    frontier = orbit.copy()
     moving_tokens_from_fp: list[str] = []
     escaped = False
     depth = 0
@@ -187,6 +229,7 @@ def bfs_closure(net, sym: int, cap: int, chunk: int = 4096, settle_horizon: int 
     return {
         "symbol": sym,
         "settle_step": settle_t,
+        "attractor_period": period,
         "fp_decode": fp_decode,
         "fp_decode_correct": fp_decode == sym,
         "closure_size": len(visited),
@@ -403,7 +446,8 @@ def run_circuit(cname: str, cfg: dict, cap: int, timeout: int, skip_abc: bool,
 
     # 1. rebuild + replay gate ------------------------------------------------------
     print(f"[{cname}] 1/4 rebuild + replay gate", flush=True)
-    spec = spec_from_json(cfg["json"], alphabet=ALPHABET)
+    spec = spec_from_json(cfg["json"], alphabet=ALPHABET,
+                          n_distractors=cfg.get("distractors", 8))
     model = rebuild_model(spec, cfg["ckpt"])
     gate = check_accuracy(model, spec, max_batches=8)
     diff = abs(gate["rebuilt_test_acc"] - spec.test_acc)
