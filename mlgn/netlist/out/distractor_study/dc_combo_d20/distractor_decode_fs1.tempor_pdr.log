@@ -1,0 +1,10 @@
+======== ABC command line "read_blif distractor_decode_fs1.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs1.tempor_pdr.cex"
+[1;37mdistractor_decode_fs1         :[0m i/o =    9/    1  lat = 1046  and =  18754  lev = 49
+Using user-given frame number (15).
+No output failed in 14 frames.  Time =     0.52 sec
+Reached limit on the number of timeframes (15).
+[1;37mdistractor_decode_fs1         :[0m i/o =  144/    1  lat =  488  and =  11434  lev = 84
+Invariant F[15] : 2719 clauses with 482 flops (out of 488) (cex = 0, ave = 213.00)
+Verification of invariant with 2719 clauses was successful.  Time =     0.28 sec
+Property proved.  Time =   197.13 sec
+Counter-example is not available.

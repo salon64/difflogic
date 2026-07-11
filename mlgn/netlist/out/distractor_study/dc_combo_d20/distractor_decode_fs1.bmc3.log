@@ -1,0 +1,4 @@
+======== ABC command line "read_blif distractor_decode_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs1.bmc3.cex"
+[1;37mdistractor_decode_fs1         :[0m i/o =    9/    1  lat = 1046  and =  18754  lev = 49
+No output asserted in 70 frames. Resource limit reached (timeout 180 sec). Time =   180.04 sec
+Counter-example is not available.

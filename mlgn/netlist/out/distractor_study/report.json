@@ -1,6 +1,5 @@
 {
-  "campaign": "distractor_study",
-  "date": "2026-07-10 17:06:00",
+  "note": "aggregate rebuilt 2026-07-11 from the per-circuit circuit_report.json files (the canonical artifacts) after partial-run overwrites; see report.md for the reading",
   "circuits": {
     "combo": {
       "circuit": "combo",
@@ -648,8 +647,2140 @@
         }
       },
       "contradictions": [],
-      "anchor_deviations": [],
-      "total_seconds": 11.1
+      "anchor_deviations": []
+    },
+    "dc_clatch_d8": {
+      "circuit": "dc_clatch_d8",
+      "ckpt": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\ckpt_v_dc_clatch_d8_s0.pt",
+      "json": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\distcopy_clatch_v_dc_clatch_d8_s0_20260710-192106.json",
+      "settle": 19,
+      "accuracy_gate": {
+        "rebuilt_test_acc": 1.0,
+        "recorded_test_acc": 0.9999,
+        "full_test_set": false,
+        "gate_passed": true,
+        "abs_diff_vs_recorded": 9.999999999998899e-05
+      },
+      "netlist": {
+        "pis": 9,
+        "latches": 1024,
+        "gates": 7168,
+        "head": [
+          8,
+          128
+        ]
+      },
+      "protocol_analysis": [
+        {
+          "symbol": 0,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "symbol": 1,
+          "settled": true,
+          "settle_step": 16,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            0,
+            7,
+            3,
+            3,
+            6
+          ]
+        },
+        {
+          "symbol": 2,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "symbol": 3,
+          "settled": true,
+          "settle_step": 17,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            0,
+            7,
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "symbol": 4,
+          "settled": true,
+          "settle_step": 14,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            4,
+            4,
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "symbol": 5,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "symbol": 6,
+          "settled": true,
+          "settle_step": 18,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            6,
+            6,
+            6,
+            6,
+            6
+          ]
+        },
+        {
+          "symbol": 7,
+          "settled": true,
+          "settle_step": 17,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            0,
+            7,
+            3,
+            3,
+            6
+          ]
+        }
+      ],
+      "bfs": [
+        {
+          "symbol": 0,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 0,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 1,
+          "settle_step": 15,
+          "attractor_period": 1,
+          "fp_decode": 1,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 2,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 2,
+          "fp_decode_correct": true,
+          "closure_size": 32,
+          "escaped_cap": false,
+          "bfs_levels": 6,
+          "moving_tokens_from_fp": [
+            "sym1"
+          ],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 3,
+          "settle_step": 16,
+          "attractor_period": 1,
+          "fp_decode": 3,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 4,
+          "settle_step": 13,
+          "attractor_period": 1,
+          "fp_decode": 4,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 5,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 5,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 6,
+          "settle_step": 17,
+          "attractor_period": 1,
+          "fp_decode": 6,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 7,
+          "settle_step": 16,
+          "attractor_period": 1,
+          "fp_decode": 7,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        }
+      ],
+      "bfs_case": "closures are finite but non-trivial (sizes [1, 1, 32, 1, 1, 1, 1, 1]): distractors move the state; exhaustive enumeration closes the from_start=False envelope in simulation, MC must close from_start=True",
+      "props": {
+        "protocol_decode": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_clatch_d8\\protocol_decode.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1052,
+            "gates": 19025
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (174 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1052,
+                "ands": 18724,
+                "levels": 49
+              },
+              "seconds": 181.2,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; bmc3 -T 180; write_cex protocol_decode.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1052,
+                "ands": 18724,
+                "levels": 49
+              },
+              "seconds": 11.1,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; tempor -F 21; scorr; dc2; print_stats; pdr -T 600; write_cex protocol_decode.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_hold_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_clatch_d8\\distractor_hold_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1044,
+            "gates": 9330
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 19",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1044,
+                "ands": 8045,
+                "levels": 26
+              },
+              "seconds": 0.3,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs0.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 20,
+                "nonblank_frames": [
+                  "t=0:WRITE sym2",
+                  "t=19:sym1"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  19
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 19",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1044,
+                "ands": 8045,
+                "levels": 26
+              },
+              "seconds": 601.2,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; tempor -F 21; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 19",
+            "counterexample at frame 19"
+          ]
+        },
+        "distractor_hold_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_clatch_d8\\distractor_hold_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1044,
+            "gates": 9331
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 19",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1044,
+                "ands": 8045,
+                "levels": 26
+              },
+              "seconds": 0.5,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs1.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 20,
+                "nonblank_frames": [
+                  "t=0:WRITE sym7",
+                  "t=1:sym7",
+                  "t=3:sym1",
+                  "t=4:sym1",
+                  "t=5:sym1",
+                  "t=6:sym0",
+                  "t=7:sym1"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  19
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 19",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1044,
+                "ands": 8045,
+                "levels": 26
+              },
+              "seconds": 601.3,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; tempor -F 21; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 19",
+            "counterexample at frame 19"
+          ]
+        },
+        "distractor_decode_fs0": {
+          "engines": {
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "seconds": 1.5,
+              "detail": "invariant F[8], 120 clauses / 90 flops (foreground run after background kills; log inline)"
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_decode_fs1": {
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "seconds": 0.4,
+              "detail": "counterexample at frame 19"
+            },
+            "tempor_pdr": {
+              "verdict": "UNDECIDED",
+              "seconds": 420.3
+            }
+          },
+          "final": "CEX"
+        }
+      },
+      "note": "decode fs0/fs1 verdicts from foreground ABC runs 2026-07-11 (background host kills); BLIFs in this dir"
+    },
+    "dc_combo_d20": {
+      "circuit": "dc_combo_d20",
+      "ckpt": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\ckpt_v_dc_combo_d20_s0.pt",
+      "json": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\distcopy_combo_v_dc_combo_d20_s0_20260710-212712.json",
+      "settle": 13,
+      "accuracy_gate": {
+        "rebuilt_test_acc": 1.0,
+        "recorded_test_acc": 1.0,
+        "full_test_set": false,
+        "gate_passed": true,
+        "abs_diff_vs_recorded": 0.0
+      },
+      "netlist": {
+        "pis": 9,
+        "latches": 1024,
+        "gates": 7168,
+        "head": [
+          8,
+          128
+        ]
+      },
+      "protocol_analysis": [
+        {
+          "symbol": 0,
+          "settled": false,
+          "settle_step": null,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "symbol": 1,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            2,
+            2,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "symbol": 2,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "symbol": 3,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "symbol": 4,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "symbol": 5,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "symbol": 6,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            2,
+            2,
+            6,
+            6,
+            6,
+            6
+          ]
+        },
+        {
+          "symbol": 7,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            2,
+            2,
+            7,
+            7,
+            1,
+            3
+          ]
+        }
+      ],
+      "bfs": [
+        {
+          "symbol": 0,
+          "settle_step": 10,
+          "attractor_period": 2,
+          "fp_decode": 0,
+          "fp_decode_correct": true,
+          "closure_size": 2,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [
+            "blank",
+            "sym0",
+            "sym1",
+            "sym2",
+            "sym3",
+            "sym4",
+            "sym5",
+            "sym6",
+            "sym7"
+          ],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 1,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 1,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 2,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 2,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 3,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 3,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 4,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 4,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 5,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 5,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 6,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 6,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 7,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 7,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        }
+      ],
+      "bfs_case": "closures are finite but non-trivial (sizes [2, 1, 1, 1, 1, 1, 1, 1]): distractors move the state; exhaustive enumeration closes the from_start=False envelope in simulation, MC must close from_start=True",
+      "props": {
+        "protocol_decode": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d20\\protocol_decode.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1046,
+            "gates": 19019
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (172 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1046,
+                "ands": 18737,
+                "levels": 49
+              },
+              "seconds": 188.4,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; bmc3 -T 180; write_cex protocol_decode.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1046,
+                "ands": 18737,
+                "levels": 49
+              },
+              "seconds": 14.7,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600; write_cex protocol_decode.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_hold_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d20\\distractor_hold_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1038,
+            "gates": 9324
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 13",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1038,
+                "ands": 7813,
+                "levels": 27
+              },
+              "seconds": 0.3,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs0.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 14,
+                "nonblank_frames": [
+                  "t=0:WRITE sym0",
+                  "t=13:sym1"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  13
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 13",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1038,
+                "ands": 7813,
+                "levels": 27
+              },
+              "seconds": 600.9,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 13",
+            "counterexample at frame 13"
+          ]
+        },
+        "distractor_hold_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d20\\distractor_hold_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1038,
+            "gates": 9325
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 13",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1038,
+                "ands": 7813,
+                "levels": 27
+              },
+              "seconds": 0.3,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs1.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 14,
+                "nonblank_frames": [
+                  "t=0:WRITE sym6",
+                  "t=2:sym7",
+                  "t=3:sym7",
+                  "t=7:sym3",
+                  "t=8:sym3",
+                  "t=9:sym3",
+                  "t=10:sym3",
+                  "t=11:sym1",
+                  "t=12:sym3",
+                  "t=13:sym3"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  13
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 13",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1038,
+                "ands": 7813,
+                "levels": 27
+              },
+              "seconds": 600.9,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 13",
+            "counterexample at frame 13"
+          ]
+        },
+        "distractor_decode_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d20\\distractor_decode_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1046,
+            "gates": 19037
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (107 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1046,
+                "ands": 18754,
+                "levels": 49
+              },
+              "seconds": 183.4,
+              "script": "read_blif distractor_decode_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs0.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1046,
+                "ands": 18754,
+                "levels": 49
+              },
+              "seconds": 51.8,
+              "script": "read_blif distractor_decode_fs0.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_decode_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d20\\distractor_decode_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1046,
+            "gates": 19038
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (70 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1046,
+                "ands": 18754,
+                "levels": 49
+              },
+              "seconds": 180.3,
+              "script": "read_blif distractor_decode_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs1.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1046,
+                "ands": 18754,
+                "levels": 49
+              },
+              "seconds": 239.3,
+              "script": "read_blif distractor_decode_fs1.blif; strash; print_stats; tempor -F 15; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        }
+      },
+      "contradictions": [],
+      "anchor_deviations": []
+    },
+    "dc_combo_d8": {
+      "circuit": "dc_combo_d8",
+      "ckpt": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\ckpt_v_dc_combo_d8_s0.pt",
+      "json": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\distcopy_combo_v_dc_combo_d8_s0_20260710-212633.json",
+      "settle": 14,
+      "accuracy_gate": {
+        "rebuilt_test_acc": 1.0,
+        "recorded_test_acc": 1.0,
+        "full_test_set": false,
+        "gate_passed": true,
+        "abs_diff_vs_recorded": 0.0
+      },
+      "netlist": {
+        "pis": 9,
+        "latches": 1024,
+        "gates": 7168,
+        "head": [
+          8,
+          128
+        ]
+      },
+      "protocol_analysis": [
+        {
+          "symbol": 0,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "symbol": 1,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            2,
+            7,
+            6,
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "symbol": 2,
+          "settled": true,
+          "settle_step": 10,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "symbol": 3,
+          "settled": true,
+          "settle_step": 13,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            2,
+            7,
+            6,
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "symbol": 4,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "symbol": 5,
+          "settled": true,
+          "settle_step": 12,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "symbol": 6,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            2,
+            6,
+            6,
+            6,
+            6,
+            6
+          ]
+        },
+        {
+          "symbol": 7,
+          "settled": true,
+          "settle_step": 13,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            2,
+            7,
+            7,
+            6,
+            7,
+            7
+          ]
+        }
+      ],
+      "bfs": [
+        {
+          "symbol": 0,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 0,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 1,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 1,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 2,
+          "settle_step": 9,
+          "attractor_period": 1,
+          "fp_decode": 2,
+          "fp_decode_correct": true,
+          "closure_size": 2,
+          "escaped_cap": false,
+          "bfs_levels": 2,
+          "moving_tokens_from_fp": [
+            "sym7"
+          ],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 3,
+          "settle_step": 12,
+          "attractor_period": 1,
+          "fp_decode": 3,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 4,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 4,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 5,
+          "settle_step": 11,
+          "attractor_period": 1,
+          "fp_decode": 5,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 6,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 6,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 7,
+          "settle_step": 12,
+          "attractor_period": 1,
+          "fp_decode": 7,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        }
+      ],
+      "bfs_case": "closures are finite but non-trivial (sizes [1, 1, 2, 1, 1, 1, 1, 1]): distractors move the state; exhaustive enumeration closes the from_start=False envelope in simulation, MC must close from_start=True",
+      "props": {
+        "protocol_decode": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d8\\protocol_decode.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1047,
+            "gates": 19020
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (178 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1047,
+                "ands": 19091,
+                "levels": 49
+              },
+              "seconds": 182.1,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; bmc3 -T 180; write_cex protocol_decode.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1047,
+                "ands": 19091,
+                "levels": 49
+              },
+              "seconds": 8.6,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; tempor -F 16; scorr; dc2; print_stats; pdr -T 600; write_cex protocol_decode.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_hold_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d8\\distractor_hold_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1039,
+            "gates": 9325
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 14",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1039,
+                "ands": 8289,
+                "levels": 27
+              },
+              "seconds": 0.3,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs0.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 15,
+                "nonblank_frames": [
+                  "t=0:WRITE sym2",
+                  "t=14:sym7"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  14
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 14",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1039,
+                "ands": 8289,
+                "levels": 27
+              },
+              "seconds": 601.1,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; tempor -F 16; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 14",
+            "counterexample at frame 14"
+          ]
+        },
+        "distractor_hold_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d8\\distractor_hold_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1039,
+            "gates": 9326
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 14",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1039,
+                "ands": 8289,
+                "levels": 27
+              },
+              "seconds": 0.3,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs1.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 15,
+                "nonblank_frames": [
+                  "t=0:WRITE sym4",
+                  "t=4:sym7",
+                  "t=5:sym1",
+                  "t=6:sym1",
+                  "t=7:sym1",
+                  "t=8:sym1",
+                  "t=9:sym1",
+                  "t=10:sym1",
+                  "t=11:sym1",
+                  "t=12:sym1",
+                  "t=13:sym3"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  14
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 14",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1039,
+                "ands": 8289,
+                "levels": 27
+              },
+              "seconds": 601.1,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; tempor -F 16; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 14",
+            "counterexample at frame 14"
+          ]
+        },
+        "distractor_decode_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d8\\distractor_decode_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1047,
+            "gates": 19038
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (103 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1047,
+                "ands": 19108,
+                "levels": 49
+              },
+              "seconds": 181.0,
+              "script": "read_blif distractor_decode_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs0.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1047,
+                "ands": 19108,
+                "levels": 49
+              },
+              "seconds": 47.8,
+              "script": "read_blif distractor_decode_fs0.blif; strash; print_stats; tempor -F 16; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_decode_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_combo_d8\\distractor_decode_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1047,
+            "gates": 19039
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 14",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1047,
+                "ands": 19108,
+                "levels": 49
+              },
+              "seconds": 0.5,
+              "script": "read_blif distractor_decode_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs1.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 15,
+                "nonblank_frames": [
+                  "t=0:WRITE sym7",
+                  "t=1:sym7",
+                  "t=2:sym7",
+                  "t=3:sym7",
+                  "t=4:sym7",
+                  "t=5:sym7",
+                  "t=6:sym7",
+                  "t=7:sym7",
+                  "t=8:sym7",
+                  "t=9:sym7",
+                  "t=10:sym7",
+                  "t=11:sym5",
+                  "t=12:sym1",
+                  "t=13:sym1"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  14
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 14",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1047,
+                "ands": 19108,
+                "levels": 49
+              },
+              "seconds": 612.0,
+              "script": "read_blif distractor_decode_fs1.blif; strash; print_stats; tempor -F 16; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 14",
+            "counterexample at frame 14"
+          ]
+        }
+      },
+      "contradictions": [],
+      "anchor_deviations": []
+    },
+    "dc_gated_d8": {
+      "circuit": "dc_gated_d8",
+      "ckpt": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\ckpt_v_dc_gated_d8_s0.pt",
+      "json": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\seqlgn\\results\\distcopy_gated_v_dc_gated_d8_s0_20260710-192124.json",
+      "settle": 29,
+      "accuracy_gate": {
+        "rebuilt_test_acc": 1.0,
+        "recorded_test_acc": 1.0,
+        "full_test_set": false,
+        "gate_passed": true,
+        "abs_diff_vs_recorded": 0.0
+      },
+      "netlist": {
+        "pis": 9,
+        "latches": 1024,
+        "gates": 7168,
+        "head": [
+          8,
+          128
+        ]
+      },
+      "protocol_analysis": [
+        {
+          "symbol": 0,
+          "settled": true,
+          "settle_step": 14,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "symbol": 1,
+          "settled": true,
+          "settle_step": 28,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            4,
+            4,
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "symbol": 2,
+          "settled": true,
+          "settle_step": 11,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "symbol": 3,
+          "settled": true,
+          "settle_step": 28,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            0,
+            4,
+            6,
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "symbol": 4,
+          "settled": true,
+          "settle_step": 14,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "symbol": 5,
+          "settled": true,
+          "settle_step": 10,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            5,
+            4,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "symbol": 6,
+          "settled": true,
+          "settle_step": 16,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            0,
+            4,
+            6,
+            6,
+            6,
+            6
+          ]
+        },
+        {
+          "symbol": 7,
+          "settled": true,
+          "settle_step": 19,
+          "decode_correct_at_settle": true,
+          "decode_trajectory_head": [
+            2,
+            4,
+            0,
+            0,
+            4,
+            3,
+            3,
+            3
+          ]
+        }
+      ],
+      "bfs": [
+        {
+          "symbol": 0,
+          "settle_step": 13,
+          "attractor_period": 1,
+          "fp_decode": 0,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 1,
+          "settle_step": 27,
+          "attractor_period": 1,
+          "fp_decode": 1,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 2,
+          "settle_step": 10,
+          "attractor_period": 1,
+          "fp_decode": 2,
+          "fp_decode_correct": true,
+          "closure_size": 4,
+          "escaped_cap": false,
+          "bfs_levels": 3,
+          "moving_tokens_from_fp": [
+            "sym1"
+          ],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 3,
+          "settle_step": 27,
+          "attractor_period": 1,
+          "fp_decode": 3,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 4,
+          "settle_step": 13,
+          "attractor_period": 1,
+          "fp_decode": 4,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 5,
+          "settle_step": 9,
+          "attractor_period": 1,
+          "fp_decode": 5,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 6,
+          "settle_step": 15,
+          "attractor_period": 1,
+          "fp_decode": 6,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        },
+        {
+          "symbol": 7,
+          "settle_step": 18,
+          "attractor_period": 1,
+          "fp_decode": 7,
+          "fp_decode_correct": true,
+          "closure_size": 1,
+          "escaped_cap": false,
+          "bfs_levels": 1,
+          "moving_tokens_from_fp": [],
+          "n_wrong_decode": 0,
+          "all_visited_decode_correct": true,
+          "wrong_decode_examples": [],
+          "seconds": 0.0
+        }
+      ],
+      "bfs_case": "closures are finite but non-trivial (sizes [1, 1, 4, 1, 1, 1, 1, 1]): distractors move the state; exhaustive enumeration closes the from_start=False envelope in simulation, MC must close from_start=True",
+      "props": {
+        "protocol_decode": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_gated_d8\\protocol_decode.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1062,
+            "gates": 19035
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (186 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1062,
+                "ands": 18783,
+                "levels": 49
+              },
+              "seconds": 183.3,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; bmc3 -T 180; write_cex protocol_decode.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1062,
+                "ands": 18783,
+                "levels": 49
+              },
+              "seconds": 15.5,
+              "script": "read_blif protocol_decode.blif; strash; print_stats; tempor -F 31; scorr; dc2; print_stats; pdr -T 600; write_cex protocol_decode.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_hold_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_gated_d8\\distractor_hold_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1054,
+            "gates": 9340
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 29",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1054,
+                "ands": 8051,
+                "levels": 26
+              },
+              "seconds": 0.4,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs0.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 30,
+                "nonblank_frames": [
+                  "t=0:WRITE sym2",
+                  "t=29:sym1"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  29
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 29",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1054,
+                "ands": 8051,
+                "levels": 26
+              },
+              "seconds": 601.4,
+              "script": "read_blif distractor_hold_fs0.blif; strash; print_stats; tempor -F 31; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 29",
+            "counterexample at frame 29"
+          ]
+        },
+        "distractor_hold_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_gated_d8\\distractor_hold_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1054,
+            "gates": 9341
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 29",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1054,
+                "ands": 8051,
+                "levels": 26
+              },
+              "seconds": 0.8,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs1.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 30,
+                "nonblank_frames": [
+                  "t=0:WRITE sym7",
+                  "t=1:raw(001000010)->aliased",
+                  "t=2:sym7",
+                  "t=3:sym7",
+                  "t=4:sym1",
+                  "t=5:sym1",
+                  "t=6:sym1",
+                  "t=7:sym1",
+                  "t=8:sym1",
+                  "t=9:sym7",
+                  "t=10:sym7",
+                  "t=11:sym7",
+                  "t=12:sym7",
+                  "t=13:sym7",
+                  "t=14:sym7",
+                  "t=15:sym7",
+                  "t=16:sym7",
+                  "t=17:sym7",
+                  "t=18:sym7",
+                  "t=19:sym7",
+                  "t=20:sym7",
+                  "t=21:sym7",
+                  "t=22:sym7",
+                  "t=23:sym7",
+                  "t=24:sym7",
+                  "t=25:sym7",
+                  "t=26:sym7",
+                  "t=27:sym7",
+                  "t=28:sym7",
+                  "t=29:sym1"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  29
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 29",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1054,
+                "ands": 8051,
+                "levels": 26
+              },
+              "seconds": 601.4,
+              "script": "read_blif distractor_hold_fs1.blif; strash; print_stats; tempor -F 31; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_hold_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 29",
+            "counterexample at frame 29"
+          ]
+        },
+        "distractor_decode_fs0": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_gated_d8\\distractor_decode_fs0.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1062,
+            "gates": 19053
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "BOUNDED_CLEAN",
+              "detail": "no cex within explored bound (110 frames)",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1062,
+                "ands": 18800,
+                "levels": 49
+              },
+              "seconds": 181.8,
+              "script": "read_blif distractor_decode_fs0.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs0.bmc3.cex",
+              "_log_has_error": false
+            },
+            "tempor_pdr": {
+              "verdict": "PROVED",
+              "detail": "invariant holds on all reachable states",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1062,
+                "ands": 18800,
+                "levels": 49
+              },
+              "seconds": 65.2,
+              "script": "read_blif distractor_decode_fs0.blif; strash; print_stats; tempor -F 31; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs0.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "final": "PROVED"
+        },
+        "distractor_decode_fs1": {
+          "blif": "C:\\Users\\malco\\projects\\difflogic\\mlgn\\netlist\\out\\distractor_study\\dc_gated_d8\\distractor_decode_fs1.blif",
+          "netlist": {
+            "pis": 9,
+            "latches": 1062,
+            "gates": 19054
+          },
+          "engines": {
+            "bmc3": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 29",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1062,
+                "ands": 18800,
+                "levels": 49
+              },
+              "seconds": 7.0,
+              "script": "read_blif distractor_decode_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_decode_fs1.bmc3.cex",
+              "_log_has_error": false,
+              "cex_tokens": {
+                "n_frames": 30,
+                "nonblank_frames": [
+                  "t=0:WRITE sym7",
+                  "t=1:sym7",
+                  "t=2:sym7",
+                  "t=3:sym7",
+                  "t=4:sym7",
+                  "t=5:sym7",
+                  "t=6:sym7",
+                  "t=7:sym7",
+                  "t=8:sym7",
+                  "t=9:sym7",
+                  "t=10:sym7",
+                  "t=11:sym7",
+                  "t=12:sym0",
+                  "t=13:sym0",
+                  "t=14:sym0",
+                  "t=15:sym0",
+                  "t=16:sym1",
+                  "t=17:sym3",
+                  "t=20:sym3",
+                  "t=21:sym3",
+                  "t=22:sym3",
+                  "t=23:sym0",
+                  "t=24:sym0",
+                  "t=25:sym3",
+                  "t=26:sym3",
+                  "t=27:sym3"
+                ]
+              },
+              "cex_replay": {
+                "bad_frames": [
+                  29
+                ],
+                "confirmed": true
+              }
+            },
+            "tempor_pdr": {
+              "verdict": "CEX",
+              "detail": "counterexample at frame 29",
+              "aig": {
+                "pi": 9,
+                "po": 1,
+                "latches": 1062,
+                "ands": 18800,
+                "levels": 49
+              },
+              "seconds": 615.5,
+              "script": "read_blif distractor_decode_fs1.blif; strash; print_stats; tempor -F 31; scorr; dc2; print_stats; pdr -T 600; write_cex distractor_decode_fs1.tempor_pdr.cex",
+              "_log_has_error": false
+            }
+          },
+          "cex_replay_confirmed": true,
+          "cex_replay_failed": false,
+          "final": "CEX",
+          "cex_detail": [
+            "counterexample at frame 29",
+            "counterexample at frame 29"
+          ]
+        }
+      },
+      "contradictions": [],
+      "anchor_deviations": []
     },
     "gated": {
       "circuit": "gated",
@@ -1349,8 +3480,7 @@
         }
       },
       "contradictions": [],
-      "anchor_deviations": [],
-      "total_seconds": 1829.2
+      "anchor_deviations": []
     }
   }
 }

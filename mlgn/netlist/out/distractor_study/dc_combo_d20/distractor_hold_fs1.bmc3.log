@@ -1,0 +1,3 @@
+======== ABC command line "read_blif distractor_hold_fs1.blif; strash; print_stats; bmc3 -T 180; write_cex distractor_hold_fs1.bmc3.cex"
+[1;37mdistractor_hold_fs1           :[0m i/o =    9/    1  lat = 1038  and =   7813  lev = 27
+Output 0 of miter "distractor_hold_fs1" was asserted in frame 13. Time =     0.08 sec

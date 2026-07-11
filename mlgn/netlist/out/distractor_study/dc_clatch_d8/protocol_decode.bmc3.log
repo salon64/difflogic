@@ -1,0 +1,5 @@
+======== ABC command line "read_blif protocol_decode.blif; strash; print_stats; bmc3 -T 180; write_cex protocol_decode.bmc3.cex"
+[1;37mprotocol_decode               :[0m i/o =    9/    1  lat = 1052  and =  18724  lev = 49
+Reached timeout (180 seconds).
+No output asserted in 174 frames. Resource limit reached (timeout 180 sec). Time =   180.95 sec
+Counter-example is not available.

@@ -73,3 +73,38 @@ simulations — the model checker had real work to do on combo and confirmatory 
   first engine for suspected-false properties.
 - The campaign is resumable (`--resume`); this run resumed twice after host-side interruptions, reusing completed BFS closures and
   property verdicts (visible as RESUME markers in `campaign.log`).
+
+---
+
+# Round 3 addendum (2026-07-11) — distcopy-TRAINED circuits
+
+Same pipeline, four disc-1.0 circuits trained WITH distractors (DUST `run_queue_p3a`,
+new-format self-contained checkpoints; per-circuit artifacts in `dc_*/`). All replay
+gates exact; BFS<->MC cross-validation and anchors clean on every circuit.
+
+## The dose-response result
+
+| circuit (training) | protocol_decode | d_hold fs0 | d_hold fs1 | d_decode fs0 | d_decode fs1 |
+|---|---|---|---|---|---|
+| combo (copy, round 2)  | PROVED | CEX | CEX | CEX @ 30 | CEX @ 16 |
+| dc_clatch_d8  | PROVED | CEX | CEX | **PROVED** (pdr invariant: 120 clauses / 90 flops) | CEX @ 19 |
+| dc_gated_d8   | PROVED | CEX | CEX | **PROVED** (65 s) | CEX @ 29 |
+| dc_combo_d8   | PROVED | CEX | CEX | **PROVED** | CEX |
+| dc_combo_d20  | PROVED | CEX | CEX | **PROVED** | **PROVED** |
+
+1. **Provable robustness scales with training-time distractor pressure**: 0 distractors
+   -> no distractor theorem; d8 -> post-settle readout robustness (fs0) proved on all
+   three mechanisms; d20 -> full robustness incl. the settle window (fs1). The d20-combo
+   fs1 theorem is the strongest artifact of the program: ANY legal write + ANY distractor
+   token sequence at ANY time => readout equals the written symbol at every frame >= 13.
+2. **`distractor_hold` CEXes on every circuit, trained or not**: the state register
+   wiggles under distractors even when the readout is provably invariant — the
+   certificate lives at the readout (decode-type specs), not at the state bits.
+3. BFS ground truth matches: distcopy-trained closures are near-frozen (sizes 1-32)
+   vs copy-trained 87k/escaped-cap; `bfs_closure` now seeds from limit-cycle orbits
+   (`attractor_period` recorded; dc_combo_d20 sym0 is a correctly-decoding period-2 orbit).
+4. dc_clatch_d8's fs0 proof is the first where pdr produced a NON-trivial inductive
+   invariant (120 clauses over 90 residual flops) instead of scorr collapsing the cone —
+   free-input proofs are genuinely harder, and the recipe still closes them.
+   (dc_clatch_d8's decode fs0/fs1 verdicts were re-run in the foreground after repeated
+   background host kills; engine provenance in its circuit_report.json.)
