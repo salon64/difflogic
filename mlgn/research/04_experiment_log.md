@@ -13,6 +13,39 @@ Template:
 
 ---
 
+## 2026-07-11 — P3a round 3 (DUST v_ checkpoints verified): distractor training buys PROVABLE robustness, dose-response in theorems; P2-native clatch theorems all PROVED
+- **Setup:** the 14 `run_queue_p3a.sh` checkpoints (all NEW-format/self-contained — DUST ran the
+  buffers fix; loads restore exact wiring, replay unnecessary). Full-test-set accuracy gates
+  passed on all 12 verified ckpts (exact equality incl. the 0.8686/0.8792/0.9999 ones).
+  falsify.py now runs `protocol_decode` first-class (a missed `prop_settle` entry initially made
+  the recipe unroll -F 3 and stall — fixed, all decode verdicts re-run).
+- **(1) P2-native theorems COMPLETE:** clatch copy-35/50 (s0+s1) — fixed-point family, 0 cycles,
+  hold + anyx0 + **decode PROVED** (6–23 s each). The c50 ladder rung (warm-started from c35) also
+  all-PROVED → seed-0's crystallization story now runs c8(48 cyc)→c20(32)→c35(0)→c50(0) with
+  theorems at every settled rung.
+- **(2) Accuracy is attractor-count-quantized, everywhere:** all three ~0.87 d20 circuits
+  (clatch s0/s1, gated s0/s1) are exactly **7/8-correct-fixpoint** registers (hold PROVED, decode
+  CEX at the arming frame; 0.8686–0.8792 ≈ 7/8 ± test noise). dc_combo_d20 (disc 1.0) is a MIXED
+  family — 7 fixpoints + 1 correctly-decoding period-2 orbit (hold CEX, **decode PROVED 14.6 s**);
+  third independent confirmation that decode-type certificates are the right spec.
+- **(3) THE HEADLINE — distractor training buys provable robustness, with a dose-response curve
+  (campaign on the disc-1.0 distcopy-trained circuits, `out/distractor_study/dc_*`):**
+  | training | distractor_decode fs0 (post-settle) | fs1 (during settle) |
+  | copy (round 2) | CEX @ 30 | CEX @ 16 |
+  | distcopy d8 (combo, gated) | **PROVED** (65 s gated, recipe) | CEX |
+  | distcopy d20 (combo) | **PROVED** | **PROVED** |
+  d20-combo's fs1 theorem is the strongest statement produced so far: for ANY legal write followed
+  by ANY distractor-token sequence at ANY time, the readout equals the written symbol at every
+  frame ≥ K — full unbounded-length functional correctness ON THE TRAINED TASK, machine-checked.
+  distractor_hold still CEXes on every circuit (state bits wiggle; the certificate lives at the
+  readout, not the register). BFS ground truth agrees: distcopy-trained closures are near-frozen
+  (sizes ~1–4 vs copy-trained 87k/escaped-cap). bfs_closure now handles limit-cycle attractors
+  (orbit-seeded closure; `attractor_period` recorded).
+- **Read:** P3a's experiment section now has: mechanism (attractor structure explains accuracy),
+  spec (decode > hold), method (sim-guided tempor recipe; bmc3 for false props), and RESULT
+  (training pressure ⇒ graded provable robustness). Remaining tail: dc_clatch_d8 campaign run +
+  T-FF parity props (ckpts weak, 0.58/0.61 — deprioritized). Next: write the P3a note/paper skeleton.
+
 ## 2026-07-10 (pm) — P3a round 2 (8-agent build+verify): decode THEOREM proved; combo provably NOT distractor-robust; 901-LUT synthesis; self-contained checkpoints
 - **Setup:** multi-agent workflow (4 build/experiment chains, each adversarially reviewed by an
   independent agent that re-ran every gate; 455k tokens, ~2h). All results below survived review.

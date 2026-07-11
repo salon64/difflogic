@@ -219,6 +219,34 @@ re-verified by an independent reviewer:
 4. **Self-contained checkpoints.** `difflogic/difflogic.py`: wiring buffers +
    strict-load back-compat (see the wiring section above).
 
+## Round 3 (2026-07-11, DUST `run_queue_p3a` checkpoints): the dose-response result
+
+All 12 verified new checkpoints passed their full-test-set gates exactly (new-format
+self-contained ckpts — wiring restored from the checkpoint, no replay needed).
+
+1. **P2-native theorems complete:** clatch copy-35/50 (two seeds) — fixed-point
+   family, hold + anyx0 + decode all PROVED in seconds. The c50 ladder rung too:
+   seed-0 crystallization now runs 48→32→0→0 cycles across c8→c50 with theorems.
+2. **Accuracy = attractor count, everywhere:** every ~0.87 d20 circuit is exactly a
+   7/8-correct-fixpoint register (hold PROVED, decode CEX); dc_combo_d20 (disc 1.0)
+   is a mixed family (7 fixpoints + 1 correct period-2 orbit: hold CEX, decode
+   PROVED) — decode-type certificates are the right spec, third confirmation.
+3. **THE RESULT — provable robustness scales with training-time distractor
+   pressure** (`out/distractor_study/dc_*`):
+
+   | training | decode fs0 (post-settle) | decode fs1 (during settle) |
+   |---|---|---|
+   | copy (0 distractors) | CEX @ 30 | CEX @ 16 |
+   | distcopy d8 | **PROVED** | CEX |
+   | distcopy d20 | **PROVED** | **PROVED** |
+
+   The d20 fs1 theorem is the strongest artifact so far: any legal write + ANY
+   distractor sequence at ANY time ⇒ readout correct forever — full unbounded
+   functional correctness on the trained task as one MC query. `distractor_hold`
+   still CEXes on every circuit: the state wiggles, the certificate lives at the
+   readout. BFS agrees (distcopy-trained closures ~1–4 states vs copy-trained
+   87k/escaped). `bfs_closure` now handles limit-cycle attractors (orbit-seeded).
+
 ## Next steps
 
 - ~~ladder study~~ DONE — `out/ladder_summary.md`. Headline: **three solution
