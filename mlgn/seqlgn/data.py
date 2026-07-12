@@ -30,6 +30,12 @@ Tasks
   NON-cued symbol tokens scattered later that the cell must HOLD its value THROUGH (not overwrite). The
   corrected hold-vs-overwrite separator: a soft-MUX leaks each distractor into the register; a rounded
   write-enable register holds exact. Dials: ``--distractors`` and ``--seq-len``. See research/18.
+- ``can`` / ``can-syn`` — CAN-bus intrusion detection (P3b gate C0.g, research/23 §C0): sliding
+  windows of per-message tokens (ID bits + Δt thermometer + optional payload bits, all {0,1} by
+  construction), per-message attack labels, contiguous-in-time / whole-capture splits (NO message
+  shuffling — leakage). ``can-syn`` = zero-file synthetic fixture. Builders live in ``can_data.py``;
+  ``--seq-len`` is the window length (default 32). ``--can-flatten`` reshapes the window to ONE step
+  [1, T*F] for the gate-matched windowed-feedforward control arm (``--mechanism ff``).
 
 Adding-problem (regression) is intentionally omitted for now: it needs a regression head
 instead of GroupSum+cross-entropy. See ``docs/benchmarks.md`` (TODO).
@@ -262,6 +268,20 @@ def get_task(
     n_val: int = 5_000,
     n_test: int = 10_000,
     seed: int = 0,
+    # --- CAN task knobs (ignored by every other task; see can_data.py) ----------------
+    can_source: str = "road",
+    can_file: str = "",
+    can_attack: str = "all",
+    can_stride: int = 1,
+    can_eval_stride: int = 1,
+    can_id_enc: str = "onehot",
+    can_top_ids: int = 20,
+    can_dt_bins: int = 8,
+    can_dt_global: bool = False,
+    can_payload_bytes: int = 0,
+    can_per_step: bool = False,
+    can_flatten: bool = False,
+    can_ambient: bool = False,
 ) -> TaskSpec:
     """Build a :class:`TaskSpec`. ``seq_len`` overrides synthetic-task length; ``chunk``
     sets pixels-per-step for the pixel-MNIST tasks (seq_len = 784//chunk). ``test_seq_len``
@@ -271,6 +291,21 @@ def get_task(
     _synthetic = ("parity", "copy", "selcopy", "selective_copy", "selective-copy", "distcopy", "distractor-copy")
     if test_seq_len is not None and name not in _synthetic:
         raise ValueError(f"--test-seq-len is only supported for synthetic tasks (parity/copy/selcopy/distcopy), not {name!r}")
+
+    if name in ("can", "can-syn"):
+        # CAN-bus IDS (P3b C0.g). Lazy import (mirrors the torchvision-in-branch
+        # precedent); can_data consumes ZERO global-RNG draws and its split is
+        # seed-INDEPENDENT, so `seed` is deliberately NOT passed (paired arms).
+        from .can_data import can_task
+        return can_task(
+            name, batch_size, window=seq_len or 32,
+            stride=can_stride, eval_stride=can_eval_stride,
+            id_enc=can_id_enc, top_ids=can_top_ids, dt_bins=can_dt_bins,
+            dt_global=can_dt_global, payload_bytes=can_payload_bytes,
+            per_step=can_per_step, flatten=can_flatten,
+            source=("syn" if name == "can-syn" else can_source),
+            file=can_file, attack=can_attack, ambient=can_ambient,
+        )
 
     if name in ("smnist", "smnist-row"):
         return _mnist_task("smnist", "row", batch_size, val_frac, seed, delay=delay)
@@ -321,8 +356,10 @@ def get_task(
         )
 
     raise ValueError(
-        f"unknown task {name!r}. options: smnist, smnist-pixel, psmnist, parity, copy, selcopy, distcopy"
+        f"unknown task {name!r}. options: smnist, smnist-pixel, psmnist, parity, copy, selcopy, "
+        f"distcopy, can, can-syn"
     )
 
 
-AVAILABLE_TASKS = ("smnist", "smnist-pixel", "psmnist", "parity", "copy", "selcopy", "distcopy")
+AVAILABLE_TASKS = ("smnist", "smnist-pixel", "psmnist", "parity", "copy", "selcopy", "distcopy",
+                   "can", "can-syn")

@@ -1,0 +1,11 @@
+{
+  "attack_type": "masquerade",
+  "masquerade": true,
+  "injection_id": "185",
+  "injection_data_str": null,
+  "injection_interval": [
+    3.2,
+    6.4
+  ],
+  "synthetic": true
+}

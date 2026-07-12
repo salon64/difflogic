@@ -38,6 +38,26 @@ Memory mechanisms
   flows backward through time un-attenuated — the mechanism that lets LSTMs/GRUs beat
   vanilla RNNs, here realised in pure logic.
 
+- ``"ff"``      — the P3b C0.g **stateless control arm**: a plain feedforward LogicMLP
+  over ``x_t`` ALONE (the state is ignored entirely):
+      h_{t+1} = LogicMLP(x_t)
+  Intended use: ``seq_len=1`` with the whole information window flattened into one input
+  (``--can-flatten``: window [T,F] -> x [1, T*F], the psmnist-chunk pattern) — the honest
+  "same information window, no recurrence" baseline. NOT the same as ``rddlgn`` at
+  seq_len=1: rddlgn concatenates ``h_0 = all-zeros`` into its first layer, wasting ~half
+  of the random fan-in on constant-0 inputs, which handicaps the control.
+  **Gate-count matching arithmetic** (utils.count_gates = sum of LogicLayer.out_dim):
+      gated/clatch @ (hidden H, cell_layers L) = candidate + gate MLPs = 2·L·H gates
+      ff           @ (hidden H_ff, cell_layers L) = L·H_ff gates
+  ⇒ set ``H_ff = 2·H`` at the SAME ``--cell-layers`` for EXACT gate parity at equal
+  per-step logic depth (e.g. H=1024, L=2: 4096 vs 4096; smoke: H=64 vs H_ff=128 = 256
+  both — mirrors the research/20 "gate-matched 4000/4096" discipline). The recurrent
+  arm's only extra resource is its state bits + the 3-gates-per-bit MUX (report the
+  printed ``logic gates=`` count in tables). You cannot match unrolled depth AND gate
+  count simultaneously — house precedent matches TOTAL GATES; a depth-doubled variant
+  (H, 2L) is an ablation, not the primary control. ``keep_bias`` does not apply (there
+  is no gate MLP) — train.py records it as null for ff.
+
 - ``"latch"``   — Paper #2's contribution. A **bistable SR-latch** memory primitive. Two
   learned logic networks drive the *set* (``S``) and *reset* (``R``) lines; the state is
   updated by the SR-latch **characteristic next-state equation** ``Q⁺ = S ∨ (R̄ ∧ Q)``,
@@ -77,7 +97,7 @@ import torch.nn as nn
 from difflogic import LogicLayer
 
 
-MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo", "clatch")
+MECHANISMS = ("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo", "clatch", "ff")
 # Bistable primitives available under mechanism='latch' (see the latch docstring above).
 LATCH_KINDS = ("sr", "tff")
 # Mechanisms that carry a tuple state (h, C) — a separate cell state C from the output h.
@@ -265,6 +285,13 @@ class LogicRecurrentCell(nn.Module):
             # CONTROL: recompute the full state each step from [x_t ; h_t].
             self.update = LogicMLP(cat_dim, hidden_dim, **mlp_kwargs)
 
+        elif mechanism == "ff":
+            # C0.g STATELESS CONTROL: feedforward LogicMLP over x_t ALONE (in_dim =
+            # input_dim, not cat_dim) — no recurrence by construction. Gate parity vs
+            # gated/clatch: hidden_ff = 2*hidden_recurrent at equal cell_layers (see
+            # the module docstring for the arithmetic). keep_bias is N/A (no gate MLP).
+            self.update = LogicMLP(input_dim, hidden_dim, **mlp_kwargs)
+
         elif mechanism in ("gated", "combo", "clatch"):
             # Paper #1 ('gated'): separate candidate and gate networks (mirrors GRU's separate
             # weight matrices for the candidate and the update gate). 'combo' (Paper #1 + #2) is
@@ -331,6 +358,9 @@ class LogicRecurrentCell(nn.Module):
                 bias_gate_closed(self.toggle_net, keep_bias)
 
     def forward(self, x_t: torch.Tensor, state):
+        if self.mechanism == "ff":
+            return self.update(x_t)      # stateless by construction: `state` is ignored
+
         # Unpack the (possibly tuple) state into the hidden vector h used to form z.
         h = state[0] if self.mechanism in _TUPLE_STATE else state
         z = torch.cat([x_t, h], dim=-1)  # [batch, input_dim + hidden_dim]

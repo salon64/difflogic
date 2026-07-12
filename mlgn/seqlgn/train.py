@@ -71,6 +71,8 @@ def evaluate(model, loader, device, discrete: bool = True) -> float:
         if discrete:
             x = x.round()
         y = y.to(device)
+        if y.ndim == 2:      # per-message labels ([B, T], --can-per-step): score the
+            y = y[:, -1]     # FINAL message = the window's detection target
         preds = model(x).argmax(-1)
         correct += (preds == y).sum().item()
         total += y.numel()
@@ -78,17 +80,52 @@ def evaluate(model, loader, device, discrete: bool = True) -> float:
     return correct / max(total, 1)
 
 
+@torch.no_grad()
+def evaluate_confusion(model, loader, device) -> dict:
+    """Binary-detection confusion counts on the DISCRETE circuit (positive class = 1,
+    inputs binarised, gates argmaxed). Accuracy alone is dishonest for rare attacks —
+    the C0.g gate reads recall/F1 at matched FPR, and the always-'normal' constant
+    circuit is the non-vacuity floor every arm must beat."""
+    was_training = model.training
+    model.eval()
+    tp = fp = tn = fn = 0
+    for x, y in loader:
+        x = x.to(device).round()
+        y = y.to(device)
+        if y.ndim == 2:
+            y = y[:, -1]
+        preds = model(x).argmax(-1)
+        pos = y == 1
+        tp += int((preds[pos] == 1).sum())
+        fn += int((preds[pos] == 0).sum())
+        fp += int((preds[~pos] == 1).sum())
+        tn += int((preds[~pos] == 0).sum())
+    model.train(was_training)
+    return {
+        "tp": tp, "fp": fp, "tn": tn, "fn": fn,
+        "fpr": fp / (fp + tn) if (fp + tn) else None,
+        "recall": tp / (tp + fn) if (tp + fn) else None,
+        "precision": tp / (tp + fp) if (tp + fp) else None,
+        # direct form 2tp/(2tp+fp+fn): well-defined (=0) for the constant-'normal'
+        # predictor, where precision alone would be undefined
+        "f1": 2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) else None,
+    }
+
+
 def build_args():
     p = argparse.ArgumentParser(description="Train a recurrent Logic Gate Network.")
     p.add_argument("--task", default="psmnist", choices=AVAILABLE_TASKS)
-    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo", "clatch"),
+    p.add_argument("--mechanism", default="gated", choices=("rddlgn", "gated", "lstm", "gru_cell", "latch", "combo", "clatch", "ff"),
                    help="memory mechanism: 'rddlgn' control, 'gated' (GRU-style, Paper #1), "
                         "'lstm' (richer arm), 'gru_cell' (separate cell state + GRU MUX - the 2x2 "
                         "ablation), 'latch' (Paper #2 - bistable SR/T-FF primitive; see --latch-kind), "
                         "'combo' (gated write + bistable restore on the hold), "
                         "'clatch' (INPUT-CLOCKED LATCH - round the write-ENABLE not the value = a "
                         "learnable write-enabled register; exact hold, no drift, no collapse; "
-                        "--anneal ramps the enable-hardening).")
+                        "--anneal ramps the enable-hardening), "
+                        "'ff' (P3b C0.g STATELESS control: LogicMLP over x_t alone; pair with "
+                        "--can-flatten and hidden = 2x the recurrent arm's for exact gate parity "
+                        "- see cells.py docstring).")
     p.add_argument("--latch-kind", default="sr", choices=("sr", "tff"),
                    help="latch primitive when --mechanism latch: 'sr' (set/reset - hold/recall, e.g. "
                         "copy) or 'tff' (T flip-flop - toggle/integrate, e.g. parity).")
@@ -136,6 +173,50 @@ def build_args():
     p.add_argument("--delay", type=int, default=0,
                    help="append N blank steps after an MNIST image (RECALL test: hold the "
                         "digit through the delay, then classify). seq_len = image_steps + N.")
+
+    # --- CAN-bus IDS task (P3b gate C0.g; --task can / can-syn; see can_data.py). -----
+    # The window length is --seq-len (default 32 for can). EVERY arg here is persisted
+    # into the results JSON (research/20 §C3 rule).
+    p.add_argument("--can-source", default="road", choices=("road", "hcrl", "syn"),
+                   help="real dataset under data-can/<source>/ ('road' primary; 'hcrl' "
+                        "sanity row only). --task can-syn forces the synthetic source.")
+    p.add_argument("--can-file", default="",
+                   help="optional path/glob of capture files (overrides the conventional "
+                        "data-can/<source>/ layout; e.g. the checked-in fixture "
+                        "mlgn/seqlgn/data/can/*.log with --can-source road)")
+    p.add_argument("--can-attack", default="all",
+                   help="capture filter: '+'-separated substrings that must ALL appear "
+                        "in the capture filename, e.g. 'masquerade' or "
+                        "'max_speedometer+masquerade' (matches ROAD's "
+                        "max_speedometer_attack_1_masquerade); 'all' = every attack "
+                        "capture. NOT flooding/fuzzing for gate evidence (workmap §C0.g).")
+    p.add_argument("--can-stride", type=int, default=1,
+                   help="sliding-window stride for TRAIN windows (>1 decorrelates)")
+    p.add_argument("--can-eval-stride", type=int, default=1,
+                   help="sliding-window stride for val/test windows (1 = every message "
+                        "scored; >1 trades eval fidelity for speed — recorded in the JSON)")
+    p.add_argument("--can-id-enc", default="onehot", choices=("onehot", "binary"),
+                   help="arbitration-ID encoding: top-N one-hot + other bucket, or raw "
+                        "11-bit binary")
+    p.add_argument("--can-top-ids", type=int, default=20,
+                   help="N for the one-hot ID vocabulary (fit on the train split only)")
+    p.add_argument("--can-dt-bins", type=int, default=8,
+                   help="thermometer bins for the same-ID inter-arrival Δt (log-spaced "
+                        "edges fit on the train split only)")
+    p.add_argument("--can-dt-global", action="store_true",
+                   help="also add a global (any-ID) inter-arrival thermometer")
+    p.add_argument("--can-payload-bytes", type=int, default=0,
+                   help="raw payload bytes to include (8 bits each). ROAD masquerade is "
+                        "frequency-preserving -> needs payload/content bits (use 8).")
+    p.add_argument("--can-per-step", action="store_true",
+                   help="yield PER-MESSAGE labels y:[B,T] (deep-sup supervises every "
+                        "step against its own frame label; the main loss uses y[:,-1])")
+    p.add_argument("--can-flatten", action="store_true",
+                   help="flatten each window [T,F] to ONE step [1,T*F] — the windowed-"
+                        "feedforward control arm (pair with --mechanism ff)")
+    p.add_argument("--can-ambient", action="store_true",
+                   help="road: also load data-can/road/ambient/ captures (all-benign; "
+                        "last one held out for FPR reporting via the group split rule)")
 
     p.add_argument("--lr", type=float, default=0.01)
     p.add_argument("--lr-min", type=float, default=-1.0,
@@ -189,6 +270,10 @@ def build_args():
 
 def main():
     args = build_args()
+    assert not (args.running_target and args.can_per_step), \
+        "--running-target is parity-only; incompatible with --can-per-step"
+    assert not (args.can_flatten and args.can_per_step), \
+        "--can-flatten collapses the window to one step; per-step labels don't apply"
     device = utils.get_device(args.device)
     utils.set_seed(args.seed)
 
@@ -201,10 +286,24 @@ def main():
         test_seq_len=args.test_seq_len,
         alphabet=args.alphabet, chunk=args.chunk, delay=args.delay,
         write_flag=args.sel_flag, n_distractors=args.distractors, seed=args.seed,
+        can_source=args.can_source, can_file=args.can_file, can_attack=args.can_attack,
+        can_stride=args.can_stride, can_eval_stride=args.can_eval_stride,
+        can_id_enc=args.can_id_enc, can_top_ids=args.can_top_ids,
+        can_dt_bins=args.can_dt_bins, can_dt_global=args.can_dt_global,
+        can_payload_bytes=args.can_payload_bytes, can_per_step=args.can_per_step,
+        can_flatten=args.can_flatten, can_ambient=args.can_ambient,
     )
     lg = f"  test_seq_len={task.test_seq_len} (LENGTH-GEN)" if task.test_seq_len != task.seq_len else ""
     print(f"task={task.name}  seq_len={task.seq_len}  input_dim={task.input_dim}  "
           f"num_classes={task.num_classes}{lg}")
+    can_meta = getattr(task, "can_meta", None)
+    if can_meta:
+        af = can_meta["attack_frac_frames"]
+        print(f"[can] source={can_meta['source']} attack={can_meta['attack']} "
+              f"windows={can_meta['windows']} attack_frac(frames)="
+              + "/".join(f"{s}:{af[s]:.3f}" if af[s] is not None else f"{s}:-"
+                         for s in ("train", "val", "test"))
+              + f"  splits={can_meta['splits']}")
 
     # latch bistable-restore anneal window (START,END fractions of training); None = hard from step 0.
     anneal_window = None
@@ -262,6 +361,9 @@ def main():
         if i >= args.iters:
             break
         x, y = x.to(device), y.to(device)
+        # per-message labels ([B, T], --can-per-step): the window's detection target is
+        # the FINAL message; the per-step vector feeds deep supervision below.
+        y_final = y[:, -1] if y.ndim == 2 else y
         # latch bistable-restore anneal: ramp hard_alpha 0->1 over the window so the state
         # hardens gradually (soft solution first, then commit to {0,1}); avoids the
         # hard-from-scratch cold-start/plateau. No-op unless --mechanism latch --anneal set.
@@ -272,7 +374,7 @@ def main():
             logits, states = model(x, return_hidden=True)   # states = per-t carousel/hidden states
         else:
             logits = model(x)
-        loss = loss_fn(logits, y)          # task (CE) loss - reported as `loss`
+        loss = loss_fn(logits, y_final)    # task (CE) loss - reported as `loss`
         total_loss = loss
 
         # Optional gate-entropy penalty (ramped): pushes gates one-hot (SELECTION gap).
@@ -298,8 +400,13 @@ def main():
                 ytar = (bits.cumsum(dim=1) % 2).long()             # [B, L] running XOR, aligned to state_t
                 ds = torch.stack([loss_fn(model.head(states[t]), ytar[:, t])
                                   for t in range(len(states))]).mean()
+            elif y.ndim == 2:
+                # per-message labels (--can-per-step): each state is supervised against
+                # ITS OWN frame's label — the native fit for per-step attack labels.
+                ds = torch.stack([loss_fn(model.head(states[t]), y[:, t])
+                                  for t in range(len(states))]).mean()
             else:
-                ds = torch.stack([loss_fn(model.head(h), y) for h in states]).mean()
+                ds = torch.stack([loss_fn(model.head(h), y_final) for h in states]).mean()
             total_loss = total_loss + args.deep_sup * ds
 
         optimizer.zero_grad()
@@ -349,6 +456,19 @@ def main():
         model.cell.hard_alpha = 1.0  # report the fully-hardened (deployed-consistent) numbers
     test_acc = evaluate(model, task.test_loader, device, discrete=True)
     test_soft = evaluate(model, task.test_loader, device, discrete=False)
+    # IDS confusion metrics (can tasks only): rare attacks make accuracy dishonest —
+    # the C0.g gate reads recall/F1 at matched FPR vs the always-normal floor.
+    conf = None
+    if can_meta is not None and task.num_classes == 2:
+        conf = evaluate_confusion(model, task.test_loader, device)
+        base = can_meta.get("attack_frac_windows_test")
+        print(f"IDS test confusion (discrete): TP={conf['tp']} FP={conf['fp']} "
+              f"TN={conf['tn']} FN={conf['fn']}  FPR="
+              + (f"{conf['fpr']:.5f}" if conf['fpr'] is not None else "-")
+              + "  recall=" + (f"{conf['recall']:.4f}" if conf['recall'] is not None else "-")
+              + "  precision=" + (f"{conf['precision']:.4f}" if conf['precision'] is not None else "-")
+              + "  F1=" + (f"{conf['f1']:.4f}" if conf['f1'] is not None else "-")
+              + "  base-attack-rate=" + (f"{base:.4f}" if base is not None else "-"))
     train_minutes = (time.time() - t0) / 60
     print("\n--- final ---")
     lg = f"  (train L={task.seq_len} -> test L={task.test_seq_len})" if task.test_seq_len != task.seq_len else ""
@@ -410,19 +530,31 @@ def main():
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     tag = f"_{args.tag}" if args.tag else ""
     out = os.path.join(RESULTS_DIR, f"{task.name}_{args.mechanism}{tag}_{stamp}.json")
+    _cm = can_meta or {}      # {} -> every can_* field records as None for non-can tasks
     record = {
         "task": task.name, "mechanism": args.mechanism, "seq_len": task.seq_len,
         "test_seq_len": task.test_seq_len,
+        # input_dim/num_classes: needed later by mlgn/netlist/extract.py (RunSpec has no
+        # 'can' branch yet — it must read these from the record instead of hardcoding).
+        "input_dim": task.input_dim, "num_classes": task.num_classes,
         "latch_kind": args.latch_kind if args.mechanism == "latch" else None,
         "hard_state": (not args.soft_state) if is_restore else None,
         "hard_control": args.hard_control if args.mechanism == "latch" else None,
         "anneal": args.anneal if is_restore else None,
-        "hidden": args.hidden, "cell_layers": args.cell_layers, "keep_bias": args.keep_bias,
+        "hidden": args.hidden, "cell_layers": args.cell_layers,
+        # keep_bias is N/A for the stateless ff arm (no gate MLP) — record null, not a
+        # silent default 3.0 (research/20 finding #1: kb mismatches are a confound).
+        "keep_bias": args.keep_bias if args.mechanism != "ff" else None,
         "tau": args.tau,
         "grad_factor": args.grad_factor, "grad_clip": args.grad_clip,
         "lr": args.lr, "lr_min": args.lr_min, "entropy_reg": args.entropy_reg,
+        "entropy_ramp": args.entropy_ramp,
         "margin_reg": args.margin_reg, "deep_sup": args.deep_sup,
         "running_target": args.running_target,
+        # previously-omitted load-bearing args (research/20 §C item 3, fixed here):
+        "alphabet": args.alphabet, "chunk": args.chunk, "delay": args.delay,
+        "distractors": args.distractors, "sel_flag": args.sel_flag,
+        "init_from": args.init_from, "eval_freq": args.eval_freq, "tag": args.tag,
         "state_mushy_by_t": state_mushy,
         "batch_size": args.batch_size,
         "iters": args.iters, "seed": args.seed, "device": device,
@@ -430,6 +562,31 @@ def main():
         "best_val": best_val, "test_acc": test_acc, "test_soft": test_soft,
         "discretization_gap": test_soft - test_acc, "n_skipped": n_skipped,
         "train_minutes": train_minutes,
+        # --- CAN task record (all None for non-can tasks; can_meta is built by the task
+        # builder, so derived encoder state — fitted Δt edges, ID vocab, split identity —
+        # is persisted, not just the CLI args) ------------------------------------------
+        "can_source": _cm.get("source"), "can_file": _cm.get("file"),
+        "can_attack": _cm.get("attack"), "can_ambient": _cm.get("ambient"),
+        "can_window": _cm.get("window"), "can_stride": _cm.get("stride"),
+        "can_eval_stride": _cm.get("eval_stride"), "can_id_enc": _cm.get("id_enc"),
+        "can_top_ids": _cm.get("top_ids"), "can_dt_bins": _cm.get("dt_bins"),
+        "can_dt_global": _cm.get("dt_global"), "can_dt_edges": _cm.get("dt_edges"),
+        "can_dt_edges_global": _cm.get("dt_edges_global"),
+        "can_id_vocab": _cm.get("id_vocab"),
+        "can_payload_bytes": _cm.get("payload_bytes"),
+        "can_per_step": args.can_per_step if can_meta else None,
+        "can_flatten": _cm.get("flatten") if can_meta else None,
+        "can_split": _cm.get("splits"),
+        "can_split_boundaries": _cm.get("split_boundaries"),
+        "can_frames": _cm.get("frames"), "can_windows": _cm.get("windows"),
+        "can_attack_frac": _cm.get("attack_frac_frames"),
+        "can_attack_frac_windows_test": _cm.get("attack_frac_windows_test"),
+        "test_tp": conf["tp"] if conf else None, "test_fp": conf["fp"] if conf else None,
+        "test_tn": conf["tn"] if conf else None, "test_fn": conf["fn"] if conf else None,
+        "test_fpr": conf["fpr"] if conf else None,
+        "test_recall": conf["recall"] if conf else None,
+        "test_precision": conf["precision"] if conf else None,
+        "test_f1": conf["f1"] if conf else None,
         "grad_profile": grad_profile,
         # gate usage: per-LogicLayer histograms over the 16 gates + the aggregate 16-vector.
         # Map indices via utils.GATE_NAMES. Shows what the latch's set/reset (or combo's gate/

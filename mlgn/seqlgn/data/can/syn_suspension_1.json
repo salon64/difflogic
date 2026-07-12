@@ -1,0 +1,11 @@
+{
+  "attack_type": "suspension",
+  "masquerade": false,
+  "injection_id": "110",
+  "injection_data_str": null,
+  "injection_interval": [
+    3.2,
+    5.6
+  ],
+  "synthetic": true
+}

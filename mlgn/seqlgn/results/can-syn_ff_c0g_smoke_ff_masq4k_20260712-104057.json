@@ -1,0 +1,205 @@
+{
+  "task": "can-syn",
+  "mechanism": "ff",
+  "seq_len": 1,
+  "test_seq_len": 1,
+  "input_dim": 240,
+  "num_classes": 2,
+  "latch_kind": null,
+  "hard_state": null,
+  "hard_control": null,
+  "anneal": null,
+  "hidden": 128,
+  "cell_layers": 2,
+  "keep_bias": null,
+  "tau": 30.0,
+  "grad_factor": 1.0,
+  "grad_clip": 1.0,
+  "lr": 0.01,
+  "lr_min": -1.0,
+  "entropy_reg": 0.0,
+  "entropy_ramp": 1.0,
+  "margin_reg": 0.0,
+  "deep_sup": 0.0,
+  "running_target": false,
+  "alphabet": 8,
+  "chunk": 1,
+  "delay": 0,
+  "distractors": 8,
+  "sel_flag": false,
+  "init_from": "",
+  "eval_freq": 1000,
+  "tag": "c0g_smoke_ff_masq4k",
+  "state_mushy_by_t": null,
+  "batch_size": 64,
+  "iters": 4000,
+  "seed": 0,
+  "device": "cpu",
+  "logic_gates": 256,
+  "best_val": 0.8938053097345132,
+  "test_acc": 0.8959899749373433,
+  "test_soft": 0.8959899749373433,
+  "discretization_gap": 0.0,
+  "n_skipped": 0,
+  "train_minutes": 1.6079721609751383,
+  "can_source": "syn",
+  "can_file": null,
+  "can_attack": "masquerade",
+  "can_ambient": false,
+  "can_window": 16,
+  "can_stride": 1,
+  "can_eval_stride": 4,
+  "can_id_enc": "onehot",
+  "can_top_ids": 20,
+  "can_dt_bins": 8,
+  "can_dt_global": false,
+  "can_dt_edges": [
+    0.009052999999999757,
+    0.012841372732242288,
+    0.018215050662584796,
+    0.025837430122051763,
+    0.036649516253235384,
+    0.05198609286028722,
+    0.07374050539179561,
+    0.10459839999999944
+  ],
+  "can_dt_edges_global": null,
+  "can_id_vocab": [
+    "0x0B0",
+    "0x110",
+    "0x185",
+    "0x224",
+    "0x2A9",
+    "0x333"
+  ],
+  "can_payload_bytes": 0,
+  "can_per_step": false,
+  "can_flatten": true,
+  "can_split": {
+    "syn_ambient_1": "time-split(0.7/0.1/0.2)",
+    "syn_masquerade_1": "train",
+    "syn_masquerade_2": "val",
+    "syn_masquerade_3": "test"
+  },
+  "can_split_boundaries": {
+    "syn_ambient_1": [
+      [
+        "train",
+        0.009384,
+        13.995053
+      ],
+      [
+        "val",
+        14.001286,
+        15.992112
+      ],
+      [
+        "test",
+        15.996029,
+        19.992561
+      ]
+    ],
+    "syn_masquerade_1": [
+      [
+        "train",
+        0.010483,
+        19.99822
+      ]
+    ],
+    "syn_masquerade_2": [
+      [
+        "val",
+        0.009418,
+        19.994027
+      ]
+    ],
+    "syn_masquerade_3": [
+      [
+        "test",
+        0.009063,
+        19.997929
+      ]
+    ]
+  },
+  "can_frames": {
+    "train": 8949,
+    "val": 5905,
+    "test": 6410
+  },
+  "can_windows": {
+    "train": 8919,
+    "val": 1469,
+    "test": 1596
+  },
+  "can_attack_frac": {
+    "train": 0.07118113755726897,
+    "val": 0.10804403048264183,
+    "test": 0.09921996879875195
+  },
+  "can_attack_frac_windows_test": 0.10401002317667007,
+  "test_tp": 0,
+  "test_fp": 0,
+  "test_tn": 1430,
+  "test_fn": 166,
+  "test_fpr": 0.0,
+  "test_recall": 0.0,
+  "test_precision": null,
+  "test_f1": 0.0,
+  "grad_profile": null,
+  "gate_totals": [
+    24,
+    15,
+    7,
+    18,
+    16,
+    27,
+    1,
+    12,
+    8,
+    1,
+    21,
+    14,
+    14,
+    12,
+    20,
+    46
+  ],
+  "gate_distribution": {
+    "cell.update.net.0": [
+      22,
+      8,
+      2,
+      5,
+      6,
+      3,
+      0,
+      3,
+      1,
+      1,
+      6,
+      5,
+      2,
+      7,
+      12,
+      45
+    ],
+    "cell.update.net.1": [
+      2,
+      7,
+      5,
+      13,
+      10,
+      24,
+      1,
+      9,
+      7,
+      0,
+      15,
+      9,
+      12,
+      5,
+      8,
+      1
+    ]
+  }
+}

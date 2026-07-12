@@ -25,9 +25,16 @@ whole paper is testing. See [docs/design.md](docs/design.md).
 
 ```
 seqlgn/
-├── cells.py        LogicMLP, LogicRecurrentCell (the pluggable cell)
+├── cells.py        LogicMLP, LogicRecurrentCell (the pluggable cell; incl. the 'ff'
+│                   stateless control arm for P3b gate C0.g)
 ├── models.py       SequenceClassifier (unrolls the cell + GroupSum head)
-├── data.py         get_task(): smnist, smnist-pixel, psmnist, parity, copy
+├── data.py         get_task(): smnist, smnist-pixel, psmnist, parity, copy, selcopy,
+│                   distcopy, can, can-syn
+├── can_data.py     CAN-bus IDS task (P3b C0.g): ROAD/HCRL parsers, bit-native encoder,
+│                   leakage-safe splits, synthetic fixture (tests: test_can.py)
+├── test_can.py     unit tests for the CAN plumbing (python -m mlgn.seqlgn.test_can)
+├── data/can/       checked-in synthetic fixture + real-dataset download README
+├── run_queue_c0g.sh  the C0.g gate queue (ROAD masquerade, gated/clatch vs windowed-ff)
 ├── train.py        CLI training/eval loop (discrete-locked eval, grad analysis)
 ├── utils.py        seeding, gate counting/distribution, grad-norm-through-time
 ├── _cpu_compat.py  lets difflogic import on a CPU-only machine (dev convenience)

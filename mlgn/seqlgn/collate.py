@@ -34,6 +34,10 @@ COLS = [
     ("test", "test_acc", "{:.3f}"),
     ("soft", "test_soft", "{:.3f}"),
     ("gap", "discretization_gap", "{:+.3f}"),
+    # IDS metrics (can tasks; '-' elsewhere): C0.g reads recall/F1 at matched FPR
+    ("fpr", "test_fpr", "{:.4f}"),
+    ("rec", "test_recall", "{:.4f}"),
+    ("f1", "test_f1", "{:.4f}"),
     ("gates", "logic_gates", "{:,}"),
     ("skip", "n_skipped", "{}"),
     ("min", "train_minutes", "{:.0f}"),

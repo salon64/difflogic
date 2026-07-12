@@ -1,0 +1,229 @@
+{
+  "task": "can-syn",
+  "mechanism": "ff",
+  "seq_len": 1,
+  "test_seq_len": 1,
+  "input_dim": 240,
+  "num_classes": 2,
+  "latch_kind": null,
+  "hard_state": null,
+  "hard_control": null,
+  "anneal": null,
+  "hidden": 128,
+  "cell_layers": 2,
+  "keep_bias": null,
+  "tau": 30.0,
+  "grad_factor": 1.0,
+  "grad_clip": 1.0,
+  "lr": 0.01,
+  "lr_min": -1.0,
+  "entropy_reg": 0.0,
+  "entropy_ramp": 1.0,
+  "margin_reg": 0.0,
+  "deep_sup": 0.0,
+  "running_target": false,
+  "alphabet": 8,
+  "chunk": 1,
+  "delay": 0,
+  "distractors": 8,
+  "sel_flag": false,
+  "init_from": "",
+  "eval_freq": 100,
+  "tag": "c0g_smoke_ff_verify",
+  "state_mushy_by_t": null,
+  "batch_size": 32,
+  "iters": 200,
+  "seed": 0,
+  "device": "cpu",
+  "logic_gates": 256,
+  "best_val": 0.8322605073835668,
+  "test_acc": 0.8369486623282719,
+  "test_soft": 0.8369486623282719,
+  "discretization_gap": 0.0,
+  "n_skipped": 0,
+  "train_minutes": 0.16489969491958617,
+  "can_source": "syn",
+  "can_file": null,
+  "can_attack": "all",
+  "can_ambient": false,
+  "can_window": 16,
+  "can_stride": 1,
+  "can_eval_stride": 4,
+  "can_id_enc": "onehot",
+  "can_top_ids": 20,
+  "can_dt_bins": 8,
+  "can_dt_global": false,
+  "can_dt_edges": [
+    0.009047260000001816,
+    0.012836830081243715,
+    0.018213714045433704,
+    0.025842780283704417,
+    0.03666738651578074,
+    0.05202602890005039,
+    0.07381785123801991,
+    0.10473747999999972
+  ],
+  "can_dt_edges_global": null,
+  "can_id_vocab": [
+    "0x0B0",
+    "0x110",
+    "0x185",
+    "0x224",
+    "0x2A9",
+    "0x333"
+  ],
+  "can_payload_bytes": 0,
+  "can_per_step": false,
+  "can_flatten": true,
+  "can_split": {
+    "syn_ambient_1": "time-split(0.7/0.1/0.2)",
+    "syn_masquerade_1": "train",
+    "syn_masquerade_2": "val",
+    "syn_masquerade_3": "test",
+    "syn_suspension_1": "train",
+    "syn_suspension_2": "val",
+    "syn_suspension_3": "test"
+  },
+  "can_split_boundaries": {
+    "syn_ambient_1": [
+      [
+        "train",
+        0.009384,
+        13.995053
+      ],
+      [
+        "val",
+        14.001286,
+        15.992112
+      ],
+      [
+        "test",
+        15.996029,
+        19.992561
+      ]
+    ],
+    "syn_masquerade_1": [
+      [
+        "train",
+        0.010483,
+        19.99822
+      ]
+    ],
+    "syn_masquerade_2": [
+      [
+        "val",
+        0.009418,
+        19.994027
+      ]
+    ],
+    "syn_masquerade_3": [
+      [
+        "test",
+        0.009063,
+        19.997929
+      ]
+    ],
+    "syn_suspension_1": [
+      [
+        "train",
+        0.010771,
+        19.997511
+      ]
+    ],
+    "syn_suspension_2": [
+      [
+        "val",
+        0.009645,
+        19.996976
+      ]
+    ],
+    "syn_suspension_3": [
+      [
+        "test",
+        0.009421,
+        19.995365
+      ]
+    ]
+  },
+  "can_frames": {
+    "train": 13645,
+    "val": 10605,
+    "test": 11102
+  },
+  "can_windows": {
+    "train": 13600,
+    "val": 2641,
+    "test": 2766
+  },
+  "can_attack_frac": {
+    "train": 0.13045071454745327,
+    "val": 0.1684111268269684,
+    "test": 0.1601513240857503
+  },
+  "can_attack_frac_windows_test": 0.16305133700370789,
+  "test_tp": 0,
+  "test_fp": 0,
+  "test_tn": 2315,
+  "test_fn": 451,
+  "test_fpr": 0.0,
+  "test_recall": 0.0,
+  "test_precision": null,
+  "test_f1": 0.0,
+  "grad_profile": null,
+  "gate_totals": [
+    19,
+    16,
+    12,
+    14,
+    19,
+    22,
+    6,
+    18,
+    14,
+    7,
+    10,
+    17,
+    18,
+    20,
+    23,
+    21
+  ],
+  "gate_distribution": {
+    "cell.update.net.0": [
+      9,
+      7,
+      4,
+      5,
+      8,
+      10,
+      2,
+      6,
+      6,
+      6,
+      7,
+      8,
+      8,
+      11,
+      18,
+      13
+    ],
+    "cell.update.net.1": [
+      10,
+      9,
+      8,
+      9,
+      11,
+      12,
+      4,
+      12,
+      8,
+      1,
+      3,
+      9,
+      10,
+      9,
+      5,
+      8
+    ]
+  }
+}
