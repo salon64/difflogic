@@ -1,0 +1,1248 @@
+Info: Packing constants..
+Info: Inserting IO buffers..
+Info:     IO port 'clk' driven by IBUF '$iopadmap$lgn_top.clk'
+Info:     IO port 'rst' driven by IBUF '$iopadmap$lgn_top.rst'
+Info:     IO port 'class_out[0]' driven by OBUF '$iopadmap$lgn_top.class_out'
+Info:     IO port 'class_out[1]' driven by OBUF '$iopadmap$lgn_top.class_out_1'
+Info:     IO port 'class_out[2]' driven by OBUF '$iopadmap$lgn_top.class_out_2'
+Info:     IO port 'x[0]' driven by IBUF '$iopadmap$lgn_top.x'
+Info:     IO port 'x[1]' driven by IBUF '$iopadmap$lgn_top.x_1'
+Info:     IO port 'x[2]' driven by IBUF '$iopadmap$lgn_top.x_2'
+Info:     IO port 'x[3]' driven by IBUF '$iopadmap$lgn_top.x_3'
+Info:     IO port 'x[4]' driven by IBUF '$iopadmap$lgn_top.x_4'
+Info:     IO port 'x[5]' driven by IBUF '$iopadmap$lgn_top.x_5'
+Info:     IO port 'x[6]' driven by IBUF '$iopadmap$lgn_top.x_6'
+Info:     IO port 'x[7]' driven by IBUF '$iopadmap$lgn_top.x_7'
+Info:     IO port 'x[8]' driven by IBUF '$iopadmap$lgn_top.x_8'
+Info:     Constraining 'clk' to site 'IOB_X1Y76'
+Info:     Tile 'RIOB33_X43Y75'
+Info: Generating input buffer for '$iopadmap$lgn_top.clk'
+Info: Generating input buffer for '$iopadmap$lgn_top.rst'
+Info: Generating output buffer for '$iopadmap$lgn_top.class_out'
+Info: Generating output buffer for '$iopadmap$lgn_top.class_out_1'
+Info: Generating output buffer for '$iopadmap$lgn_top.class_out_2'
+Info: Generating input buffer for '$iopadmap$lgn_top.x'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_1'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_2'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_3'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_4'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_5'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_6'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_7'
+Info: Generating input buffer for '$iopadmap$lgn_top.x_8'
+Info:     Created 14 PAD cells from:
+Info:             14x PAD
+Info: Preparing clocking...
+Info: Packing constants..
+Info: Packing cfg...
+Info: Packing PLLs...
+Info: Packing GTP Transceivers..
+Info: Packing global buffers...
+Info:     Constrained BUFGCTRL '$auto$clkbufmap.cc:261:execute$106598' to bel 'BUFGCTRL_X0Y16/BUFGCTRL' based on dedicated routing
+Info: Packing MUX[789]s..
+Info: Packing carries..
+Info:    Grouped 0 MUXCYs and 0 XORCYs into 0 chains.
+Info:    Blasted 0 non-chain MUXCYs and 0 non-chain XORCYs to soft logic
+Info: Packing LUTs..
+Info:     Created 2651 SLICE_LUTX cells from:
+Info:             50x LUT1
+Info:            277x LUT2
+Info:            365x LUT3
+Info:            600x LUT4
+Info:            660x LUT5
+Info:            699x LUT6
+Info: Packing DRAM..
+Info:    Transformed 0 tied-low DRAM address inputs to be tied-high
+Info: Packing BRAM..
+Info: Packing DSPs..
+Info: Packing flipflops..
+Info:     Created 885 SLICE_FFX cells from:
+Info:            885x FDRE
+Info:     Created 10 SELMUX2_1 cells from:
+Info:              8x MUXF7
+Info:              2x MUXF8
+Info: Constrained 858 LUTFF pairs.
+
+Info: Annotating ports with timing budgets for target frequency 500.00 MHz
+Info: Checksum: 0xe6fbe017
+
+Info: Device utilisation:
+Info: 	          SLICE_LUTX:  2651/65200     4%
+Info: 	           SLICE_FFX:   885/65200     1%
+Info: 	              CARRY4:     0/ 8150     0%
+Info: 	          PSEUDO_GND:     1/18055     0%
+Info: 	          PSEUDO_VCC:     1/18055     0%
+Info: 	               HARD0:     0/ 1980     0%
+Info: 	            RAMB18E1:     0/  150     0%
+Info: 	            FIFO18E1:     0/   75     0%
+Info: 	        RAMBFIFO36E1:     0/   75     0%
+Info: 	            RAMB36E1:     0/   75     0%
+Info: 	             DSP48E1:     0/  120     0%
+Info: 	                 PAD:    14/  512     2%
+Info: 	       IOB33M_OUTBUF:     0/  120     0%
+Info: 	       IOB33S_OUTBUF:     0/  120     0%
+Info: 	        IOB33_OUTBUF:     3/  250     1%
+Info: 	     IOB33M_INBUF_EN:     0/  120     0%
+Info: 	     IOB33S_INBUF_EN:     0/  120     0%
+Info: 	      IOB33_INBUF_EN:    11/  250     4%
+Info: 	IOB33M_TERM_OVERRIDE:     0/  120     0%
+Info: 	IOB33S_TERM_OVERRIDE:     0/  120     0%
+Info: 	 IOB33_TERM_OVERRIDE:     0/  250     0%
+Info: 	       PULL_OR_KEEP1:     0/  490     0%
+Info: 	            IDELAYE2:     0/  250     0%
+Info: 	        OLOGICE3_TFF:     0/  250     0%
+Info: 	      OLOGICE3_OUTFF:     0/  250     0%
+Info: 	       OLOGICE3_MISR:     0/  250     0%
+Info: 	           OSERDESE2:     0/  250     0%
+Info: 	        ILOGICE3_IFF:     0/  250     0%
+Info: 	ILOGICE3_ZHOLD_DELAY:     0/  250     0%
+Info: 	           ISERDESE2:     0/  250     0%
+Info: 	               BUFIO:     0/   20     0%
+Info: 	          IDELAYCTRL:     0/    5     0%
+Info: 	            BUFGCTRL:     1/   32     3%
+Info: 	               BSCAN:     0/    4     0%
+Info: 	                BUFG:     0/   32     0%
+Info: 	              BUFHCE:     0/   72     0%
+Info: 	            DCIRESET:     0/    1     0%
+Info: 	            DNA_PORT:     0/    1     0%
+Info: 	           EFUSE_USR:     0/    1     0%
+Info: 	           FRAME_ECC:     0/    1     0%
+Info: 	       GTPE2_CHANNEL:     0/    4     0%
+Info: 	        GTPE2_COMMON:     0/    1     0%
+Info: 	         IBUFDS_GTE2:     0/    2     0%
+Info: 	                ICAP:     0/    2     0%
+Info: 	            INVERTER:     0/  120     0%
+Info: 	          MMCME2_ADV:     0/    5     0%
+Info: 	        OLOGICE2_TFF:     0/  250     0%
+Info: 	      OLOGICE2_OUTFF:     0/  250     0%
+Info: 	           PLLE2_ADV:     0/    5     0%
+Info: 	           SELMUX2_1:    10/25450     0%
+Info: 	             STARTUP:     0/    1     0%
+Info: 	          USR_ACCESS:     0/    1     0%
+Info: 	              BUFFER:     0/   22     0%
+Info: 	        ILOGICE2_IFF:     0/  250     0%
+Info: 	       OLOGICE2_MISR:     0/  250     0%
+
+Info: Placed 29 cells based on constraints.
+Info: Creating initial analytic placement for 2668 cells, random placement wirelen = 675410.
+Info:     at initial placer iter 0, wirelen = 664
+Info:     at initial placer iter 1, wirelen = 494
+Info:     at initial placer iter 2, wirelen = 488
+Info:     at initial placer iter 3, wirelen = 488
+Info: Running main analytical placer.
+Info:     at iteration #1, type ALL: wirelen solved = 488, spread = 82153, legal = 81956; time = 0.21s
+Info:     at iteration #2, type ALL: wirelen solved = 1582, spread = 63517, legal = 64269; time = 0.28s
+Info:     at iteration #3, type ALL: wirelen solved = 3397, spread = 57811, legal = 58854; time = 0.27s
+Info:     at iteration #4, type ALL: wirelen solved = 8386, spread = 56794, legal = 57560; time = 0.23s
+Info:     at iteration #5, type ALL: wirelen solved = 15458, spread = 53204, legal = 54423; time = 0.19s
+Info:     at iteration #6, type ALL: wirelen solved = 21294, spread = 51972, legal = 52983; time = 0.26s
+Info:     at iteration #7, type ALL: wirelen solved = 26457, spread = 50199, legal = 51370; time = 0.23s
+Info:     at iteration #8, type ALL: wirelen solved = 30681, spread = 49351, legal = 50521; time = 0.25s
+Info:     at iteration #9, type ALL: wirelen solved = 33187, spread = 51071, legal = 52213; time = 0.26s
+Info:     at iteration #10, type ALL: wirelen solved = 36695, spread = 50210, legal = 51308; time = 0.30s
+Info:     at iteration #11, type ALL: wirelen solved = 37707, spread = 49417, legal = 50549; time = 0.40s
+Info:     at iteration #12, type ALL: wirelen solved = 39032, spread = 48748, legal = 49901; time = 0.32s
+Info:     at iteration #13, type ALL: wirelen solved = 40031, spread = 47835, legal = 49176; time = 0.26s
+Info: HeAP Placer Time: 4.84s
+Info:   of which solving equations: 3.57s
+Info:   of which spreading cells: 0.29s
+Info:   of which strict legalisation: 0.18s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 67, wirelen = 49176
+Info:   at iteration #5: temp = 0.000000, timing cost = 127, wirelen = 46952
+Info:   at iteration #8: temp = 0.000000, timing cost = 127, wirelen = 46772 
+Info: SA placement time 2.75s
+
+Info: Max frequency for clock '$abc$103316$iopadmap$clk': 334.22 MHz (FAIL at 500.00 MHz)
+
+Info: Slack histogram:
+Info:  legend: * represents 2 endpoint(s)
+Info:          + represents [1,2) endpoint(s)
+Info: [  -992,   -859) |*+
+Info: [  -859,   -726) |***+
+Info: [  -726,   -593) |******+
+Info: [  -593,   -460) |********+
+Info: [  -460,   -327) |*********************+
+Info: [  -327,   -194) |************************************+
+Info: [  -194,    -61) |**********************************************+
+Info: [   -61,     72) |**********************************************************+
+Info: [    72,    205) |******************************************************+
+Info: [   205,    338) |************************************************************ 
+Info: [   338,    471) |****************************************+
+Info: [   471,    604) |*************************+
+Info: [   604,    737) |***************+
+Info: [   737,    870) |********+
+Info: [   870,   1003) |*****+
+Info: [  1003,   1136) |***+
+Info: [  1136,   1269) |+
+Info: [  1269,   1402) | 
+Info: [  1402,   1535) |+
+Info: [  1535,   1668) |+
+Info: Checksum: 0x09642e23
+Info: Running post-placement legalisation...
+Info: Routing global clocks...
+Info:     routing clock '$abc$103316$iopadmap$clk'
+Info: Running router2...
+Info: Setting up routing resources...
+Info: Running main router loop...
+Info:     iter=1 wires=66206 overused=4322 overuse=4460 archfail=NA
+Info:     iter=2 wires=69617 overused=34 overuse=34 archfail=NA
+Info:     iter=3 wires=69668 overused=1 overuse=1 archfail=NA
+Info:     iter=4 wires=69666 overused=0 overuse=0 archfail=0
+Info: 1000 slowest nets by runtime:
+                                      $techmap105869$abc$103316$lut$not$aiger103315$92.A    885 531.0ms
+                                                                                   g1911     21 75.0ms
+                                                                                   g1272     22 62.6ms
+                                                                                  g18896      1 58.2ms
+                                                                                   g1411      8 55.8ms
+                                                                                    g401     11 52.0ms
+                                                                                   g1250     27 50.3ms
+                                                                                  g18890      1 50.0ms
+                                                                                   g1417     10 48.4ms
+                                                                                    g518     11 46.4ms
+                                                                                   g2958     13 45.8ms
+                                                                                   g2497      9 44.2ms
+                                                                                    g442      9 44.0ms
+                                                                                   g2782      9 43.5ms
+                                                                                   g1706     18 43.4ms
+                                                                                   g1973     11 43.3ms
+                                                                                   g1830      9 43.2ms
+                                                                                   g1681     13 41.8ms
+                                                                                   g1406     11 41.8ms
+                                                                                   g1239      8 40.8ms
+                                                                                   g7408      7 40.7ms
+                                                                                   g1620     11 40.7ms
+                                                                                   g1854     10 40.5ms
+                                                                                  g18893      1 40.4ms
+                                                                                   g2802      7 40.1ms
+                                                                                   g1794     10 39.8ms
+                                                                                   g7580      9 39.8ms
+                                                                                   g1163     13 39.1ms
+                                                                                   g3572     12 38.5ms
+                                                                                    g950      7 38.5ms
+                                                                                     q94      7 37.2ms
+                                                                                    q651      7 36.8ms
+                                                                                   g1210      7 36.6ms
+                                                                                     g23     12 36.4ms
+                                                                                   g7660     11 36.3ms
+                                                                                   g1194     20 36.2ms
+                                                                                   g1175     10 35.9ms
+                                                                                   g1526     12 35.2ms
+                                                                                     q30      7 34.5ms
+                                                                                   g7482      8 34.5ms
+                                                                         $PACKER_VCC_NET   1113 34.4ms
+                                                                                   g1351     15 34.0ms
+                                                                                   g2000     12 33.8ms
+                                                                                     q87      6 33.8ms
+                                                                                   g3843     12 33.5ms
+                                                                                   g2652     12 33.4ms
+                                                                                    q929      8 33.3ms
+                                                                                   g1186     23 33.1ms
+                                                                                    q624     10 32.9ms
+                                                                                    q599      9 32.7ms
+                                                                                   g1380     18 32.4ms
+                                                                                    q615     10 32.3ms
+                                                                                    q382     11 32.2ms
+                                                                                   g1325     30 31.9ms
+                                                                                    q505      6 31.9ms
+                                                                                   g7543      8 31.6ms
+                                                                                   g7173      7 31.3ms
+                                                                                   g1174     11 31.2ms
+                                                                                    q319     12 30.8ms
+                                                                                   g3152     10 30.6ms
+                                                                                    g511      9 30.6ms
+                                                                                   g2422     11 30.5ms
+                                                                                   g1403     12 30.4ms
+                                                                                    q234     11 30.3ms
+                                    $techmap105263$abc$103316$lut$aiger103315$13281.A[2]      7 30.3ms
+                                                                                     q99      8 30.3ms
+                                                                                   g1469     13 30.0ms
+                                                                                    q544     10 30.0ms
+                                                                                   g2641      6 30.0ms
+                                                                                    q395      9 29.9ms
+                                                                                    q192      8 29.7ms
+                                                                                    q331     10 29.6ms
+                                                                                   g1502      9 29.6ms
+                                                                                    q325     11 29.5ms
+                                                                                    q164     10 29.4ms
+                                                                                   g2505      7 29.0ms
+                                                                                   g2279     10 29.0ms
+                                                                                   g2806      9 28.9ms
+                                                                                    q354      8 28.8ms
+                                                                                    g248     11 28.5ms
+                                                                                   g1625      9 28.3ms
+                                                                                   g1040     10 28.0ms
+                                                                                   g1089     10 28.0ms
+                                                                                   g1159     12 27.9ms
+                                                                                    q933     11 27.7ms
+                                                                                   g1354     10 27.6ms
+                                                                                    q471      9 27.4ms
+                                                                                    q773      9 27.3ms
+                                                                                    q324     11 27.1ms
+                                                                                   g1790     10 27.0ms
+                                     $techmap105639$abc$103316$lut$aiger103315$9386.A[1]      7 27.0ms
+                                                                                   g1119     12 26.9ms
+                                                                                   g1690     10 26.9ms
+                                                                                    g819     10 26.8ms
+                                                                                    q254      9 26.8ms
+                                                                                   g2815     11 26.8ms
+                                                                                    q917     10 26.7ms
+                                                                                    q502      8 26.5ms
+                                                                                   g7432      8 26.4ms
+                                                                                   g2103      6 26.3ms
+                                                                                   g1168     13 26.2ms
+                                                                                    q426      7 26.1ms
+                                                                                    q754      8 25.8ms
+                                                                                    g988     12 25.6ms
+                                                                                   g3006     12 25.2ms
+                                                                                   g7623      9 25.0ms
+                                                                                   g3049      9 24.8ms
+                                                                                   g1709     10 24.7ms
+                                                                                   g2596      8 24.6ms
+                                                                                    q530     11 24.6ms
+                                                                                    q701      9 24.6ms
+                                                                                    q335      9 24.3ms
+                                                                                   g2447      9 24.3ms
+                                                                                    g341     10 24.2ms
+                                                                                    g393     12 24.0ms
+                                                                                    g349     12 24.0ms
+                                                                                   g7369      8 24.0ms
+                                                                                   g7612      5 23.9ms
+                                     $techmap105639$abc$103316$lut$aiger103315$9386.A[4]      7 23.7ms
+                                                                                    g241     10 23.6ms
+                                                                                   g1107     20 23.4ms
+                                                                                   g2046     10 23.3ms
+                                                                                   g2625     11 23.3ms
+                                                                                   g1011      8 23.2ms
+                                                                                    q478     11 23.1ms
+                                                                                   g1410     19 23.1ms
+                                                                                   g3763      8 23.1ms
+                                                                                    q508      9 23.1ms
+                                                                                     q62     10 23.1ms
+                                                                                   g3751     10 23.1ms
+                                                                                   g2366     10 23.0ms
+                                                                                    g545      7 23.0ms
+                                                                                   g1015     11 23.0ms
+                                                                                    q964      9 22.9ms
+                                                                                   g3047      7 22.8ms
+                                                                                    q780      6 22.7ms
+                                                                                     q21      9 22.6ms
+                                                                                   g1185      9 22.5ms
+                                                                                    q407      6 22.5ms
+                                                                                   g1228     11 22.4ms
+                                                                                   g1078      9 22.4ms
+                                                                                   g1559     11 22.3ms
+                                                                                    g870     11 22.3ms
+                                                                                   g1627     10 22.2ms
+                                                                                   g2801     10 22.1ms
+                                     $techmap105078$abc$103316$lut$aiger103315$7603.A[4]      8 22.1ms
+                                                                                   g2717      8 22.0ms
+                                                                                    g144      7 22.0ms
+                                    $techmap105454$abc$103316$lut$aiger103315$15198.A[4]      7 22.0ms
+                                                                                     g16      7 21.9ms
+                                                                                     g10      9 21.9ms
+                                                                                   g1980      8 21.9ms
+                                                                                    g172     10 21.8ms
+                                                                                    q931     12 21.8ms
+                                                                                   g1740      9 21.8ms
+                                                                                     g87      6 21.7ms
+                                     $techmap105641$abc$103316$lut$aiger103315$9409.A[4]      7 21.7ms
+                                                                                    q932      9 21.7ms
+                                                                                      x2      6 21.6ms
+                                                                                    q758      8 21.6ms
+                                                                                     q59      6 21.5ms
+                                                                                    q616     10 21.5ms
+                                                                                   g1922     11 21.5ms
+                                                                                    q501      6 21.5ms
+                                                                                    q597      8 21.4ms
+                                                                                    q772      9 21.4ms
+                                                                                    q835     10 21.3ms
+                                                                                    q278     10 21.2ms
+                                    $techmap104451$abc$103316$lut$aiger103315$19621.A[2]      7 21.2ms
+                                                                                   g3060     11 21.2ms
+                                                                                   g1755     16 21.2ms
+                                                                                   g1730     10 21.1ms
+                                    $techmap105263$abc$103316$lut$aiger103315$13281.A[4]      7 21.1ms
+                                                                                   g1257     11 21.1ms
+                                     $techmap105518$abc$103316$lut$aiger103315$9134.A[1]      4 21.1ms
+                                                                                    q153      7 21.0ms
+                                    $techmap104191$abc$103316$lut$aiger103315$10639.A[1]      3 21.0ms
+                                                                                   g1137     12 21.0ms
+                                                                                     q37     12 20.9ms
+                                                                                   g1957     12 20.9ms
+                                                                                   g3938     10 20.8ms
+                                                                                   g1450     10 20.8ms
+                                                                                    g729      8 20.7ms
+                                    $techmap104428$abc$103316$lut$aiger103315$16065.A[2]      3 20.7ms
+                                                                                   g1774      7 20.6ms
+                                                                                   g1859      7 20.6ms
+                                                                                   g1096      8 20.6ms
+                                                                                   g1420      8 20.5ms
+                                                                                   g1996     12 20.5ms
+                                                                                    g151     10 20.5ms
+                                                                                   g2810      9 20.4ms
+                                                                                    q170      9 20.4ms
+                                                                                    q519     10 20.4ms
+                                                                                   g2626     10 20.3ms
+                                                                                   g1719      7 20.3ms
+                                                                                    q903      6 20.1ms
+                                                                                   g1263     11 20.0ms
+                                                                                    q476      5 20.0ms
+                                                                                    q685      7 20.0ms
+                                                                                    g154      7 20.0ms
+                                                                                    g118      9 19.9ms
+                                                                                   q1014      9 19.9ms
+                                     $techmap104978$abc$103316$lut$aiger103315$5501.A[0]      3 19.8ms
+                                                                                   g2607      6 19.8ms
+                                                                                    q295      8 19.8ms
+                                                                                     g71     11 19.7ms
+                                     $techmap105078$abc$103316$lut$aiger103315$7603.A[3]      7 19.7ms
+                                                                                   g2319     10 19.7ms
+                                                                                    q928     11 19.6ms
+                                                                                    q741      9 19.6ms
+                                                                                   g2927      9 19.5ms
+                                                                                   g7347      7 19.5ms
+                                                                                    q991     11 19.5ms
+                                                                                   g4031     10 19.5ms
+                                                                                   g1886     11 19.4ms
+                                                                                   g1249      9 19.4ms
+                                                                                    q608      7 19.4ms
+                                                                                    q338      9 19.4ms
+                                                                                    q484      7 19.3ms
+                                                                                      q1      6 19.3ms
+                                                                                   g1663     10 19.3ms
+                                                                                   g2746      8 19.2ms
+                                                                                    q457      5 19.1ms
+                                                                                    q965     10 19.1ms
+                                                                                    q912      9 19.1ms
+                                                                                    q982      5 19.1ms
+                                                                                    q979      8 19.1ms
+                                                                                   g2269      8 19.1ms
+                                                                                   g1826     10 19.0ms
+                                                                                   g2201      9 19.0ms
+                                    $techmap104251$abc$103316$lut$aiger103315$19609.A[2]      5 19.0ms
+                                                                                    q469      9 19.0ms
+                                                                                     g14     13 19.0ms
+                                                                                    g741      7 19.0ms
+                                                                                   g2326      5 19.0ms
+                                                                                   g2161      5 19.0ms
+                                                                                  g10347      7 18.9ms
+                                     $techmap105034$abc$103316$lut$aiger103315$7479.A[2]      8 18.8ms
+                                                                                     g53      7 18.8ms
+                                    $techmap104461$abc$103316$lut$aiger103315$19629.A[3]      7 18.8ms
+                                                                                    q821     11 18.8ms
+                                                                                    q531     10 18.7ms
+                                                                                    g171     10 18.7ms
+                                                  $abc$103316$lut$aiger103315$12953.A[6]      5 18.7ms
+                                                                                   g1000     10 18.6ms
+                                    $techmap104576$abc$103316$lut$aiger103315$18588.A[2]      5 18.6ms
+                                                                                   g7291      7 18.6ms
+                                                                                     q92      6 18.6ms
+                                                                                   g2531      8 18.5ms
+                                                                                   g2343      7 18.5ms
+                                                                                    g829      9 18.5ms
+                                                                                    q475      4 18.5ms
+                                                                                   g2466     12 18.5ms
+                                                                                    q591      6 18.5ms
+                                                                                    g803     10 18.4ms
+                                                                                   g2881      8 18.4ms
+                                                                                    q918     10 18.4ms
+                                                                                    q802      7 18.4ms
+                                                                                    q231      6 18.3ms
+                                                                                    q425      6 18.3ms
+                                                                                    g699     12 18.2ms
+                                                                                    q211      9 18.2ms
+                                    $techmap104451$abc$103316$lut$aiger103315$19621.A[1]      7 18.2ms
+                                                                                   g1721      9 18.1ms
+                                                                                    q242      7 18.1ms
+                                    $techmap105663$abc$103316$lut$aiger103315$19742.A[2]      2 18.1ms
+                                                                                     q63      8 18.1ms
+                                                                                    q757      9 18.0ms
+                                                                                    q855      5 18.0ms
+                                    $techmap104691$abc$103316$lut$aiger103315$19448.A[4]      3 18.0ms
+                                                                                    q308     10 18.0ms
+                                                                                   g1639     12 18.0ms
+                                                                                    q753     10 18.0ms
+                                                                                   g3698      9 18.0ms
+                                                                                   g2903      4 17.9ms
+                                                                                   g2391      8 17.9ms
+                                                                                   g1120      8 17.9ms
+                                                                                    q208      8 17.8ms
+                                    $techmap105157$abc$103316$lut$aiger103315$12169.A[5]      1 17.8ms
+                                                                                   g2373      6 17.8ms
+                                    $techmap104251$abc$103316$lut$aiger103315$19609.A[4]      6 17.8ms
+                                                                                    q856      9 17.8ms
+                                    $techmap105448$abc$103316$lut$aiger103315$15162.A[1]      7 17.8ms
+                                                                                    q619      5 17.7ms
+                                    $techmap104069$abc$103316$lut$aiger103315$16828.A[4]      3 17.7ms
+                                                                                    g730      9 17.7ms
+                                                                                    q316      9 17.7ms
+                                                                                   g7191      9 17.7ms
+                                                                                    q901      8 17.7ms
+                                                                                   g1329      8 17.7ms
+                                                                                    q120      6 17.7ms
+                                                                                   g2673      9 17.7ms
+                                    $techmap105181$abc$103316$lut$aiger103315$12992.A[1]      3 17.7ms
+                                                                                    q414      8 17.6ms
+                                                                                   g7287      9 17.6ms
+                                                                                   g1429      6 17.6ms
+                                                                                   g2789      9 17.6ms
+                                                                                    q543      9 17.6ms
+                                                                                   g1161     14 17.6ms
+                                                                                   g2081      9 17.5ms
+                                                                                   g1966     12 17.5ms
+                                                                                   g1842     10 17.5ms
+                                                                                   g1304      9 17.5ms
+                                                                                    q958      6 17.5ms
+                                                                                   g1082      9 17.4ms
+                                                                                    q357      5 17.3ms
+                                                                                   g2905     11 17.3ms
+                                                                                   g1866     10 17.3ms
+                                                                                   g1511     10 17.2ms
+                                                  $abc$103316$lut$aiger103315$19272.A[6]      3 17.2ms
+                                                                                    g665      9 17.2ms
+                                                                                      x0      3 17.2ms
+                                                                                   g1128     11 17.2ms
+                                                                                   g1430      7 17.1ms
+                                                                                    q227      4 17.1ms
+                                    $techmap104366$abc$103316$lut$aiger103315$19613.A[1]      7 17.1ms
+                                    $techmap104133$abc$103316$lut$aiger103315$10272.A[3]      3 17.1ms
+                                                                                    g105      9 17.0ms
+                                    $techmap104071$abc$103316$lut$aiger103315$16816.A[4]      3 17.0ms
+                                                                                    q511      8 17.0ms
+                                    $techmap104451$abc$103316$lut$aiger103315$19621.A[0]      7 17.0ms
+                                    $techmap104105$abc$103316$lut$aiger103315$15959.A[1]      3 16.9ms
+                                                                                    g127     12 16.9ms
+                                                                                    q895      7 16.9ms
+                                                                                   g1752      7 16.9ms
+                                                                                   g1413     13 16.8ms
+                                    $techmap104461$abc$103316$lut$aiger103315$19629.A[2]      7 16.8ms
+                                    $techmap105155$abc$103316$lut$aiger103315$12143.A[3]      4 16.8ms
+                                                                                   g1514      8 16.8ms
+                                                                                   g2234      6 16.8ms
+                                    $techmap104266$abc$103316$lut$aiger103315$16446.A[1]      2 16.8ms
+                                                                                   g1563      9 16.8ms
+                                                                                   g2584      6 16.7ms
+                                                                                    q677     12 16.7ms
+                                                                                    q545      8 16.7ms
+                                                                                    q934     11 16.6ms
+                                     $techmap105058$abc$103316$lut$aiger103315$7592.A[3]      6 16.6ms
+                                                                                   g1029      9 16.5ms
+                                                                                   g1071      8 16.5ms
+                                                                                    q860      8 16.5ms
+                                                                                    q562     10 16.5ms
+                                                                                     q36     10 16.5ms
+                                                                                    q330      5 16.5ms
+                                                                                     g21      7 16.4ms
+                                                                                    q784      7 16.4ms
+                                    $techmap104312$abc$103316$lut$aiger103315$16011.A[5]      2 16.4ms
+                                                                                     g39     11 16.4ms
+                                    $techmap105657$abc$103316$lut$aiger103315$19677.A[4]      6 16.3ms
+                                                                                   g1930     10 16.3ms
+                                    $techmap105127$abc$103316$lut$aiger103315$12128.A[4]      6 16.3ms
+                                                                                    q397      9 16.3ms
+                                                                                    g786     10 16.3ms
+                                    $techmap104149$abc$103316$lut$aiger103315$10091.A[5]      2 16.2ms
+                                                  $abc$103316$lut$aiger103315$12953.A[7]      4 16.2ms
+                                                                                    q886      7 16.2ms
+                                    $techmap105258$abc$103316$lut$aiger103315$13241.A[1]      7 16.2ms
+                                                                                   g2295      9 16.2ms
+                                                                                   g2518      9 16.2ms
+                                                                                    q373      8 16.2ms
+                                    $techmap105198$abc$103316$lut$aiger103315$12904.A[3]      4 16.2ms
+                                                                                   g1956      7 16.2ms
+                                                                                    g484      9 16.1ms
+                                                                                   g1664      8 16.1ms
+                                                                                    q759      9 16.1ms
+                                                                                    q637      9 16.1ms
+                                                                                    q547      7 16.1ms
+                                                                                   g2850      8 16.1ms
+                                                                                   g1214     10 16.1ms
+                                                                                    q394      8 16.1ms
+                                    $techmap104242$abc$103316$lut$aiger103315$15484.A[5]      2 16.0ms
+                                                                                   g1422     12 16.0ms
+                                                  $abc$103316$lut$aiger103315$12953.A[0]      6 16.0ms
+                                                                                     g57      6 16.0ms
+                                                                                   g1323     11 16.0ms
+                                    $techmap105455$abc$103316$lut$aiger103315$15207.A[3]      9 15.9ms
+                                                                                   g1371      9 15.9ms
+                                                                                    q249      6 15.9ms
+                                                                                    q582      8 15.9ms
+                                                                                    q438      7 15.8ms
+                                                                                   g3379      9 15.8ms
+                                                                                   g2245      7 15.8ms
+                                                                                    g210      8 15.8ms
+                                                                                    q269      9 15.8ms
+                                     $techmap105078$abc$103316$lut$aiger103315$7603.A[2]      8 15.8ms
+                                     $techmap105031$abc$103316$lut$aiger103315$5297.A[4]      3 15.8ms
+                                                                                    q974      5 15.8ms
+                                                                                   g1446      8 15.7ms
+                                                                                    q585      7 15.7ms
+                                                                                   g2128      7 15.7ms
+                                    $techmap104214$abc$103316$lut$aiger103315$16784.A[5]      2 15.7ms
+                                                                                   g1144     11 15.6ms
+                                                                                   g3598      8 15.6ms
+                                                                                   q1019      8 15.6ms
+                                                                                   g7568      4 15.6ms
+                                    $techmap104533$abc$103316$lut$aiger103315$18167.A[4]      7 15.5ms
+                                    $techmap105420$abc$103316$lut$aiger103315$15063.A[4]      5 15.5ms
+                                                                                   g7280      4 15.5ms
+                                                                                    q602     10 15.5ms
+                                                                                    q138      6 15.5ms
+                                                                                    q794      4 15.5ms
+                                    $techmap105173$abc$103316$lut$aiger103315$12485.A[4]      3 15.5ms
+                                                                                    q877     12 15.5ms
+                                                                                    q595      7 15.4ms
+                                                                                   g1326      8 15.4ms
+                                    $techmap104086$abc$103316$lut$aiger103315$16882.A[1]      4 15.4ms
+                                    $techmap105366$abc$103316$lut$aiger103315$13974.A[0]      7 15.4ms
+                                                                                   g1539      4 15.4ms
+                                                                                    q521      8 15.4ms
+                                                                                   g7210      7 15.4ms
+                                     $techmap104991$abc$103316$lut$aiger103315$7547.A[1]      7 15.4ms
+                                    $techmap105358$abc$103316$lut$aiger103315$14092.A[0]      4 15.3ms
+                                                                                   g2339      9 15.3ms
+                                                                                    q645      8 15.3ms
+                                                                                    q456      8 15.3ms
+                                                                                    q459      6 15.3ms
+                                                                                    q943      4 15.3ms
+                                                                                   g2563     11 15.3ms
+                                                                                    q155      9 15.2ms
+                                     $techmap104932$abc$103316$lut$aiger103315$3886.A[0]      3 15.2ms
+                                                                                   g1464     13 15.2ms
+                                                                                   g2970      9 15.2ms
+                                                                                     q42      8 15.2ms
+                                    $techmap105333$abc$103316$lut$aiger103315$14880.A[0]      3 15.1ms
+                                                                                   g1238      9 15.1ms
+                                                                                    q489      6 15.1ms
+                                     $techmap104920$abc$103316$lut$aiger103315$3713.A[4]      2 15.0ms
+                                    $techmap104655$abc$103316$lut$aiger103315$19251.A[2]      1 15.0ms
+                                                                                    q905      6 15.0ms
+                                     $techmap104984$abc$103316$lut$aiger103315$5549.A[2]      3 15.0ms
+                                    $techmap105145$abc$103316$lut$aiger103315$12100.A[3]      3 15.0ms
+                                                                                    q955      8 14.9ms
+                                                                                     q69      9 14.9ms
+                                    $techmap105390$abc$103316$lut$aiger103315$14061.A[0]      3 14.9ms
+                                                                                    q586      9 14.9ms
+                                                                                   g1014     10 14.9ms
+                                                                                   g1094     12 14.9ms
+                                                                                   g2947      6 14.8ms
+                                    $techmap105259$abc$103316$lut$aiger103315$13273.A[3]      7 14.8ms
+                                                                                   g1057      9 14.8ms
+                                                                                    g131     11 14.8ms
+                                                                                   g1062      8 14.8ms
+                                                                                    q923      6 14.8ms
+                                                                                   g2088     10 14.8ms
+                                    $techmap104312$abc$103316$lut$aiger103315$16011.A[4]      3 14.7ms
+                                    $techmap104310$abc$103316$lut$aiger103315$15946.A[1]      2 14.7ms
+                                    $techmap104646$abc$103316$lut$aiger103315$19157.A[5]      3 14.7ms
+                                    $techmap104543$abc$103316$lut$aiger103315$17610.A[3]      3 14.7ms
+                                                                                    q568      6 14.7ms
+                                     $techmap105559$abc$103316$lut$aiger103315$7759.A[0]      2 14.7ms
+                                    $techmap104461$abc$103316$lut$aiger103315$19629.A[0]      6 14.6ms
+                                                                                   g1646     11 14.6ms
+                                                                                   g2226      9 14.6ms
+                                                                                    q454      6 14.6ms
+                                                                                    q584     10 14.5ms
+                                                                                   g3809      7 14.5ms
+                                                                                   g1945      8 14.5ms
+                                                                                    g608      8 14.5ms
+                                                                                    q262      8 14.5ms
+                                    $techmap104603$abc$103316$lut$aiger103315$18679.A[5]      4 14.5ms
+                                                                                    g928      9 14.5ms
+                                                                                   g1269      7 14.4ms
+                                                                                   g2623      7 14.4ms
+                                                                                    g651     12 14.4ms
+                                    $techmap104502$abc$103316$lut$aiger103315$18003.A[5]      2 14.4ms
+                                                                                   g7268      5 14.4ms
+                                    $techmap104099$abc$103316$lut$aiger103315$15569.A[0]      4 14.4ms
+                                                                                   g1424      7 14.4ms
+                                                                                   g3726      9 14.4ms
+                                                                                    g302      9 14.4ms
+                                    $techmap104231$abc$103316$lut$aiger103315$15874.A[5]      2 14.4ms
+                                                                                    q307      9 14.4ms
+                                    $techmap104520$abc$103316$lut$aiger103315$17963.A[5]      2 14.4ms
+                                                                                   g7649      8 14.4ms
+                                                                                    q714     10 14.4ms
+                                                                                   g1942     10 14.3ms
+                                     $techmap105058$abc$103316$lut$aiger103315$7592.A[2]      4 14.3ms
+                                                                                   g2062      9 14.2ms
+                                    $techmap105216$abc$103316$lut$aiger103315$12822.A[0]      3 14.2ms
+                                    $techmap104691$abc$103316$lut$aiger103315$19448.A[3]      3 14.2ms
+                                                                                   g1177     10 14.2ms
+                                     $techmap104855$abc$103316$lut$aiger103315$5171.A[5]      2 14.2ms
+                                                                                   g1157      8 14.2ms
+                                                                                    q854      7 14.2ms
+                                                                                    q348      6 14.2ms
+                                                                                    g841      9 14.2ms
+                                                                                    q353      6 14.2ms
+                                    $techmap104489$abc$103316$lut$aiger103315$18096.A[2]      2 14.2ms
+                                                                                    q352      6 14.1ms
+                                                                                    q413      7 14.1ms
+                                    $techmap105351$abc$103316$lut$aiger103315$13396.A[4]      3 14.1ms
+                                    $techmap104465$abc$103316$lut$aiger103315$17661.A[4]      3 14.1ms
+                                                                                    q538     12 14.1ms
+                                    $techmap104513$abc$103316$lut$aiger103315$18239.A[0]      4 14.1ms
+                                                                                    q193      8 14.1ms
+                                    $techmap105313$abc$103316$lut$aiger103315$14438.A[1]      3 14.0ms
+                                     $techmap105032$abc$103316$lut$aiger103315$5478.A[5]      4 14.0ms
+                                                                                   g2885      8 14.0ms
+                                                                                   g2529     11 14.0ms
+                                                                                   g2567      8 14.0ms
+                                                                                   g7455      6 14.0ms
+                                                                                   g2745      9 14.0ms
+                                                                                   g2222      6 14.0ms
+                                     $techmap104859$abc$103316$lut$aiger103315$5240.A[3]      3 14.0ms
+                                     $techmap104962$abc$103316$lut$aiger103315$4037.A[4]      2 13.9ms
+                                                                                   g7567      8 13.9ms
+                                                                                   q1008      9 13.9ms
+                                                                                   g7411      9 13.9ms
+                                                                                   g2984      9 13.9ms
+                                                                                    q265      5 13.9ms
+                                    $techmap105121$abc$103316$lut$aiger103315$11530.A[1]      3 13.8ms
+                                                                                    q623      9 13.8ms
+                                                                                   g1527     10 13.8ms
+                                                                                    q625      7 13.8ms
+                                    $techmap104618$abc$103316$lut$aiger103315$19039.A[0]      5 13.8ms
+                                                                                    q163      7 13.8ms
+                                    $techmap104693$abc$103316$lut$aiger103315$19604.A[0]      5 13.7ms
+                                                                                    g116      6 13.7ms
+                                                                                    q605      6 13.6ms
+                                    $techmap104666$abc$103316$lut$aiger103315$19471.A[3]      3 13.6ms
+                                                                                   g2564      7 13.6ms
+                                    $techmap104445$abc$103316$lut$aiger103315$17000.A[5]      2 13.6ms
+                                                                                    q930     11 13.6ms
+                                    $techmap105148$abc$103316$lut$aiger103315$12062.A[1]      2 13.6ms
+                                                                                    q639      9 13.5ms
+                                                                                    q668      5 13.5ms
+                                                                                   g2102      9 13.5ms
+                                                                                   g1962     13 13.5ms
+                                    $techmap104603$abc$103316$lut$aiger103315$18679.A[2]      2 13.5ms
+                                                                                     g70      5 13.4ms
+                                     $techmap105506$abc$103316$lut$aiger103315$9164.A[1]      4 13.4ms
+                                                                                   g3484      7 13.4ms
+                                    $techmap104563$abc$103316$lut$aiger103315$18181.A[2]      3 13.4ms
+                                    $techmap105268$abc$103316$lut$aiger103315$14788.A[0]      6 13.4ms
+                                    $techmap104339$abc$103316$lut$aiger103315$10246.A[3]      5 13.3ms
+                                                                                    q604      8 13.3ms
+                                                                                   g2663      9 13.3ms
+                                                                                   g1018      4 13.3ms
+                                    $techmap104405$abc$103316$lut$aiger103315$16842.A[0]      2 13.3ms
+                                                                                     q12      7 13.3ms
+                                     $techmap105604$abc$103316$lut$aiger103315$8279.A[5]      3 13.3ms
+                                                                                    g954      8 13.2ms
+                                                                                    q257      5 13.2ms
+                                                                                    q989      7 13.2ms
+                                                                                    q127      6 13.1ms
+                                     $techmap105643$abc$103316$lut$aiger103315$9421.A[4]      1 13.1ms
+                                                                                    q209      7 13.1ms
+                                     $techmap105007$abc$103316$lut$aiger103315$7200.A[2]      2 13.1ms
+                                                                                   g1135     11 13.1ms
+                                                                                    q311      9 13.1ms
+                                    $techmap105083$abc$103316$lut$aiger103315$17211.A[0]      6 13.1ms
+                                                                                    q818      6 13.1ms
+                                     $techmap105044$abc$103316$lut$aiger103315$5458.A[3]      2 13.1ms
+                                                                                   g7505      7 13.1ms
+                                                                                    q510      6 13.1ms
+                                                                                    g190     10 13.1ms
+                                     $techmap105580$abc$103316$lut$aiger103315$7981.A[5]      2 13.0ms
+                                                                                    q272      6 13.0ms
+                                    $techmap105145$abc$103316$lut$aiger103315$12100.A[0]      5 13.0ms
+                                                                                    q763      7 13.0ms
+                                                                                   g7301      4 13.0ms
+                                                                                    q847      9 12.9ms
+                                                                                   g7638      7 12.9ms
+                                                                                    q188      7 12.9ms
+                                                                                   g3888     10 12.9ms
+                                                                                    g370      9 12.9ms
+                                                                                   g2364      7 12.8ms
+                                    $techmap105299$abc$103316$lut$aiger103315$14849.A[4]      2 12.8ms
+                                                                                   g1465      8 12.8ms
+                                    $techmap104358$abc$103316$lut$aiger103315$10961.A[3]      2 12.8ms
+                                     $techmap104985$abc$103316$lut$aiger103315$7562.A[2]      5 12.8ms
+                                                                                   g1523      8 12.8ms
+                                                                                   g1650     10 12.8ms
+                                                                                   g2911      9 12.7ms
+                                    $techmap105218$abc$103316$lut$aiger103315$12931.A[0]      3 12.7ms
+                                    $techmap104312$abc$103316$lut$aiger103315$16011.A[0]      3 12.7ms
+                                                                                   q1001      7 12.7ms
+                                    $techmap105998$abc$103316$lut$aiger103315$19751.A[2]      1 12.7ms
+                                                                                    q109      6 12.7ms
+                                    $techmap104564$abc$103316$lut$aiger103315$19314.A[4]      2 12.7ms
+                                    $techmap105680$abc$103316$lut$aiger103315$20072.A[2]      1 12.7ms
+                                                                                    q346      7 12.7ms
+                                                                                     q57      5 12.6ms
+                                    $techmap104364$abc$103316$lut$aiger103315$11229.A[2]      2 12.6ms
+                                                                                    q707      7 12.6ms
+                                                                                   g1337      8 12.6ms
+                                                                                    g143      7 12.6ms
+                                                                                    q158      8 12.6ms
+                                                                                   g2583      9 12.5ms
+                                    $techmap104636$abc$103316$lut$aiger103315$18854.A[2]      2 12.5ms
+                                     $techmap104866$abc$103316$lut$aiger103315$5356.A[4]      2 12.5ms
+                                                                                    g807     10 12.5ms
+                                                                                   g6312      1 12.5ms
+                                                                                    q951      5 12.5ms
+                                                                                   g7667      6 12.5ms
+                                     $techmap105528$abc$103316$lut$aiger103315$8958.A[0]      2 12.5ms
+                                                                                   q1011      6 12.5ms
+                                                                                    q291      6 12.5ms
+                                                                                   g1242      8 12.5ms
+                                     $techmap105631$abc$103316$lut$aiger103315$9331.A[1]      3 12.4ms
+                                    $techmap104522$abc$103316$lut$aiger103315$18062.A[3]      3 12.4ms
+                                                                                   g1890      8 12.4ms
+                                     $techmap105643$abc$103316$lut$aiger103315$9421.A[2]      7 12.4ms
+                                                                                     q34      4 12.4ms
+                                    $techmap105289$abc$103316$lut$aiger103315$14641.A[0]      2 12.4ms
+                                    $techmap105390$abc$103316$lut$aiger103315$14061.A[1]      4 12.3ms
+                                                                                   g6299      1 12.3ms
+                                                                                    q288      7 12.3ms
+                                                                                    g731      6 12.2ms
+                                                                                   g1736      8 12.2ms
+                                                                                   g6184      1 12.2ms
+                                    $techmap104172$abc$103316$lut$aiger103315$11011.A[3]      4 12.2ms
+                                                                                    g266      8 12.2ms
+                                                                                   g6954      1 12.2ms
+                                                                                    q698      7 12.2ms
+                                     $techmap104750$abc$103316$lut$aiger103315$6047.A[5]      2 12.2ms
+                                                                                     q35      7 12.1ms
+                                                                                   g2829      8 12.1ms
+                                                                                   g1929      8 12.1ms
+                                                                                   g2432      8 12.1ms
+                                                                                   g7293      6 12.1ms
+                                                                                   g7025      1 12.1ms
+                                                                                    q150      7 12.1ms
+                                                                                    q451      6 12.0ms
+                                                                                    q988      7 12.0ms
+                                                                                   g2654      7 12.0ms
+                                                                                    q906      6 12.0ms
+                                     $techmap104895$abc$103316$lut$aiger103315$4981.A[4]      2 12.0ms
+                                                                                    q351      7 12.0ms
+                                                                                   g4025      8 12.0ms
+                                                                                   g7530      7 12.0ms
+                                    $techmap104599$abc$103316$lut$aiger103315$18666.A[4]      3 12.0ms
+                                                                                    q336      6 12.0ms
+                                                                                   g6765      1 12.0ms
+                                     $techmap105643$abc$103316$lut$aiger103315$9421.A[3]      7 11.9ms
+                                    $techmap105252$abc$103316$lut$aiger103315$13187.A[1]      3 11.9ms
+                                    $techmap104249$abc$103316$lut$aiger103315$17053.A[3]      3 11.9ms
+                                     $techmap104939$abc$103316$lut$aiger103315$3913.A[0]      4 11.9ms
+                                                $techmap105910$abc$103316$lut\g6234.A[4]      2 11.9ms
+                                                                                   g1583      7 11.9ms
+                                                                                    g458      8 11.9ms
+                                    $techmap106013$abc$103316$lut$aiger103315$19840.A[2]      1 11.9ms
+                                                                                   g6826      1 11.9ms
+                                                                                   g3330      9 11.9ms
+                                                                                    q380      9 11.8ms
+                                                                                     q95      7 11.8ms
+                                                                                    q967      7 11.8ms
+                                                                                   g3070      6 11.8ms
+                                                                                   g2337      5 11.8ms
+                                                                                    g931      7 11.8ms
+                                    $techmap104215$abc$103316$lut$aiger103315$16876.A[3]      3 11.8ms
+                            $techmap106480$auto$abc9_ops.cc:1550:reintegrate$103778.A[3]      2 11.8ms
+                                     $techmap105013$abc$103316$lut$aiger103315$7494.A[1]      4 11.8ms
+                                                                                    q732      6 11.8ms
+                                                                                   g1753      1 11.8ms
+                                                                                   g1080      7 11.8ms
+                                                                                      x7      7 11.8ms
+                                     $techmap104908$abc$103316$lut$aiger103315$4795.A[3]      4 11.7ms
+                                                                                    q945      9 11.7ms
+                                                                                    q406      4 11.7ms
+                                                                                   g1522      5 11.7ms
+                                                                                   g6674      1 11.7ms
+                                                                                   g2174      8 11.7ms
+                                                                                   g1353      1 11.7ms
+                                    $techmap105358$abc$103316$lut$aiger103315$14092.A[3]      3 11.7ms
+                                                                                   g6618      1 11.7ms
+                                                  $abc$103316$lut$aiger103315$19272.A[5]      7 11.7ms
+                                                                                    q524     12 11.7ms
+                                    $techmap105455$abc$103316$lut$aiger103315$15207.A[2]      8 11.6ms
+                                                                                   g2216      6 11.6ms
+                            $techmap106292$auto$abc9_ops.cc:1550:reintegrate$103462.A[3]      2 11.6ms
+                                                                                    g724      8 11.6ms
+                                                                                   g1098      8 11.6ms
+                                                                                   g1222      9 11.6ms
+                                                                                    q722      7 11.6ms
+                                                                                   g6646      1 11.6ms
+                                                                                    q279     11 11.6ms
+                                                                                   g7271      9 11.5ms
+                                     $techmap105526$abc$103316$lut$aiger103315$8952.A[4]      2 11.5ms
+                                     $techmap104880$abc$103316$lut$aiger103315$4802.A[2]      2 11.5ms
+                                    $techmap105673$abc$103316$lut$aiger103315$20030.A[0]      1 11.5ms
+                                                                                    q612      9 11.5ms
+                                                                                   g7451      8 11.5ms
+                                                                                   g2609      7 11.5ms
+                                                                                   g1638      8 11.5ms
+                                                                                   g6716      1 11.5ms
+                                                                                   g7169      6 11.5ms
+                                                                                   g1335      5 11.5ms
+                                    $techmap105134$abc$103316$lut$aiger103315$12079.A[1]      2 11.5ms
+                                                                                   g6644      1 11.4ms
+                                                                                    q432      8 11.4ms
+                                     $techmap104132$abc$103316$lut$aiger103315$9793.A[2]      4 11.4ms
+                                                                                     q32      8 11.4ms
+                                     $techmap104941$abc$103316$lut$aiger103315$3923.A[1]      1 11.4ms
+                                     $techmap104907$abc$103316$lut$aiger103315$4786.A[4]      2 11.4ms
+                                    $techmap104251$abc$103316$lut$aiger103315$19609.A[0]      7 11.4ms
+                                    $techmap105396$abc$103316$lut$aiger103315$13376.A[2]      2 11.3ms
+                                    $techmap104503$abc$103316$lut$aiger103315$18081.A[2]      3 11.3ms
+                                                                                    q261      9 11.3ms
+                                    $techmap105452$abc$103316$lut$aiger103315$15176.A[5]      7 11.3ms
+                                                                                    q960      4 11.3ms
+                                                                                    q122      9 11.3ms
+                                     $techmap105062$abc$103316$lut$aiger103315$7447.A[3]      2 11.3ms
+                                                                                   g6987      1 11.3ms
+                                                                                  g10482      7 11.3ms
+                                                                                    q274      5 11.3ms
+                                                                                   g6786      1 11.2ms
+                                                                                   g7188      7 11.2ms
+                                                                                    q302      5 11.2ms
+                                                                                    q369      4 11.2ms
+                                                                                    q370      8 11.2ms
+                                                                                     q56      8 11.2ms
+                                                                                    q743      7 11.2ms
+                                                                                    q807      8 11.2ms
+                                                                                   g4278      1 11.2ms
+                                     $techmap105604$abc$103316$lut$aiger103315$8279.A[2]      3 11.1ms
+                                                                                   g6334      1 11.1ms
+                                    $techmap105997$abc$103316$lut$aiger103315$19747.A[3]      3 11.1ms
+                                                                                   g2940      6 11.1ms
+                                                                                    q865      8 11.1ms
+                                     $techmap104822$abc$103316$lut$aiger103315$6545.A[0]      2 11.1ms
+                                    $techmap104564$abc$103316$lut$aiger103315$19314.A[5]      3 11.1ms
+                                     $techmap105474$abc$103316$lut$aiger103315$8515.A[4]      3 11.1ms
+                                                                                    q576      8 11.1ms
+                                    $techmap104173$abc$103316$lut$aiger103315$11129.A[3]      6 11.1ms
+                                                                                   g6645      1 11.1ms
+                                                                                    q810      9 11.1ms
+                                    $techmap104226$abc$103316$lut$aiger103315$17066.A[2]      4 11.1ms
+                                                                                    q789      7 11.1ms
+                                     $techmap104702$abc$103316$lut$aiger103315$6326.A[3]      4 11.1ms
+                                                                                   g6343      1 11.0ms
+                                                                                   g3811      8 11.0ms
+                                                $techmap106096$abc$103316$lut\g1647.A[1]      2 11.0ms
+                                     $techmap105604$abc$103316$lut$aiger103315$8279.A[1]      3 11.0ms
+                                                                                    q303      8 11.0ms
+                                                                                    q219      6 10.9ms
+                                     $techmap104890$abc$103316$lut$aiger103315$5151.A[1]      2 10.9ms
+                                                                                   g6621      1 10.9ms
+                                                                                   g1944      8 10.8ms
+                                                                                    q182      5 10.8ms
+                                     $techmap105034$abc$103316$lut$aiger103315$7479.A[1]      7 10.8ms
+                                    $techmap105268$abc$103316$lut$aiger103315$14788.A[1]      6 10.8ms
+                                    $techmap104282$abc$103316$lut$aiger103315$16938.A[4]      3 10.8ms
+                                                                                   g7417      6 10.8ms
+                                                                                    g915      6 10.8ms
+                                                                                   g6679      1 10.8ms
+                                                                                   q1015     10 10.8ms
+                                                                                   g1782      8 10.8ms
+                                                                                    q834      6 10.8ms
+                                                                                    q485      8 10.8ms
+                                     $techmap105558$abc$103316$lut$aiger103315$7749.A[2]      5 10.7ms
+                                                                                    q189      5 10.7ms
+                                                                                   g1717      7 10.7ms
+                                    $techmap105259$abc$103316$lut$aiger103315$13273.A[5]      7 10.7ms
+                                                                                   g7057      1 10.7ms
+                                                                                    q134      4 10.6ms
+                                     $techmap105543$abc$103316$lut$aiger103315$9119.A[0]      2 10.6ms
+                                                                                    g397      8 10.6ms
+                                                                                   g2458      8 10.6ms
+                                     $techmap105603$abc$103316$lut$aiger103315$8265.A[4]      4 10.6ms
+                                                                                    q975      7 10.6ms
+                                                                                    g601     10 10.6ms
+                                                                                   g3013      8 10.5ms
+                                                                                   g6667      1 10.5ms
+                                    $techmap104665$abc$103316$lut$aiger103315$19407.A[4]      2 10.5ms
+                                                                                   g1009      8 10.5ms
+                                                                                    q867      4 10.5ms
+                                                                                    q662      7 10.5ms
+                                                                                   g1167      2 10.5ms
+                                    $techmap105116$abc$103316$lut$aiger103315$11799.A[3]      3 10.5ms
+                                                                                    q986      8 10.5ms
+                                                                                   g6949      1 10.5ms
+                                    $techmap104203$abc$103316$lut$aiger103315$11392.A[0]      7 10.4ms
+                                                $techmap106023$abc$103316$lut\g6599.A[4]      2 10.4ms
+                                                                                    g859     10 10.4ms
+                                                                                   g1910      7 10.4ms
+                                                                                     q50      4 10.3ms
+                                     $techmap104991$abc$103316$lut$aiger103315$7547.A[4]      7 10.3ms
+                                                                                    q636      8 10.3ms
+                                                                                    g654     12 10.3ms
+                                                                                   g7370      6 10.3ms
+                                                                                   g1054      8 10.3ms
+                                                                                   g6384      1 10.3ms
+                                                                                    q101      5 10.3ms
+                                                                                   g6966      1 10.3ms
+                                    $techmap105453$abc$103316$lut$aiger103315$15187.A[4]      7 10.2ms
+                                                                                    q659     10 10.2ms
+                                                                                   g7316      6 10.2ms
+                                                                                    q609      5 10.2ms
+                                     $techmap105568$abc$103316$lut$aiger103315$7882.A[0]      4 10.2ms
+                                    $techmap104492$abc$103316$lut$aiger103315$18018.A[5]      1 10.2ms
+                                    $techmap104520$abc$103316$lut$aiger103315$17963.A[1]      2 10.2ms
+                                     $techmap105498$abc$103316$lut$aiger103315$8613.A[0]      3 10.2ms
+                            $techmap105810$auto$abc9_ops.cc:1550:reintegrate$103397.A[4]      2 10.2ms
+                                     $techmap104943$abc$103316$lut$aiger103315$3944.A[4]      4 10.2ms
+                                                                                   g1601     10 10.2ms
+                                                                                    g263      7 10.1ms
+                                                                                   g2878      9 10.1ms
+                                     $techmap105027$abc$103316$lut$aiger103315$5312.A[4]      2 10.1ms
+                                                                                    q349      7 10.1ms
+                                                                                    q803      8 10.1ms
+                                                                                    q504      7 10.1ms
+                                                                                     q78      8 10.1ms
+                                     $techmap105073$abc$103316$lut$aiger103315$5444.A[1]      1 10.0ms
+                                                                                   g7509      6 10.0ms
+                                                                                    q365      6 10.0ms
+                                    $techmap104576$abc$103316$lut$aiger103315$18588.A[3]      5 10.0ms
+                                     $techmap105013$abc$103316$lut$aiger103315$7494.A[2]      4 10.0ms
+                                                                                   g6807      1 10.0ms
+                                                                                    q277      7 10.0ms
+                                                                                     q44      6 10.0ms
+                                                                                   g1266      8 10.0ms
+                                    $techmap104313$abc$103316$lut$aiger103315$17185.A[3]      3 10.0ms
+                                                  $abc$103316$lut$aiger103315$12953.A[3]      6 10.0ms
+                                                                                   g3830     10 9.9ms
+                                                                                    q184      5 9.9ms
+                                                                                   g1296      6 9.9ms
+                                                                                   g7171      8 9.9ms
+                                                                                   g7177      7 9.9ms
+                                                                                    g655      7 9.9ms
+                                    $techmap104282$abc$103316$lut$aiger103315$16938.A[5]      2 9.9ms
+                                                                                    q841      8 9.9ms
+                                                                                   g2997     10 9.9ms
+                                     $techmap104859$abc$103316$lut$aiger103315$5240.A[0]      3 9.9ms
+                                                                                   g3184      7 9.8ms
+                                    $techmap105441$abc$103316$lut$aiger103315$15117.A[5]      2 9.8ms
+                                                                                    q552      7 9.8ms
+                                                                                    q119      5 9.8ms
+                                     $techmap105642$abc$103316$lut$aiger103315$9413.A[1]      7 9.8ms
+                                    $techmap105385$abc$103316$lut$aiger103315$13933.A[1]      3 9.8ms
+                                                                                    q627      6 9.8ms
+                                    $techmap104229$abc$103316$lut$aiger103315$15894.A[5]      2 9.8ms
+                                                                                    q966      6 9.8ms
+                                    $techmap104520$abc$103316$lut$aiger103315$17963.A[3]      2 9.7ms
+                                    $techmap105082$abc$103316$lut$aiger103315$17203.A[4]      1 9.7ms
+                                                                                      g6      8 9.7ms
+                                                                                     q76      8 9.7ms
+                                    $techmap105124$abc$103316$lut$aiger103315$11665.A[1]      3 9.7ms
+                                                                                   g6430      1 9.7ms
+                                                                                   g1651      7 9.6ms
+                                                                                    q142      7 9.6ms
+                                                                                    q259      5 9.6ms
+                                                                                      x3      5 9.6ms
+                                    $techmap104236$abc$103316$lut$aiger103315$16027.A[3]      3 9.6ms
+                                                                                   g2865      8 9.6ms
+                                                                                   g1763      7 9.6ms
+                                    $techmap104526$abc$103316$lut$aiger103315$17780.A[1]      5 9.6ms
+                                                  $abc$103316$lut$aiger103315$15309.A[5]      2 9.6ms
+                                                                                    q368      5 9.6ms
+                                                                                    q263      8 9.6ms
+                                                                                    q873      6 9.6ms
+                                                                                    q676      6 9.6ms
+                                    $techmap104251$abc$103316$lut$aiger103315$19609.A[3]      3 9.5ms
+                                    $techmap104640$abc$103316$lut$aiger103315$19144.A[4]      7 9.5ms
+                                                                                   g7338      8 9.5ms
+                                                                                    g908      7 9.5ms
+                                     $techmap104720$abc$103316$lut$aiger103315$7159.A[3]      4 9.5ms
+                                    $techmap104445$abc$103316$lut$aiger103315$17000.A[1]      3 9.5ms
+                                                                                   g3030      9 9.5ms
+                                                                                   g2426      8 9.4ms
+                                    $techmap104477$abc$103316$lut$aiger103315$17580.A[4]      3 9.4ms
+                                                                                   g7164      1 9.4ms
+                                    $techmap104409$abc$103316$lut$aiger103315$16678.A[1]      2 9.4ms
+                                                                                   g6408      1 9.4ms
+                                                                                   g2735      8 9.4ms
+                                                                                   g1187      5 9.4ms
+                                                                                     q23      7 9.4ms
+                                     $techmap104833$abc$103316$lut$aiger103315$7235.A[3]      4 9.4ms
+                                                                                   g1595      6 9.4ms
+                                                                                    q198      8 9.4ms
+                                                                                    q371     10 9.3ms
+                                    $techmap104474$abc$103316$lut$aiger103315$17341.A[5]      3 9.3ms
+                                                                                    g985      9 9.3ms
+                                                                                    q323      6 9.3ms
+                                    $techmap104531$abc$103316$lut$aiger103315$18046.A[4]      3 9.3ms
+                                    $techmap104484$abc$103316$lut$aiger103315$18212.A[2]      6 9.3ms
+                                                                                   g1447      8 9.3ms
+                                     $techmap104985$abc$103316$lut$aiger103315$7562.A[3]      5 9.3ms
+                                    $techmap105231$abc$103316$lut$aiger103315$13039.A[0]      5 9.3ms
+                                     $techmap105604$abc$103316$lut$aiger103315$8279.A[4]      3 9.3ms
+                                                                                   g6817      1 9.2ms
+                                                                                    q872      7 9.2ms
+                                                                                   g7049      1 9.2ms
+                                                                                    q697      5 9.2ms
+                                                                                    q360      7 9.2ms
+                                                                                    q427      8 9.2ms
+                                     $techmap104819$abc$103316$lut$aiger103315$6488.A[4]      2 9.2ms
+                                     $techmap105034$abc$103316$lut$aiger103315$7479.A[3]      4 9.1ms
+                                     $techmap105051$abc$103316$lut$aiger103315$7312.A[3]      2 9.1ms
+                                    $techmap104425$abc$103316$lut$aiger103315$16986.A[4]      2 9.1ms
+                                                                                    q775      5 9.1ms
+                                     $techmap104893$abc$103316$lut$aiger103315$4952.A[4]      2 9.1ms
+                                     $techmap105506$abc$103316$lut$aiger103315$9164.A[2]      3 9.1ms
+                                                                                    q813      9 9.1ms
+                                                                                   g1621      8 9.1ms
+                                                                                   g2390      7 9.1ms
+                                                                                     q91      4 9.1ms
+                                                                                    q843      7 9.1ms
+                                    $techmap105203$abc$103316$lut$aiger103315$12917.A[5]      3 9.1ms
+                                                                                    q731     10 9.0ms
+                                    $techmap104365$abc$103316$lut$aiger103315$11414.A[0]      5 9.0ms
+                                                                                    q492      8 9.0ms
+                                                                                      x1      6 9.0ms
+                                    $techmap105237$abc$103316$lut$aiger103315$13056.A[3]      3 9.0ms
+                                                                                   g2731      6 9.0ms
+                                                                                    g255      7 9.0ms
+                                                                                    q774      6 9.0ms
+                                                                                    q590      6 9.0ms
+                                     $techmap105486$abc$103316$lut$aiger103315$9059.A[2]      3 9.0ms
+                                                                                    q777      7 9.0ms
+                                                                                   g1829      7 8.9ms
+                                     $techmap105540$abc$103316$lut$aiger103315$9125.A[1]      3 8.9ms
+                                                                                    g779      8 8.9ms
+                                                  $abc$103316$lut$aiger103315$19272.A[4]      6 8.9ms
+                                    $techmap105351$abc$103316$lut$aiger103315$13396.A[5]      2 8.8ms
+                                                                                    q108      4 8.8ms
+                                                                                    q613      9 8.8ms
+                                                                                   g1827      9 8.8ms
+                                                  $abc$103316$lut$aiger103315$13503.A[6]      2 8.8ms
+                                    $techmap105107$abc$103316$lut$aiger103315$11771.A[1]      2 8.8ms
+                                                                                    q375      7 8.8ms
+                                     $techmap104939$abc$103316$lut$aiger103315$3913.A[1]      3 8.8ms
+                                                                                    q488      6 8.8ms
+                                                                                   g1579      1 8.8ms
+                                     $techmap105492$abc$103316$lut$aiger103315$9180.A[2]      3 8.8ms
+                                     $techmap104978$abc$103316$lut$aiger103315$5501.A[3]      2 8.8ms
+                                                                                    q275      6 8.8ms
+                                                                                    q465      3 8.8ms
+                                                                                   q1007      8 8.8ms
+                                                                                   g1374      7 8.7ms
+                                                                                   g1233      7 8.7ms
+                                     $techmap105489$abc$103316$lut$aiger103315$8975.A[5]      2 8.7ms
+                                    $techmap105125$abc$103316$lut$aiger103315$11765.A[1]      4 8.7ms
+                                                                                    q507      6 8.7ms
+                                    $techmap105663$abc$103316$lut$aiger103315$19742.A[1]      2 8.7ms
+                                                                                    q306      5 8.7ms
+                                                                                    q202      6 8.6ms
+                                    $techmap104426$abc$103316$lut$aiger103315$17006.A[2]      3 8.6ms
+                                    $techmap105340$abc$103316$lut$aiger103315$14962.A[5]      3 8.6ms
+                                    $techmap105684$abc$103316$lut$aiger103315$20098.A[2]      2 8.6ms
+                                     $techmap105013$abc$103316$lut$aiger103315$7494.A[3]      4 8.6ms
+                                                                                      g8      8 8.6ms
+                                                                                   g6760      1 8.6ms
+                                                                                    q913      7 8.6ms
+                                    $techmap104520$abc$103316$lut$aiger103315$17963.A[4]      2 8.6ms
+                                                                                    g404      7 8.6ms
+                                                                                   g2656      5 8.6ms
+                                    $techmap104672$abc$103316$lut$aiger103315$19592.A[3]      7 8.5ms
+                                                $techmap106085$abc$103316$lut\g1586.A[1]      2 8.5ms
+                                     $techmap104775$abc$103316$lut$aiger103315$6565.A[5]      2 8.5ms
+                                                                                     q64      7 8.5ms
+                                     $techmap105042$abc$103316$lut$aiger103315$4332.A[2]      2 8.5ms
+                                                                                    q564      8 8.5ms
+                                                                                    q148      7 8.5ms
+                                                                                    q423      6 8.5ms
+                                                                                   g1473      5 8.5ms
+                                                                                    q771      6 8.5ms
+                                                                                    q733      8 8.5ms
+                                                                                    g745      6 8.5ms
+                                                                                    q433      7 8.5ms
+                                                                                   g3009      7 8.5ms
+                                    $techmap104587$abc$103316$lut$aiger103315$18370.A[4]      3 8.5ms
+                                                                                   g1085      8 8.4ms
+                                                                                    q850      7 8.4ms
+                                    $techmap104389$abc$103316$lut$aiger103315$10671.A[5]      2 8.4ms
+                                                                                   g2897      7 8.4ms
+                                                                                    q907      7 8.4ms
+                                                                                    q273      6 8.4ms
+                                                                                   g1838      8 8.4ms
+                                                                                    q661      7 8.4ms
+                                                                                   g1767      6 8.4ms
+                                                                                   g7254      7 8.3ms
+                                                                                   g3031      8 8.3ms
+                                                                                      q4      7 8.3ms
+                                                                                   g2320      5 8.3ms
+                                                                                    q151      5 8.3ms
+                                     $techmap104985$abc$103316$lut$aiger103315$7562.A[5]      2 8.3ms
+                                                                                    q472      7 8.3ms
+                                    $techmap104489$abc$103316$lut$aiger103315$18096.A[3]      4 8.3ms
+                                     $techmap104817$abc$103316$lut$aiger103315$6785.A[3]      2 8.3ms
+                                                                                    q635      8 8.3ms
+                                     $techmap104804$abc$103316$lut$aiger103315$6212.A[2]      2 8.2ms
+                                                                                    q880      6 8.2ms
+                                                                                    q708      8 8.2ms
+                                     $techmap104338$abc$103316$lut$aiger103315$9777.A[1]      3 8.2ms
+                                                                                   g1656      9 8.2ms
+                                                                                   g1404      8 8.2ms
+                                     $techmap104991$abc$103316$lut$aiger103315$7547.A[3]      7 8.2ms
+                                    $techmap104451$abc$103316$lut$aiger103315$19621.A[4]      6 8.2ms
+                                     $techmap104852$abc$103316$lut$aiger103315$5381.A[1]      5 8.2ms
+                                    $techmap105145$abc$103316$lut$aiger103315$12100.A[2]      3 8.2ms
+                                                                                    g206      5 8.1ms
+                                                                                    q874      6 8.1ms
+                                     $techmap105058$abc$103316$lut$aiger103315$7592.A[0]      4 8.1ms
+                                                                                    q848      5 8.1ms
+                                                                                   g7644      7 8.1ms
+                                                                                    q287      7 8.1ms
+                                    $techmap104662$abc$103316$lut$aiger103315$18196.A[5]      3 8.0ms
+                                                                                    q795      6 8.0ms
+                                                                                   g1044     10 8.0ms
+                                    $techmap105341$abc$103316$lut$aiger103315$15012.A[5]      3 8.0ms
+Info: Router2 time 18.22s
+Info: Running router1 to check that route is legal...
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 0 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:          0 |        0          0 |    0     0 |         0|       0.23       0.23|
+Info: Routing complete.
+Info: Router1 time 0.23s
+Info: Checksum: 0x76c8c2db
+
+Info: Critical path report for clock '$abc$103316$iopadmap$clk' (posedge -> posedge):
+Info: curr total
+Info:  0.1  0.1  Source $auto$ff.cc:266:slice$27944.Q
+Info:  1.2  1.3    Net q397 budget 0.508000 ns (24,30) -> (24,18)
+Info:                Sink $abc$103316$lut$aiger103315$1768.A5
+Info:  0.1  1.4  Source $abc$103316$lut$aiger103315$1768.O6
+Info:  1.0  2.4    Net $techmap106023$abc$103316$lut\g6599.A[4] budget 0.478000 ns (24,18) -> (24,19)
+Info:                Sink $abc$103316$lut\g6599.A3
+Info:  0.2  2.6  Source $abc$103316$lut\g6599.O5
+Info:  0.0  2.6    Net g6599 budget -0.062000 ns (24,19) -> (24,19)
+Info:                Sink $auto$ff.cc:266:slice$27992.D
+Info:  0.1  2.7  Setup $auto$ff.cc:266:slice$27992.D
+Info: 0.5 ns logic, 2.2 ns routing
+
+Warning: Max frequency for clock '$abc$103316$iopadmap$clk': 367.92 MHz (FAIL at 500.00 MHz)
+
+Info: Slack histogram:
+Info:  legend: * represents 1 endpoint(s)
+Info:          + represents [1,1) endpoint(s)
+Info: [  -718,   -611) |**+
+Info: [  -611,   -504) |*+
+Info: [  -504,   -397) |****+
+Info: [  -397,   -290) |*****+
+Info: [  -290,   -183) |***********+
+Info: [  -183,    -76) |**********+
+Info: [   -76,     31) |*******************+
+Info: [    31,    138) |***************************************+
+Info: [   138,    245) |****************************************+
+Info: [   245,    352) |*******************************************************+
+Info: [   352,    459) |*****************************************************+
+Info: [   459,    566) |************************************************************ 
+Info: [   566,    673) |***********************************************************+
+Info: [   673,    780) |*************************************************+
+Info: [   780,    887) |***********************************************+
+Info: [   887,    994) |**************+
+Info: [   994,   1101) |**************+
+Info: [  1101,   1208) |***+
+Info: [  1208,   1315) |*+
+Info: [  1315,   1422) |*+
+Info: Running post-routing legalisation...
+
+1 warning, 0 errors

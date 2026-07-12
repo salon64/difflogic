@@ -1,0 +1,11 @@
+SYM 0: PASS (40/40 frames)
+SYM 1: PASS (40/40 frames)
+SYM 2: PASS (40/40 frames)
+SYM 3: PASS (40/40 frames)
+SYM 4: PASS (40/40 frames)
+SYM 5: PASS (40/40 frames)
+SYM 6: PASS (40/40 frames)
+SYM 7: PASS (40/40 frames)
+EQUIV: 8/8 symbols PASS, 0 frame mismatches
+RESULT: PASS
+tb_top.v:93: $finish called at 3276000 (1ps)

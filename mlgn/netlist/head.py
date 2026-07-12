@@ -177,3 +177,40 @@ def decode_ok(b: NetlistBuilder, head: tuple[int, int], state_sigs, shadow_sigs)
         hits.append(b.add_gate(AND, shadow_sigs[c], pred_c))
         b.end_layer()
     return b.or_tree(hits)
+
+
+# -----------------------------------------------------------------------------------
+# the GroupSum argmax as explicit outputs (deployable head, P3b T1)
+# -----------------------------------------------------------------------------------
+def argmax_onehot(b: NetlistBuilder, head: tuple[int, int], state_sigs) -> list[int]:
+    """k signals, EXACTLY one high: pred_c = 1 iff the GroupSum argmax over
+    ``state_sigs`` is c, with torch/numpy's first-max-wins tie-break:
+
+        predicted == c   iff   (s_c > s_j  for all j < c)  AND
+                               (s_c >= s_j for all j > c)
+
+    The wins-loop duplicates ``decode_ok``'s predicted==c predicate verbatim
+    (decode_ok itself stays untouched: its gate structure backs already-proved ABC
+    theorems). Exactly one pred_c is high for any state: the first maximum always
+    exists and is unique under this predicate."""
+    k, gs = head
+    assert len(state_sigs) == k * gs, (len(state_sigs), k, gs)
+    scores = _popcount_bank(b, [state_sigs[c * gs:(c + 1) * gs] for c in range(k)])
+    preds = []
+    for c in range(k):
+        wins = [vec_gt(b, scores[c], scores[j]) if j < c
+                else vec_ge(b, scores[c], scores[j])
+                for j in range(k) if j != c]
+        preds.append(b.and_tree(wins))       # k=1 edge: and_tree([]) == CONST1
+    return preds
+
+
+def argmax_bits(b: NetlistBuilder, head: tuple[int, int], state_sigs) -> list[int]:
+    """ceil(log2(k)) little-endian bits encoding the GroupSum argmax class
+    (``bits[j]`` has weight 2**j). Exact because ``argmax_onehot`` is guaranteed
+    exactly-one-high, so the per-bit OR over the one-hot preds cannot mix classes.
+    k=1 edge: one constant-0 bit (class 0)."""
+    preds = argmax_onehot(b, head, state_sigs)
+    k = head[0]
+    w = max(1, (k - 1).bit_length())         # w = 3 for k = 8
+    return [b.or_tree([preds[c] for c in range(k) if (c >> j) & 1]) for j in range(w)]

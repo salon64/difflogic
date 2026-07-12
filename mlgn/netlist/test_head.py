@@ -6,7 +6,7 @@ Run from the repo root:
 
     python -m mlgn.netlist.test_head
 
-Three test banks, all comparing the netlist against numpy ground truth bit-for-bit:
+Four test banks, all comparing the netlist against numpy ground truth bit-for-bit:
 
 1. ``popcount`` on >= 5000 random bit-vectors per width in {1, 2, 3, 5, 8, 9, 128}
    (plus the all-zeros / all-ones rows).
@@ -16,6 +16,10 @@ Three test banks, all comparing the netlist against numpy ground truth bit-for-b
 3. ``decode_ok`` with head=(8, 128) on >= 20000 random 1024-bit states with random
    one-hot shadows, PLUS engineered popcount ties (equal group scores with the
    winning index both below and above the loser) and all-zero-shadow rows.
+4. ``argmax_bits`` (the deployable head, P3b T1): head=(8, 128) on >= 20000 random
+   states plus the SAME engineered-tie machinery as bank 3 (ordered-pair ties both
+   directions, 3-way/8-way ties, all-zeros/all-ones), vs ``np.argmax``; and
+   EXHAUSTIVE over all states for small heads (2,1), (3,2), (4,2), (2,4), (1,4).
 
 sim.py stays untouched: this module carries its own output-signal evaluator
 (``eval_netlist``), which replicates sim.step's layer loop and additionally reads
@@ -28,7 +32,7 @@ import sys
 
 import numpy as np
 
-from .head import decode_ok, popcount, vec_ge, vec_gt
+from .head import argmax_bits, decode_ok, popcount, vec_ge, vec_gt
 from .ir import GATE_FN, Netlist, NetlistBuilder
 
 
@@ -189,13 +193,80 @@ def test_decode_ok(n_random: int = 20000) -> None:
           f"{n_tied} rows with a tied maximum, {n_zero} all-zero shadows)")
 
 
+# -----------------------------------------------------------------------------------
+# 4. argmax_bits (deployable head), head = (8, 128) + exhaustive small heads
+# -----------------------------------------------------------------------------------
+def _tie_states(k: int, gs: int, rng) -> list[np.ndarray]:
+    """Engineered exact ties, same machinery as bank 3: every ordered pair (i, j)
+    sharing the maximal count (argmax must pick the LOWER index), plus 3-way and
+    all-k-way ties."""
+    rows = []
+    for i in range(k):
+        for j in range(k):
+            if i == j:
+                continue
+            top = int(rng.integers(max(1, gs // 3), gs + 1))
+            counts = rng.integers(0, top, size=k)   # everyone else strictly below
+            counts[i] = counts[j] = top
+            rows.append(_state_with_counts(counts, gs, rng))
+    tied_sets = [[0, min(3, k - 1), k - 1], list(range(k))]
+    for tied in tied_sets:
+        top = int(rng.integers(max(1, gs // 3), gs + 1))
+        counts = rng.integers(0, top, size=k)
+        for c in tied:
+            counts[c] = top
+        rows.append(_state_with_counts(counts, gs, rng))
+    return rows
+
+
+def test_argmax_bits(n_random: int = 20000) -> None:
+    # (a) the deployment head (8, 128): random states + engineered ties + extremes
+    k, gs = 8, 128
+    b = NetlistBuilder(n_pi=k * gs, n_state=0)
+    bits = argmax_bits(b, (k, gs), [b.pi(i) for i in range(k * gs)])
+    net = b.build(next_state=[], outputs=bits)
+    print(f"  argmax_bits (8,128): {len(bits)} bits, {net.n_gates} gates, "
+          f"{len(net.layers)} layers")
+    rng = np.random.default_rng(7)
+    states = (rng.random((n_random, k, gs)) < rng.random((n_random, k, 1))
+              ).reshape(n_random, k * gs)
+    states[0, :] = False                          # all-zeros: scores tie at 0 -> class 0
+    states[1, :] = True                           # all-ones: scores tie at gs -> class 0
+    ties = _tie_states(k, gs, rng)
+    states = np.concatenate([states, np.asarray(ties, dtype=bool)])
+    got = bits_to_int(eval_batched(net, states))
+    want = states.reshape(len(states), k, gs).sum(-1).argmax(-1)  # np.argmax: first max
+    assert (got == want).all(), \
+        f"argmax_bits (8,128): {int((got != want).sum())} mismatches of {len(states)}"
+    scores = states.reshape(len(states), k, gs).sum(-1)
+    n_tied = int((np.sort(scores, -1)[:, -1] == np.sort(scores, -1)[:, -2]).sum())
+    print(f"  argmax_bits (8,128): {len(states)} cases OK ({len(ties)} engineered tie "
+          f"rows, {n_tied} rows with a tied maximum)")
+
+    # (b) exhaustive small heads (every state => every score profile & tie pattern)
+    for (kk, gg) in ((2, 1), (3, 2), (4, 2), (2, 4), (1, 4)):
+        n_in = kk * gg
+        b = NetlistBuilder(n_pi=n_in, n_state=0)
+        bits = argmax_bits(b, (kk, gg), [b.pi(i) for i in range(n_in)])
+        net = b.build(next_state=[], outputs=bits)
+        n = 1 << n_in
+        x = ((np.arange(n)[:, None] >> np.arange(n_in)[None, :]) & 1).astype(bool)
+        got = bits_to_int(eval_batched(net, x))
+        want = x.reshape(n, kk, gg).sum(-1).argmax(-1)
+        assert (got == want).all(), f"argmax_bits ({kk},{gg})"
+        print(f"  argmax_bits ({kk},{gg}): exhaustive {n} states OK "
+              f"({len(bits)} bits)")
+
+
 def main() -> int:
-    print("[1/3] popcount vs numpy")
+    print("[1/4] popcount vs numpy")
     test_popcount()
-    print("[2/3] vec_gt / vec_ge vs numpy (exhaustive)")
+    print("[2/4] vec_gt / vec_ge vs numpy (exhaustive)")
     test_comparators()
-    print("[3/3] decode_ok vs np.argmax, head=(8,128)")
+    print("[3/4] decode_ok vs np.argmax, head=(8,128)")
     test_decode_ok()
+    print("[4/4] argmax_bits vs np.argmax, head=(8,128) + exhaustive small heads")
+    test_argmax_bits()
     print("ALL TESTS PASSED")
     return 0
 

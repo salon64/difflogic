@@ -166,3 +166,285 @@ arithmetic.
   pass RTL-vs-BLIF is future work. (Coverage note: the per-gate truth-table
   cross-check *is* exhaustive at the combinational level; only the composed
   sequential behavior relies on simulation.)
+
+## 7. Head-in-fabric lgn_top (P3b T1, 2026-07-11)
+
+**Runs executed 2026-07-12**, same toolchain as §1 (OSS CAD Suite in WSL: Yosys
+0.67+4 git b88b73a99, Icarus Verilog 14.0 devel). This is P3b workmap item **T1**:
+the deployable top that kills §6's 1,035-port I/O blocker by moving the GroupSum
+argmax head INTO the fabric — `lgn_top` = the verified copy-FSM + `head.argmax_bits`
+in one netlist, ports **clk + rst + x[8:0] + class_out[2:0] = 14 bits** (yosys stat:
+"4 ports / 14 port bits", vs 1,035 for `lgn_fsm`; OBUFs 1,024 → 3).
+
+### 7.1 What was exported
+
+`python -m mlgn.netlist.synth.export_top --full-gate` (new driver; export_fsm.py and
+its frozen artifacts untouched). Gates passed IN ORDER before any RTL was written:
+
+1. **Accuracy gate (full test set):** rebuilt = 1.0000 == recorded (`full=True`).
+2. **Shape asserts:** 9 PIs / 1024 latches / 7168 gates / head (8,128) / init
+   all-zeros.
+3. **Emitter regression:** `verilog.emit_verilog` gained backward-compatible
+   `expose_q` / `out_bus` parameters; `fsm.v` regenerated with defaults is
+   **byte-identical** to the checked-in golden record (diff-gated in the script).
+4. **Composition gate (python, bit-exact):** the composed top replays the FSM gates
+   first via `ir.copy_gates_with_remap` (ids g0..g7167 preserved), then appends the
+   head on the current q latches (GroupSum group c = contiguous slice
+   q[128c..128c+127], `sim.head_scores`' exact reshape). Over the 8 legal writes ×
+   40 frames AND 2 fully random 40-frame input sequences: next-state trajectory ==
+   `sim.run_sequence(net_base)` bit-for-bit and the 3 output bits ==
+   `sim.head_scores(...).argmax(-1)` (np first-max-wins) at every frame; plus the
+   torch cross-check — per-frame `model.head(cell.readout_h(h_t)).argmax` equals the
+   netlist class on all 8×40 frames.
+5. **Final decode 8/8** ([0..7]); reset-state class = 0 (all-zero scores, first-max
+   tie-break — simulator-computed, then baked into the TB).
+
+| artifact | contents |
+|---|---|
+| `top.v` (643 KB, 20,983 lines) | module `lgn_top`; q is an INTERNAL reg (`expose_q=False`), single `output wire [2:0] class_out` (`out_bus`) |
+| `top.blif` / `top_clk.blif` | BLIF twin, outputs = the 3 class bits only (every state bit stays observable THROUGH the head — no q-output padding needed this time) + the `re clk` rewrite (`export_fsm.derive_clk_blif`) |
+| `golden_cls_sym0..7.txt` | 40 per-frame DECODED CLASSES (one hex digit/line) per legal write, from the bit-exact python simulator. The transient's WRONG decodes are kept verbatim (e.g. sym0: `2 2 2 2 4 6 0 0 ...`, sym1 settles at frame 10) — golden line t = decode of states[t], same alignment as `golden_sym<k>.txt` |
+| `tb_top.v` | ports-only TB (re-runs unchanged post-synthesis); `` `ifdef RTL_Q_CHECK`` additionally compares the full 1024-bit `dut.q` against `golden_sym<k>.txt` pre-synthesis |
+| `run_top.sh` | the WSL flow: 2 RTL sims + 3 mutation controls + 4 yosys flows + post-synth re-sim (total wall 2m58s) |
+| `top_synth.v` | post-`synth_xilinx` netlist for gate-level re-simulation |
+
+Composed IR: **18,897 gates = 7,168 FSM + 11,729 head** (6 leaner than
+`decode_ok`'s 11,735 — no shadow AND/OR stage), 1,073 layer slices, 3 outputs.
+`test_head.py` gained bank 4 (`argmax_bits` vs `np.argmax`: 20,058 cases incl. the
+engineered-tie machinery at (8,128), exhaustive small heads) — `ALL TESTS PASSED`;
+banks 1–3 and `test_indices_buffers` (6/6) re-pass untouched.
+
+### 7.2 Simulation equivalence (iverilog) — PASS 8/8, twice
+
+- **RTL:** `top.v` + `tb_top.v`: `EQUIV: 8/8 symbols PASS, 0 frame mismatches /
+  RESULT: PASS` (`log/iverilog_top_equiv.log`).
+- **RTL + full state (`-DRTL_Q_CHECK`):** same 8/8 **plus** `QCHECK: 0 q-frame
+  mismatches` — the full 327,680 state bits re-verified through the hierarchical
+  `dut.q` while it still exists (`log/iverilog_top_equiv_q.log`).
+
+### 7.3 Mutation controls — CLASS-observable, searched not assumed
+
+§2's g46 precedent was validated against the 1024-bit q trajectory; a 3-bit argmax
+could mask it, so export_top.py re-derives observability by IR-level re-simulation
+of the class trajectory before baking in expectations. All three controls behaved
+exactly as predicted (`log/iverilog_top_mut.log`; single op 2→4 line-flips in
+copies of top.v, each verified to differ in exactly one `wire g<id>` line; copies
+deleted by run_top.sh after the evidence was logged — regenerate with export_top.py):
+
+| mutant | gate (op 2→4) | python-predicted divergence | TB verdict |
+|---|---|---|---|
+| `top_mut_obs.v` | `g46` = `q453 & ~q169` (FSM) | sym 0, frame 4 | **FAIL** — `SYM 0: CLASS MISMATCH frame 4 (got 6 want 4)`, 7/8 |
+| `top_mut_head.v` | `g17282` = `g16945 & ~g16944` (head comparator `gt`) | sym 1, frame 5 | **FAIL** — first mismatch `SYM 1 frame 5 (got 0 want 1)`, 31 bad frames |
+| `top_mut_masked.v` | `g7` = `q170 & ~q684` (FSM, provably class-silent over 8×40) | none | **PASS** (negative control) |
+
+So the TB is non-vacuous at class observability for both the FSM cone and the head
+cone, and passes a masked flip exactly as simulation-based checking should.
+
+### 7.4 Synthesis (yosys), Artix-7 class target — vs the §4 fsm-only baselines
+
+| cell | A: verilog `synth_xilinx` | B: `top_clk.blif` | raw `top.blif` | fsm-only §4A |
+|---|---|---|---|---|
+| LUT2/3/4/5/6 | 212/222/297/330/1902 | 462/182/347/268/3067 | 1×LUT1 + 440/183/357/281/3041 | 121/149/183/203/245 |
+| **Σ LUTs** | **2,963** | **4,326** | 4,303 | **901** |
+| INV | 50 | 34 | 34 | 50 |
+| **FDRE** | **885** | **1,019** | 1,019 clockless `$_FF_` (§4 caveat again: raw 3-token BLIF; use `top_clk.blif`) | **885** |
+| MUXF7 / MUXF8 | 696 / 237 | 1,406 / 665 | 1,395 / 656 | 0 / 0 |
+| CARRY4 / BRAM / DSP | 0 | 0 | 0 | 0 |
+| BUFG / IBUF / OBUF | 1 / 11 / **3** | 1 / 10 / 3 | 0 / 9 / 3 | 1 / 11 / **1,024** |
+| ports (bits) | **14** | 13 (no rst: latch-init reset, §6) | 12 | 1,035 |
+| est. LCs | 2,751 | 3,864 | 3,862 | 780 |
+| CHECK | 0 problems | 0 problems | 0, then **1,019 problems** at the final CHECK (the 1,019 unprocessed latch-`init` attributes on the clockless `$_FF_`s) | 0 problems |
+| wall | 45.2 s | 30.4 s | 37.2 s | 19.9 s |
+
+Generic flow (`synth -top lgn_top`, 31.0 s): 8,747 cells = **885 FFs** (884
+`$_SDFF_PP0_` + 1 `$_DFF_P_`) + **7,862 combinational** (2,651 NAND, 1,598 XOR,
+1,202 AND, 696 MUX, 531 XNOR, 372 ANDNOT, 230 OR, 230 NOR, 192 ORNOT, 160 NOT).
+
+Findings:
+
+- **FDRE stayed exactly 885** (flow A), identical to the fsm-only export: with only
+  3 output bits yosys had full sweeping freedom, yet every state bit remains live
+  because all 1,024 feed the popcount head. The head is combinationally transparent
+  to register optimization here.
+- **The in-fabric head costs ~2,062 extra LUTs + 696 MUXF7 + 237 MUXF8** (flow A
+  deltas vs §4A) for 11,729 raw IR gates; in the generic flow the comb-cell delta is
+  7,862 − 2,253 = **5,609 cells** (2.1× optimization vs raw). LUT6-heavy (1,902) with
+  F7/F8 mux chains — the wide comparators/argmax map to mux trees, **not** carry
+  chains: `synth_xilinx` inferred **zero CARRY4** from the explicit XOR/AND/OR adder
+  gates (a real finding for T2 timing: no dedicated fast-carry path as emitted).
+- Fit, XC7A15T (10,400 LUT / 20,800 FF): flow A **28.5% LUTs / 4.3% FFs**, flow B
+  conservative 41.6% / 4.9%. The full deployable top (register + head) still fits
+  the smallest ordinary Artix-7 ~3.5× over on LUTs, and I/O is now trivially
+  packageable (14 port bits).
+  **Board/chip note (verified 2026-07-12, see research/23 §B-T4/§G):** XC7A15T is used
+  here only as a *fit reference* — it is the 2403.18703 authors' custom-prototype chip,
+  is not a purchasable Crazyflie deck, and is **unsupported by the open (openXC7) flow**.
+  The actual P&R targets are **xc7a35t** (open-flow-proven; Arty A7-35T is EOL so residual
+  stock only) or **xc7a100t** (Arty A7-100T, ~$299, in production). The fit is even more
+  comfortable on the A7-100T (63,400 LUT: flow A ~4.7%).
+
+### 7.5 Post-synthesis gate-level re-simulation — PASS 8/8
+
+`top_synth.v` + yosys' Xilinx `cells_sim.v` under the **identical** `tb_top.v`
+(ports-only, so it transfers verbatim): `EQUIV: 8/8 symbols PASS, 0 frame
+mismatches / RESULT: PASS` (`log/iverilog_top_postsynth.log`).
+
+### 7.6 Honest caveats
+
+- **Still no P&R, no Fmax, no power — that is T2.** Post-synthesis cell counts
+  only. The zero-CARRY4 / MUXF7-chain structure makes the head's timing path an
+  open question until nextpnr/Vivado runs.
+- **Post-synthesis observability is 3 bits × 320 frames** (960 class decisions) vs
+  327,680 state bits for the fsm-only TB. Mitigations: (i) the FSM core is
+  gate-for-gate the already-8/8-verified replay (ids preserved), (ii) the head is
+  exhaustively unit-tested (test_head banks 1–4 incl. engineered ties), (iii) the
+  class-observable mutation controls above, (iv) the pre-synthesis `RTL_Q_CHECK`
+  run re-verified the full state through `dut.q`. Still: post-synth evidence is
+  protocol-driven simulation at 3-bit width, not a SEC proof.
+- **`rand_probe.py`/`tb_rand.v` are NOT reusable here** (they read the q port,
+  which no longer exists); a class-level random probe is possible but strictly
+  weaker at 3-bit observability — future work, noted not done.
+- **The BLIF flows are synthesis-stat cross-checks only** (not simulated); only the
+  Verilog flow's `top_synth.v` was re-simulated. Reset/init split as §6: `top.v`
+  uses synchronous `rst` loading all-zeros, the BLIFs carry latch init attributes
+  and no reset port (equivalent here because init = 0).
+- The golden class vectors keep the transient's wrong decodes verbatim (settle ≤ 15
+  steps, §2 of ../README.md); any consumer sampling `class_out` before the settle
+  window gets those honest wrong answers — the K≥16 operational envelope from the
+  ABC theorems is unchanged by moving the head into fabric.
+
+## 8. Open-flow place-and-route (openXC7, xc7a35t, P3b T2, 2026-07-12)
+
+**The first real post-place-and-route timing number for the exported circuit** —
+board-independent (a P&R timing run, no bitstream programmed). Closes the §6/§7.6
+"no P&R, no Fmax" gap. **Toolchain (all in WSL Ubuntu, installed 2026-07-12):**
+openXC7 prebuilt snaps via `toolchain-installer.sh` — **Yosys 0.38** (openXC7 snap,
+git 543faed9c; deliberately NOT the repo's OSS-CAD-Suite 0.67 — chipdb/primitive
+compatibility with nextpnr is version-locked), **nextpnr-xilinx 0.8.2**, prjxray-db
+bundled in the snap (`.../external/prjxray-db/artix7`). Chipdb `.bin` generated once
+per part with `build_chipdb.sh` (bbaexport.py + bbasm): **xc7a35tcsg324** (92 MB,
+open-flow Fmax reference = Arty A7-35T) and **xc7a100tcsg324** (159 MB, the ~$299
+Arty A7-100T *purchase* target — §7.4 board note). New scripts (this lane, do not
+touch §7's top.v/fsm*): `build_chipdb.sh`, `run_pnr.sh`, `fsm_pnr_wrap.v`. Raw
+nextpnr logs: `log/pnr_top_nextpnr_a35_f500_s{1..4}.log`,
+`log/pnr_fsm_wrap_nextpnr_a35_f500_s{1..4}.log`, `log/pnr_fsm_raw_nextpnr_a35.log`,
+`log/pnr_top100_nextpnr_p2.0_s1.log`, `log/pnr_top_nextpnr_full_a35_s1.log`.
+
+### 8.1 Method (yosys → nextpnr; how the Fmax target is really set)
+
+Flow per design: `read_verilog <f>; synth_xilinx -flatten -abc9 -nobram -arch xc7
+-top <top>; write_json` → `nextpnr-xilinx --chipdb <part>.bin --xdc <f>.xdc --json
+<f>.json --freq <MHz> --seed <s> --timing-allow-fail --write <routed>.json --sdf`.
+Two open-flow gotchas found and handled (both baked into `run_pnr.sh`):
+
+- **Every top-level PAD needs an `IOSTANDARD`** or nextpnr aborts (`port <p> of type
+  PAD has no IOSTANDARD property`); its XDC parser does **not** expand `get_ports`
+  wildcards. So the XDC is generated from the synthesized JSON with one explicit
+  `set_property IOSTANDARD LVCMOS33` line per port **bit** (only `clk` gets a real
+  pin LOC = E3; the rest are auto-placed — pin identity is off the core timing path).
+- **`create_clock` silently does nothing here:** `-abc9` renames the clock net
+  (`$abc$…$iopadmap$clk`), so `create_clock [get_ports clk]` fails to bind and
+  nextpnr falls back to its **12 MHz default target** — under which the timing-driven
+  placer barely tries. `--freq <MHz>` sets the target by frequency regardless of net
+  name; it is what actually pushes the placer. The **achieved** post-route "Max
+  frequency for clock" is reported either way (an aggressive target "FAIL"s but still
+  routes — hence `--timing-allow-fail`). We swept seeds 1–4 at `--freq 500`.
+
+### 8.2 `top.v` (deployable `lgn_top`) on xc7a35tcsg324-1 — Fmax **367.9 MHz**
+
+Post-route "Max frequency" across seeds 1–4 (`--freq 500` target): **367.9 / 365.8 /
+359.3 / 316.1 MHz** → **best 367.9 MHz, period 2.72 ns**; median ~362, worst 316.1
+(≈14% seed spread — nextpnr's acknowledged timing-PnR variance, §8.6).
+
+| post-P&R (nextpnr pack, yosys 0.38 `-abc9`) | count |
+|---|---|
+| SLICE_LUTX (LUT1/2/3/4/5/6 = 50/277/365/600/660/699) | **2,651** |
+| SLICE_FFX (FDRE) | **885** |
+| SELMUX2_1 (MUXF7 / MUXF8 = 8 / 2) | 10 |
+| CARRY4 / DSP48E1 / RAMB36E1 | **0 / 0 / 0** |
+| BUFGCTRL (clock on a real global buffer) | 1 |
+| IOB (11 IN + 3 OUT) | 14 |
+
+**Critical path (the headline): it is the FSM register recurrence, NOT the head.**
+The worst reg-to-reg path is `q397` (a state FF) → LUT → **`g6599`** → q-FF `.D`,
+**2 LUT levels**, 0.5 ns logic + 2.2 ns routing = 2.72 ns. `g6599` is an FSM-core
+gate id (< 7168), so the clock is limited by the trained register file's
+`q → next-state → q` loop. The GroupSum/argmax **head is combinational reg-to-OUT
+and off the timed clock path** — its zero-CARRY4 popcount tree (the §7.6 open
+question) does **not** set Fmax. Note `-abc9` mapped the head's wide comparators into
+LUTs (2,651 LUT, only 10 F7/F8 muxes) rather than the 696/237 MUXF7/F8 chains §7.4
+saw under yosys-0.67 default mapping — same netlist, shallower LUT-depth map, which
+is why the path is a fast 2 levels.
+
+Utilisation vs the **datasheet xc7a35t** (20,800 LUT6 / 41,600 FF): **12.7% LUT /
+2.1% FF**, 0 carry/DSP/BRAM. (nextpnr's own %, 4%/1%, uses the larger 35T⁄50T
+**shared-die** model it reports as 65,200 FF — the 35T and 50T are the same silicon;
+absolute cell counts are the meaningful figure.)
+
+### 8.3 `fsm.v` raw is I/O-unplaceable; `fsm_pnr_wrap.v` probes the FSM core
+
+- **Raw `lgn_fsm` (fsm.v) cannot be placed** — machine evidence for the §6/§7.4
+  I/O-bound caveat: `ERROR: IO placer ran out of available IOs (212 available IO,
+  1034 unconstrained pins)` (1,024 `q` + 9 `x` + `rst`; 212 IOBs on csg324). So the
+  §7 "run fsm first" step is only reachable through a wrapper.
+- **`fsm_pnr_wrap.v`** (new; instantiates `lgn_fsm` unchanged, reduces the 1,024
+  state bits to a 32-bit **registered parity signature** so it fits I/O) P&Rs at
+  **277.6 MHz best** (seeds 270.7 / 258.4 / 277.6 / 274.1). Util 1,224 LUT / **917
+  FF** (885 FSM `q` + 32 signature) / 0 CARRY4 / 43 IOB. **But its critical path is
+  the wrapper's own reduction, not the FSM core:** `q[192]` → 3 LUTs → `yr[6].D`
+  with 3.0 ns routing (the 1,024→32 parity *gather* spans the die). So 277.6 MHz is a
+  conservative **lower bound** distorted by the reduction — the faithful FSM-core
+  reg-to-reg number is §8.2's 367.9 MHz (whose critical path is demonstrably inside
+  the FSM, `g6599`). Reported honestly as a cross-check, not the FSM Fmax.
+
+### 8.4 Derived deployment timing (from `lgn_top` = 367.9 MHz)
+
+- **ns/step = clock period = 2.72 ns** (1 / 367.9 MHz).
+- **ns/decision = K × period.** The copy circuit needs K = 16 settled steps after a
+  legal write (README finding 2/3; ABC theorem envelope K ≥ 16). So a full
+  write→settle→readout **decision = 16 × 2.72 ns = 43.5 ns** (worst-case any-input
+  K = 19 → 51.6 ns). I.e. the deployed register+head resolves a symbol in **~44 ns**
+  on the open flow — well inside any CAN-frame / control-loop budget the P3b carriers
+  need. (Throughput is one new sequence per settle window; latency is the 43.5 ns.)
+
+### 8.5 A7-100T purchase target (xc7a100tcsg324-1) — flow proven, same class
+
+Same `top.v` through the **same committed `run_pnr.sh`** (`PART=xc7a100tcsg324-1`),
+seed 1: post-route **326.7 MHz** (0.5 ns logic + 2.6 ns routing), identical
+reg-to-reg FSM-core critical-path structure and identical cell counts (2,651 LUT /
+885 FF / 0 CARRY4). 326.7 MHz sits inside the A7-35T seed spread (316–368) — the
+–1 speed grade and primitives are identical across the two parts, so the delta is
+placement noise, not a device difference. Utilisation on the A7-100T datasheet
+(63,400 LUT6 / 126,800 FF): **4.2% LUT / 0.7% FF** — the deployable top is a
+rounding error on the purchase target. (This run also validates `build_chipdb.sh`
+and the `PART=` override end-to-end for the A7-100T.)
+
+### 8.6 Honest caveats
+
+- **Open-flow estimate, not Vivado sign-off.** nextpnr-xilinx's timing is derived
+  from the prjxray delay model; the openXC7 authors themselves flag timing-driven
+  PnR as weak. Treat 367.9 MHz as **indicative**, with the measured ~14% seed
+  variance (316–368 MHz over 4 seeds). A Vivado re-run (or `--seed` sweep + floorplan)
+  would tighten it; the number is a floor-ish estimate, not a guaranteed max.
+- **No board — timing-only.** No bitstream was programmed (we have no Arty board);
+  this is place-and-route timing, not an on-silicon measurement. FASM→bitstream is a
+  one-command extension (`fasm2frames` + `xc7frames2bit`, in the snap) if a board
+  arrives.
+- **Routing-dominated (2.2 of 2.7 ns is routing).** The sparse design (13% of the
+  35T) is spread across the die; a `pblock`/floorplan constraining the register file
+  to one clock region would cut routing and likely lift Fmax. Unconstrained I/O pins
+  (only `clk` LOC'd) leave I/O paths unoptimised, but those are reg-to-out, off the
+  reg-to-reg critical path, so they don't affect the reported clock Fmax.
+- **The head is off the critical clock path but its reg-to-out delay is unmeasured**
+  here (no `set_output_delay`); `class_out` settles combinationally after the last
+  edge. For the copy protocol that is read only after the K-step settle, so one extra
+  sub-clock combinational delay is immaterial — but a hard output-timing budget would
+  need it constrained. Noted, not done.
+- **Synthesis-flow delta vs §7.4.** openXC7 yosys 0.38 `-abc9` gives 2,651 LUT + 10
+  F7/F8 muxes; §7.4's OSS-CAD 0.67 default gave 2,963 LUT + 696/237 MUXF7/F8. Same
+  IR/netlist, different tech-mapper depth strategy — the `-abc9` map is what the
+  nextpnr flow requires and is the one timed here.
+- **`create_clock` is inert post-`-abc9`** (clock net renamed); `--freq` is the real
+  knob (§8.1). The reported Fmax is the achieved post-route max, independent of the
+  target — verified by matching numbers at `--freq 400` and `--freq 500` for seed 1
+  (367.92 MHz both).
