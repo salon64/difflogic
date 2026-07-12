@@ -1,5 +1,6 @@
 **/__pycache__/
 **/data-mnist/
+**/data-can/
 **/logs/
 **/.vscode
 # compiled difflogic_cuda extension + build artifacts
@@ -14,3 +15,5 @@ build/
 */.claude
 # ABC model checker drops a history file in its working directory
 abc.history
+# isolated flight-sim venv (gym-pybullet-drones stack; see mlgn/flightgate/README.md)
+.venv-flight/

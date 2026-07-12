@@ -263,3 +263,8 @@ self-contained ckpts — wiring restored from the checkpoint, no replay needed).
   trained WITH distractors: does training buy provable robustness? (the natural
   P3a headline experiment) + clatch checkpoints for the P2-native theorems.
 - AIGER emission for engine breadth (`&pdr`, rIC3, Pono).
+- **P3b kicked off 2026-07-11** — head-in-fabric top, P&R/Fmax/energy, board demo
+  (benchmark carrier: CAN-bus IDS — the P3a property harnesses port ~1:1: no-false-trip =
+  decode-type invariant over a legal-traffic automaton, bounded detection latency =
+  shadow-armed `protocol_decode`), CAN-recurrence + POMDP gates: plan + decisions in
+  `../research/23_p3b_workmap.md`.
