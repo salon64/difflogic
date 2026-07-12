@@ -253,6 +253,19 @@ A 13-agent recon→build→adversarial-verify workflow executed the in-lane part
   removed; T1 verify-loop re-run (clears stale `top_mut_*.v`); flightgate cli/trainer
   cosmetics (rounds record, empty-slice warning).
 
+**C0.g round 1 (2026-07-12, DUST) — flagship gate INCONCLUSIVE, fix in hand.** On the two
+HARD masquerade attacks (max_speedometer, reverse_light_on) **every arm collapsed to the
+always-normal predictor** (recall ≈ 0, the gate's "must beat the floor" precondition failed
+for all) — classic class-imbalance collapse at ROAD's ~2–3% attack-frame rate under
+unweighted CE. BUT on the one attack where anything trained (correlated_signal, easy),
+recurrence won decisively: **gated F1 0.74 / clatch 0.67 vs ff 0.12** (n=1) — the
+recurrence-earns-its-keep signal, where the task is learnable. Fix: **`--can-pos-weight`**
+(train.py; `auto` = neg/pos on the train frame rate) — validated on the fixture, recall
+0.00→0.31 / F1 0.00→0.47 at FPR 0.002 (a too-gentle weight of 6 still collapsed → use
+`auto`). run_queue_c0g.sh re-tagged `c0g_*→c0gpw_*` (round 1 kept as the unweighted-collapse
+baseline for the paper). **Round 2 = re-run the queue with the weight; the gate verdict is
+pending on it, NOT decided.**
+
 **All four board-independent tracks are complete + adversarially verified.** Remaining is
 **USER actions only:** (1) launch the CAN C0.g DUST queue (the flagship gate verdict);
 (2) launch the flight D1 DUST queue (thesis gate); (3) install Vivado 2026.1 for sign-off
