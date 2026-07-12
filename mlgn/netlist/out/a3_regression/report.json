@@ -18,14 +18,30 @@
     "n_distractors": 8,
     "sel_flag": false,
     "test_acc": 1.0,
-    "test_soft": 0.8786
+    "test_soft": 0.8786,
+    "input_dim_override": null,
+    "num_classes_override": null,
+    "can_window": null,
+    "can_source": "syn",
+    "can_file": "",
+    "can_attack": "all",
+    "can_stride": 1,
+    "can_eval_stride": 1,
+    "can_id_enc": "onehot",
+    "can_top_ids": 20,
+    "can_dt_bins": 8,
+    "can_dt_global": false,
+    "can_payload_bytes": 0,
+    "can_per_step": false,
+    "can_flatten": false,
+    "can_ambient": false
   },
   "accuracy_gate": {
     "rebuilt_test_acc": 1.0,
     "recorded_test_acc": 1.0,
     "full_test_set": false,
     "gate_passed": true,
-    "seconds": 6.8
+    "seconds": 36.3
   },
   "netlist": {
     "pis": 9,

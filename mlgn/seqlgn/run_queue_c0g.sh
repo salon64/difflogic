@@ -62,51 +62,56 @@ cd "$ROOT"
 GPUS=(0 1)
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
-CMN="--task can --can-source road --seq-len 32 --can-id-enc onehot --can-top-ids 20 --can-dt-bins 8 --can-payload-bytes 8 --can-stride 4 --can-eval-stride 16 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --batch-size 128"
+# --can-pos-weight auto = neg/pos on the train frame rate: at ROAD's ~2-3% attack
+# frames an unweighted CE collapses to the always-normal predictor (recall 0 -- the
+# 2026-07-12 round-1 result); this weights attack frames up so the arms actually learn
+# to detect. Shared across all arms so the gate stays matched. If FPR climbs too high,
+# drop to a fixed value (e.g. --can-pos-weight 10) on a rerun.
+CMN="--task can --can-source road --seq-len 32 --can-id-enc onehot --can-top-ids 20 --can-dt-bins 8 --can-payload-bytes 8 --can-stride 4 --can-eval-stride 16 --can-pos-weight auto --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --batch-size 128"
 REC="--hidden 1024 --deep-sup 0.2 --can-per-step"       # recurrent arms: 4096 gates
 FF="--mechanism ff --can-flatten --hidden 2048"         # stateless arm:  4096 gates
 
 JOBS=(
   # ── HARD SET 1: max_speedometer masquerade (3 seeds x 3 arms) ──────────────
-  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 0 --tag c0g_speedo_gated_s0"
-  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 1 --tag c0g_speedo_gated_s1"
-  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 2 --tag c0g_speedo_gated_s2"
-  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 0 --tag c0g_speedo_clatch_s0"
-  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 1 --tag c0g_speedo_clatch_s1"
-  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 2 --tag c0g_speedo_clatch_s2"
-  "$CMN --can-attack max_speedometer+masquerade $FF                                                    --seed 0 --tag c0g_speedo_ff_s0"
-  "$CMN --can-attack max_speedometer+masquerade $FF                                                    --seed 1 --tag c0g_speedo_ff_s1"
-  "$CMN --can-attack max_speedometer+masquerade $FF                                                    --seed 2 --tag c0g_speedo_ff_s2"
+  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 0 --tag c0gpw_speedo_gated_s0"
+  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 1 --tag c0gpw_speedo_gated_s1"
+  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 2 --tag c0gpw_speedo_gated_s2"
+  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 0 --tag c0gpw_speedo_clatch_s0"
+  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 1 --tag c0gpw_speedo_clatch_s1"
+  "$CMN --can-attack max_speedometer+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 2 --tag c0gpw_speedo_clatch_s2"
+  "$CMN --can-attack max_speedometer+masquerade $FF                                                    --seed 0 --tag c0gpw_speedo_ff_s0"
+  "$CMN --can-attack max_speedometer+masquerade $FF                                                    --seed 1 --tag c0gpw_speedo_ff_s1"
+  "$CMN --can-attack max_speedometer+masquerade $FF                                                    --seed 2 --tag c0gpw_speedo_ff_s2"
 
   # ── HARD SET 2: reverse_light_on masquerade (3 seeds x 3 arms) ─────────────
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 0 --tag c0g_rlon_gated_s0"
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 1 --tag c0g_rlon_gated_s1"
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 2 --tag c0g_rlon_gated_s2"
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 0 --tag c0g_rlon_clatch_s0"
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 1 --tag c0g_rlon_clatch_s1"
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 2 --tag c0g_rlon_clatch_s2"
-  "$CMN --can-attack reverse_light_on+masquerade $FF                                                    --seed 0 --tag c0g_rlon_ff_s0"
-  "$CMN --can-attack reverse_light_on+masquerade $FF                                                    --seed 1 --tag c0g_rlon_ff_s1"
-  "$CMN --can-attack reverse_light_on+masquerade $FF                                                    --seed 2 --tag c0g_rlon_ff_s2"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 0 --tag c0gpw_rlon_gated_s0"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 1 --tag c0gpw_rlon_gated_s1"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 2 --tag c0gpw_rlon_gated_s2"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 0 --tag c0gpw_rlon_clatch_s0"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 1 --tag c0gpw_rlon_clatch_s1"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 2 --tag c0gpw_rlon_clatch_s2"
+  "$CMN --can-attack reverse_light_on+masquerade $FF                                                    --seed 0 --tag c0gpw_rlon_ff_s0"
+  "$CMN --can-attack reverse_light_on+masquerade $FF                                                    --seed 1 --tag c0gpw_rlon_ff_s1"
+  "$CMN --can-attack reverse_light_on+masquerade $FF                                                    --seed 2 --tag c0gpw_rlon_ff_s2"
 
   # ── EASIER CONTROL: correlated_signal masquerade (1 seed per arm) ──────────
-  "$CMN --can-attack correlated_signal+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 0 --tag c0g_corr_gated_s0"
-  "$CMN --can-attack correlated_signal+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 0 --tag c0g_corr_clatch_s0"
-  "$CMN --can-attack correlated_signal+masquerade $FF                                                    --seed 0 --tag c0g_corr_ff_s0"
+  "$CMN --can-attack correlated_signal+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 0 --tag c0gpw_corr_gated_s0"
+  "$CMN --can-attack correlated_signal+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 0 --tag c0gpw_corr_clatch_s0"
+  "$CMN --can-attack correlated_signal+masquerade $FF                                                    --seed 0 --tag c0gpw_corr_ff_s0"
 
   # ── rddlgn recompute-recurrence control (1 seed per hard attack) ───────────
   #    rddlgn has ONE update MLP (not candidate+gate), so $REC's hidden 1024 would give
   #    2*1024 = 2048 gates — half the matched budget. Override to hidden 2048 for exact
   #    4096-gate parity (the copy_rddlgn_rddlgn_eqgates precedent; argparse last-wins).
-  "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 0 --tag c0g_speedo_rddlgn_s0"
-  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 0 --tag c0g_rlon_rddlgn_s0"
+  "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 0 --tag c0gpw_speedo_rddlgn_s0"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 0 --tag c0gpw_rlon_rddlgn_s0"
 
   # ── FF strength sweep (speedo; make the stateless baseline honestly strong).
   #    Budgets differ from 4096 (recorded in the JSON) — these rows only matter if the
   #    matched ff loses: does MORE window/depth/gates close its gap?
-  "--task can --can-source road --seq-len 16 --can-id-enc onehot --can-top-ids 20 --can-dt-bins 8 --can-payload-bytes 8 --can-stride 4 --can-eval-stride 16 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --batch-size 128 --can-attack max_speedometer+masquerade --mechanism ff --can-flatten --hidden 1024 --seed 0 --tag c0g_speedo_ff_w16"
-  "--task can --can-source road --seq-len 64 --can-id-enc onehot --can-top-ids 20 --can-dt-bins 8 --can-payload-bytes 8 --can-stride 4 --can-eval-stride 16 --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --batch-size 128 --can-attack max_speedometer+masquerade --mechanism ff --can-flatten --hidden 4096 --seed 0 --tag c0g_speedo_ff_w64"
-  "$CMN --can-attack max_speedometer+masquerade --mechanism ff --can-flatten --hidden 2048 --cell-layers 4 --seed 0 --tag c0g_speedo_ff_deep"
+  "--task can --can-source road --seq-len 16 --can-id-enc onehot --can-top-ids 20 --can-dt-bins 8 --can-payload-bytes 8 --can-stride 4 --can-eval-stride 16 --can-pos-weight auto --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --batch-size 128 --can-attack max_speedometer+masquerade --mechanism ff --can-flatten --hidden 1024 --seed 0 --tag c0gpw_speedo_ff_w16"
+  "--task can --can-source road --seq-len 64 --can-id-enc onehot --can-top-ids 20 --can-dt-bins 8 --can-payload-bytes 8 --can-stride 4 --can-eval-stride 16 --can-pos-weight auto --iters 20000 --eval-freq 1000 --lr 0.003 --lr-min 0.0003 --batch-size 128 --can-attack max_speedometer+masquerade --mechanism ff --can-flatten --hidden 4096 --seed 0 --tag c0gpw_speedo_ff_w64"
+  "$CMN --can-attack max_speedometer+masquerade --mechanism ff --can-flatten --hidden 2048 --cell-layers 4 --seed 0 --tag c0gpw_speedo_ff_deep"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 

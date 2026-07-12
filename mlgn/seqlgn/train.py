@@ -217,6 +217,14 @@ def build_args():
     p.add_argument("--can-ambient", action="store_true",
                    help="road: also load data-can/road/ambient/ captures (all-benign; "
                         "last one held out for FPR reporting via the group split rule)")
+    p.add_argument("--can-pos-weight", default="1.0",
+                   help="positive(attack)-class weight in the CE loss for CAN detection "
+                        "(2-class). '1.0' = unweighted; 'auto' = neg/pos = (1-p)/p from "
+                        "the TRAIN frame attack rate. At ~2-3%% positives an unweighted CE "
+                        "collapses to the always-normal predictor (recall 0); this weights "
+                        "attack frames up so the model is penalised for missing them. "
+                        "Raises recall, may raise FPR - tune down (e.g. 10) if FPR climbs. "
+                        "Ignored for non-CAN / non-binary tasks.")
 
     p.add_argument("--lr", type=float, default=0.01)
     p.add_argument("--lr-min", type=float, default=-1.0,
@@ -305,6 +313,22 @@ def main():
                          for s in ("train", "val", "test"))
               + f"  splits={can_meta['splits']}")
 
+    # Positive-class weighting for CAN detection (counters always-normal collapse under
+    # the ~2-3% attack-frame imbalance). Only for binary CAN tasks; a no-op elsewhere.
+    can_pos_weight = 1.0
+    ce_weight = None
+    if can_meta is not None and task.num_classes == 2 and args.can_pos_weight != "1.0":
+        if args.can_pos_weight == "auto":
+            p_pos = can_meta["attack_frac_frames"]["train"]
+            can_pos_weight = (1.0 - p_pos) / p_pos if p_pos and p_pos > 0 else 1.0
+        else:
+            can_pos_weight = float(args.can_pos_weight)
+        ce_weight = torch.tensor([1.0, can_pos_weight], device=device)
+        print(f"[can] positive-class weight = {can_pos_weight:.2f} "
+              f"({'auto neg/pos' if args.can_pos_weight == 'auto' else 'manual'})")
+    elif args.can_pos_weight != "1.0" and can_meta is None:
+        print("[warn] --can-pos-weight set but this is not a CAN task -> ignored")
+
     # latch bistable-restore anneal window (START,END fractions of training); None = hard from step 0.
     anneal_window = None
     if args.anneal:
@@ -339,7 +363,7 @@ def main():
         else:
             print(f"[init] --init-from {args.init_from} not found -> fresh start")
 
-    loss_fn = torch.nn.CrossEntropyLoss()
+    loss_fn = torch.nn.CrossEntropyLoss(weight=ce_weight)  # ce_weight=None -> unweighted
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     # TODO(future): make the LR schedule a first-class, pluggable choice - an explicit
     # `--lr-schedule {none,cosine,linear,step,...}` selected independently, rather than
@@ -581,6 +605,7 @@ def main():
         "can_frames": _cm.get("frames"), "can_windows": _cm.get("windows"),
         "can_attack_frac": _cm.get("attack_frac_frames"),
         "can_attack_frac_windows_test": _cm.get("attack_frac_windows_test"),
+        "can_pos_weight": can_pos_weight if can_meta else None,
         "test_tp": conf["tp"] if conf else None, "test_fp": conf["fp"] if conf else None,
         "test_tn": conf["tn"] if conf else None, "test_fn": conf["fn"] if conf else None,
         "test_fpr": conf["fpr"] if conf else None,
