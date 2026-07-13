@@ -263,8 +263,22 @@ recurrence-earns-its-keep signal, where the task is learnable. Fix: **`--can-pos
 (train.py; `auto` = neg/pos on the train frame rate) — validated on the fixture, recall
 0.00→0.31 / F1 0.00→0.47 at FPR 0.002 (a too-gentle weight of 6 still collapsed → use
 `auto`). run_queue_c0g.sh re-tagged `c0g_*→c0gpw_*` (round 1 kept as the unweighted-collapse
-baseline for the paper). **Round 2 = re-run the queue with the weight; the gate verdict is
-pending on it, NOT decided.**
+baseline for the paper).
+
+**C0.g round 2 (2026-07-13, pos-weighted) — GATE PASSES its core question; register beats
+both controls.** Recall (means, low FPR everywhere): correlated_signal gated/clatch **0.94**
+vs ff 0.57; max_speedometer gated **0.75**(n=1)/clatch 0.51 vs ff 0.11, rddlgn 0.49;
+reverse_light_on gated/clatch **0.23** vs ff 0.04, rddlgn 0.03. **Two headlines:** (1) the
+register arms (gated/clatch) beat the matched windowed-feedforward on all three attacks
+(~5–7× on the hard ones) — recurrence earns its keep, bearings fallback NOT triggered;
+(2) **rddlgn (recompute-recurrence) fails alongside ff** on the hard attacks → it's the
+exact-binary REGISTER, not generic recurrence, that carries detection — a sharper claim
+than the gate tested, straight onto the P2 register thesis. reverse_light_on is the
+cleanest separator (no ff variant >0.06). **NOT yet paper-tight:** gated max_speedometer
+is n=1 (s0/s1 were 100%-full-disk casualties — re-run), high seed variance (clatch speedo
+0.18–0.75), a 4-layer `ff_deep` reaches 0.70 on speedo only (budget-mismatched), and
+absolute recall on rlon is modest (~0.24). Firm-up = re-run gated speedo s0/s1 + a few
+more seeds. Round-1 (c0g_*, unweighted collapse) kept as the baseline.
 
 **All four board-independent tracks are complete + adversarially verified.** Remaining is
 **USER actions only:** (1) launch the CAN C0.g DUST queue (the flagship gate verdict);
