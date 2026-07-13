@@ -7,6 +7,13 @@ P3a sprint banked the emitter, synthesis, and verification demo) AND research/22
 sequencing of CAN-IDS as post-P3b (pulled forward, see Decision 2). Operationalizes
 research/10 (FPGA scout), research/16 §C (drones/Kyushu), research/22 (applications)._
 
+> **⏸ PARKED 2026-07-13** to focus on the P1/P2 papers. **The self-contained findings +
+> resume point is `../paper/p3b/findings.md`** — read that first to pick this back up.
+> Status at park: T1/T2 hardware done (367.9 MHz measured), CAN carrier PASSES (recurrence
+> > ff; register > recompute clean on rlon), flight D1 recalibrated-and-queued (round 1
+> undertrained → `run_queue_d1.sh` tags `d1v2_*` ready to re-run). This is a head start —
+> a 3rd paper for the Dec'26→Japan gap, or a PhD-start publication runway.
+
 ## THE DECISIONS (both 2026-07-11)
 
 ### 1. Kyushu pitch leads; tool paper follows on the same trunk

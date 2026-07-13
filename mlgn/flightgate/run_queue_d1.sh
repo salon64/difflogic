@@ -71,41 +71,56 @@ cd "$ROOT"
 GPUS=(0 1)
 
 # ── EDIT ME: one line per run; keep each --tag unique ────────────────────────
-CMN="--backend hover --hidden 432 --bits 16 --n-bins 9 --cell-layers 2 --rounds 4 --episodes 50 --eval-episodes 50 --iters 2000 --batch-size 16 --bptt 0 --lr 0.01 --settle-frac 0.25 --save-traj"
-REC="--keep-bias 3.0"                     # gated/clatch: 1,728 gates @ hidden 432
-BK="--blackout 0.02,6,12"                 # blackout-ON: 0.2–0.4 s bursts @ 30 Hz (recon)
+# ROUND-2 RECALIBRATION (2026-07-13, tags d1v2_*). Round 1 (d1_*) was INCONCLUSIVE:
+# every student arm exited the envelope 100% in BOTH conditions (returns 15-51 vs
+# teacher 440) and even the a' oracle exited 97% -> the policy never learned to hover
+# at all (undertraining, visible in the no-blackout control), so the gate had no room
+# to measure memory. This round: (1) SCALE the distillation hard (hidden 432->864,
+# iters 2000->8000, rounds 4->6, episodes 50->100, batch 16->32; GPU time is free) so
+# the students first learn to FLY the control; (2) SOFTEN the blackout (0.2-0.4s ->
+# 0.13-0.27s bursts) so a memory policy can bridge it and the a' ceiling stays flyable.
+# Round 1's d1_* results are preserved as the undertrained baseline.
+# READ-BACK: python -m mlgn.flightgate.gate_eval --results-dir mlgn/flightgate/results \
+#            --glob 'flightgate_hover_*_d1v2_*.json'
+# Success signal to watch FIRST: control-condition students' envelope_exit << 100%
+# (they can hover); only then does the blackout comparison mean anything. If the
+# control still exits ~100% at this scale, the bottleneck is architectural (action
+# discretization / DAgger / head), not compute -- diagnose before adding seeds.
+CMN="--backend hover --hidden 864 --bits 16 --n-bins 9 --cell-layers 2 --rounds 6 --episodes 100 --eval-episodes 50 --iters 8000 --batch-size 32 --bptt 0 --lr 0.01 --settle-frac 0.25 --save-traj"
+REC="--keep-bias 3.0"                     # gated/clatch: matched gates @ hidden 864 (2x round 1)
+BK="--blackout 0.02,4,8"                  # blackout-ON: 0.13–0.27 s bursts @ 30 Hz (softened)
 NB="--no-blackout"                        # non-vacuity CONTROL
 
 JOBS=(
   # ── velocity-range calibration snapshot (run first; inspect the preview) ────
-  "--backend hover --episodes 50 --eval-episodes 10 $BK --teacher-only --seed 0 --tag d1_calib_s0"
+  "--backend hover --episodes 50 --eval-episodes 10 $BK --teacher-only --seed 0 --tag d1v2_calib_s0"
 
   # ── a' CEILING (PID on the masked obs; blackout only, 3 seeds) ─────────────
-  "--backend hover --eval-episodes 50 $BK --teacher-masked --seed 0 --tag d1_aprime_bk_s0"
-  "--backend hover --eval-episodes 50 $BK --teacher-masked --seed 1 --tag d1_aprime_bk_s1"
-  "--backend hover --eval-episodes 50 $BK --teacher-masked --seed 2 --tag d1_aprime_bk_s2"
+  "--backend hover --eval-episodes 50 $BK --teacher-masked --seed 0 --tag d1v2_aprime_bk_s0"
+  "--backend hover --eval-episodes 50 $BK --teacher-masked --seed 1 --tag d1v2_aprime_bk_s1"
+  "--backend hover --eval-episodes 50 $BK --teacher-masked --seed 2 --tag d1v2_aprime_bk_s2"
 
   # ── BLACKOUT-ON (gate-deciding): 3 arms x 3 seeds ──────────────────────────
-  "$CMN --arm gated  $REC                 $BK --seed 0 --tag d1_gated_bk_s0"
-  "$CMN --arm gated  $REC                 $BK --seed 1 --tag d1_gated_bk_s1"
-  "$CMN --arm gated  $REC                 $BK --seed 2 --tag d1_gated_bk_s2"
-  "$CMN --arm clatch $REC --anneal 0.1,0.6 $BK --seed 0 --tag d1_clatch_bk_s0"
-  "$CMN --arm clatch $REC --anneal 0.1,0.6 $BK --seed 1 --tag d1_clatch_bk_s1"
-  "$CMN --arm clatch $REC --anneal 0.1,0.6 $BK --seed 2 --tag d1_clatch_bk_s2"
-  "$CMN --arm ff                          $BK --seed 0 --tag d1_ff_bk_s0"
-  "$CMN --arm ff                          $BK --seed 1 --tag d1_ff_bk_s1"
-  "$CMN --arm ff                          $BK --seed 2 --tag d1_ff_bk_s2"
+  "$CMN --arm gated  $REC                 $BK --seed 0 --tag d1v2_gated_bk_s0"
+  "$CMN --arm gated  $REC                 $BK --seed 1 --tag d1v2_gated_bk_s1"
+  "$CMN --arm gated  $REC                 $BK --seed 2 --tag d1v2_gated_bk_s2"
+  "$CMN --arm clatch $REC --anneal 0.1,0.6 $BK --seed 0 --tag d1v2_clatch_bk_s0"
+  "$CMN --arm clatch $REC --anneal 0.1,0.6 $BK --seed 1 --tag d1v2_clatch_bk_s1"
+  "$CMN --arm clatch $REC --anneal 0.1,0.6 $BK --seed 2 --tag d1v2_clatch_bk_s2"
+  "$CMN --arm ff                          $BK --seed 0 --tag d1v2_ff_bk_s0"
+  "$CMN --arm ff                          $BK --seed 1 --tag d1v2_ff_bk_s1"
+  "$CMN --arm ff                          $BK --seed 2 --tag d1v2_ff_bk_s2"
 
   # ── NO-BLACKOUT CONTROL (non-vacuity): 3 arms x 3 seeds — ff MUST match here ─
-  "$CMN --arm gated  $REC                 $NB --seed 0 --tag d1_gated_nb_s0"
-  "$CMN --arm gated  $REC                 $NB --seed 1 --tag d1_gated_nb_s1"
-  "$CMN --arm gated  $REC                 $NB --seed 2 --tag d1_gated_nb_s2"
-  "$CMN --arm clatch $REC --anneal 0.1,0.6 $NB --seed 0 --tag d1_clatch_nb_s0"
-  "$CMN --arm clatch $REC --anneal 0.1,0.6 $NB --seed 1 --tag d1_clatch_nb_s1"
-  "$CMN --arm clatch $REC --anneal 0.1,0.6 $NB --seed 2 --tag d1_clatch_nb_s2"
-  "$CMN --arm ff                          $NB --seed 0 --tag d1_ff_nb_s0"
-  "$CMN --arm ff                          $NB --seed 1 --tag d1_ff_nb_s1"
-  "$CMN --arm ff                          $NB --seed 2 --tag d1_ff_nb_s2"
+  "$CMN --arm gated  $REC                 $NB --seed 0 --tag d1v2_gated_nb_s0"
+  "$CMN --arm gated  $REC                 $NB --seed 1 --tag d1v2_gated_nb_s1"
+  "$CMN --arm gated  $REC                 $NB --seed 2 --tag d1v2_gated_nb_s2"
+  "$CMN --arm clatch $REC --anneal 0.1,0.6 $NB --seed 0 --tag d1v2_clatch_nb_s0"
+  "$CMN --arm clatch $REC --anneal 0.1,0.6 $NB --seed 1 --tag d1v2_clatch_nb_s1"
+  "$CMN --arm clatch $REC --anneal 0.1,0.6 $NB --seed 2 --tag d1v2_clatch_nb_s2"
+  "$CMN --arm ff                          $NB --seed 0 --tag d1v2_ff_nb_s0"
+  "$CMN --arm ff                          $NB --seed 1 --tag d1v2_ff_nb_s1"
+  "$CMN --arm ff                          $NB --seed 2 --tag d1v2_ff_nb_s2"
 )
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -140,4 +155,4 @@ for k in "${!GPUS[@]}"; do
 done
 wait
 echo "$(ts) ALL DONE"
-echo "$(ts) gate table: python -m mlgn.flightgate.gate_eval --results-dir mlgn/flightgate/results --glob 'flightgate_hover_*_d1_*.json'"
+echo "$(ts) gate table: python -m mlgn.flightgate.gate_eval --results-dir mlgn/flightgate/results --glob 'flightgate_hover_*_d1v2_*.json'"
