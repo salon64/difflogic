@@ -106,6 +106,20 @@ JOBS=(
   "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 0 --tag c0gpw_speedo_rddlgn_s0"
   "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 0 --tag c0gpw_rlon_rddlgn_s0"
 
+  # ── ROUND-2 FIRM-UP (2026-07-13). rddlgn to n=3 on both hard attacks = the
+  #    decisive test of "register beats recompute-recurrence" (round-2 rddlgn was
+  #    n=1: kept pace on speedo, failed like ff on rlon). + gated/clatch seed 3 to
+  #    tighten the high register-arm variance (speedo spanned .16-.75). Existing
+  #    c0gpw_ tags skip-resume, so re-running the queue runs ONLY these new rows.
+  "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 1 --tag c0gpw_speedo_rddlgn_s1"
+  "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 2 --tag c0gpw_speedo_rddlgn_s2"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 1 --tag c0gpw_rlon_rddlgn_s1"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism rddlgn --keep-bias 0 --hidden 2048 --seed 2 --tag c0gpw_rlon_rddlgn_s2"
+  "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism gated  --keep-bias 1                 --seed 3 --tag c0gpw_speedo_gated_s3"
+  "$CMN --can-attack max_speedometer+masquerade  $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 3 --tag c0gpw_speedo_clatch_s3"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism gated  --keep-bias 1                 --seed 3 --tag c0gpw_rlon_gated_s3"
+  "$CMN --can-attack reverse_light_on+masquerade $REC --mechanism clatch --keep-bias 1 --anneal 0.1,0.6 --seed 3 --tag c0gpw_rlon_clatch_s3"
+
   # ── FF strength sweep (speedo; make the stateless baseline honestly strong).
   #    Budgets differ from 4096 (recorded in the JSON) — these rows only matter if the
   #    matched ff loses: does MORE window/depth/gates close its gap?
