@@ -235,13 +235,18 @@ A 13-agent recon→build→adversarial-verify workflow executed the in-lane part
   on a 4th family (reverse_light_off). Leakage-safe whole-capture holdout, input_dim=93.
   Real-data train.py smoke ran end-to-end (exit 0). The highest-risk silent-failure item is
   discharged. **Remaining = the gate itself (DUST GPU, hidden 1024–2048/20k iters).**
-- **D1 (flight) — DONE, DUST-ready, verified.** `mlgn/flightgate/` closed-loop DAgger
-  (gated/clatch/ff, matched 1,728 gates @ hidden 432); mock gate 5/5. **All prior gaps
-  closed:** `run_queue_d1.sh` (22-job queue, 3 arms × {control,blackout} × 3 seeds + a′ +
-  calib), `gate_eval.py` (+ test) building the three-arm WIN/FAIL table, the a′
-  teacher-on-masked-obs ceiling arm (`--teacher-masked`; bit-exact obs→state shim), and
-  tempered jitter. Caveat: velocity thermometer ranges still placeholders — the queue's
-  first `--teacher-only` calib job freezes them.
+- **D1 (flight) — RAN on DUST 2026-07-13; gate FAILS but INCONCLUSIVE (mis-calibrated,
+  do NOT fire the pivot).** `mlgn/flightgate/` closed-loop DAgger (gated/clatch/ff @ hidden
+  432, matched 1,728 gates); `run_queue_d1.sh` 22 jobs; `gate_eval.py` table. Result: verdict
+  FAIL (blackout return gated 20.8 / clatch 16.5 < ff 34.3), BUT **no arm actually flew —
+  every student exits the envelope 100% in both conditions, returns 15–51 vs teacher 440, and
+  the a′ oracle-on-masked-obs itself exits 97%.** So ff is only "least-catastrophic," and the
+  memory-required task as configured is near-impossible for anything → the gate can't measure
+  whether memory helps (this is flight's "CAN round-1"). Discretization gap ≈ 0 (models fine).
+  **Fix before re-run:** soften the blackout/jitter so the a′ ceiling can hold the envelope
+  (then students have separation room) and/or scale training (returns far below teacher =
+  undertrained). Pivot rule (→ verified feedforward controller) stays UNTRIGGERED pending a
+  calibrated re-run. Ran on base CUDA torch + conda-forge pybullet (off the 8 GB quota).
 - **T2 open-flow P&R — DONE (headline above): 367.9 MHz / 43.5 ns-decision on xc7a35t.**
   `netlist/synth/run_pnr.sh` + `build_chipdb.sh`, report.md §8; openXC7 snaps in WSL.
 - **extract-can — DONE, verified CONFIRMED.** `netlist/extract.py` `can`/`can-syn` RunSpec:
@@ -271,15 +276,17 @@ ff 0.57; max_speedometer gated **0.49**(n=3, .16–.75)/clatch 0.51(n=3, .18–.
 rddlgn 0.49(n=1); reverse_light_on gated/clatch **0.23**(n=3) vs ff 0.04, rddlgn 0.03(n=1).
 **Solid headline — recurrence earns its keep:** recurrent LGNs beat the gate-matched
 windowed-feedforward on BOTH hard attacks (~4–6×); bearings fallback NOT triggered.
-**Register-specific sub-claim is attack-dependent (walked back from the first read):** on
-reverse_light_on the register arms (0.23) beat BOTH ff (0.04) AND rddlgn/recompute-recurrence
-(0.03) — register-specific; but on max_speedometer rddlgn KEEPS PACE with the register
-(~0.49), so it's just recurrence-over-feedforward there. rddlgn is n=1 per attack → cannot
-carry the "register > recompute" headline until seeded. **NOT paper-tight:** register arms
-high-variance (gated/clatch speedo .16–.75); a 4-layer `ff_deep` reaches 0.70 on speedo only
-(budget-mismatched); rlon absolute recall modest (~0.23). Firm-up = rddlgn seeds (for the
-register-specific claim) + more register seeds (variance). Round-1 (c0g_*, unweighted
-collapse) kept as the baseline.
+**Register-specific claim HOLDS (firm-up seeds, 2026-07-13, rddlgn now n=3):** the register
+arms beat recompute-recurrence (rddlgn) on both hard attacks — max_speedometer gated 0.49/
+clatch 0.51 > rddlgn **0.36** > ff 0.11; reverse_light_on gated 0.21/clatch 0.19 >> rddlgn
+**0.03** ≈ ff 0.04. On reverse_light_on it's a CLEAN, non-overlapping separation (gated
+0.12–0.32 vs controls ~0.02–0.05) = register-specific, not generic recurrence. On speedo the
+ordering register>recompute>ff is real in the means but register [.16–.75] and rddlgn [.21–.49]
+ranges OVERLAP (high variance) → suggestive there, clean on rlon. (NB: an earlier single-seed
+rddlgn=0.49 on speedo made this look attack-dependent; n=3 corrected it.) **NOT paper-tight:**
+register arms high-variance (speedo .16–.75); a 4-layer `ff_deep` reaches 0.70 on speedo only
+(budget-mismatched); rlon absolute recall modest (~0.20). Round-1 (c0g_*, unweighted collapse)
+kept as the baseline.
 
 **All four board-independent tracks are complete + adversarially verified.** Remaining is
 **USER actions only:** (1) launch the CAN C0.g DUST queue (the flagship gate verdict);
