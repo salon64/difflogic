@@ -93,21 +93,51 @@ P3a property machinery (`distractor_decode` = no-false-trip; shadow-armed `proto
 bounded detection latency) ports to the CAN input automaton. Not yet exercised on a CAN
 checkpoint; that's the paper's "certified IDS" payoff.
 
-### 1.3 Flight gate (D1) — inconclusive, recalibrated
+### 1.3 Flight gate (D1) — DIAGNOSED: hover distillation doesn't converge to a flyable policy
 
 The thesis gate: does a memory cell hold belief-state through sensor blackout where a
-stateless net degrades? **Round 1 (tags `d1_*`) is inconclusive, NOT a negative:** every
-student arm exited the envelope 100% in *both* conditions (returns 15–51 vs teacher 440), and
-even the a′ oracle-on-masked-obs exited 97%. Nothing learned to hover — the policy fails in
-the *no-blackout control* too, so it's **undertraining**, and the gate had no room to measure
-memory (discretization gap ≈ 0, so the models discretize fine — it's the policy that's bad).
-**The pivot rule (→ verified feedforward controller) did NOT fire** — that would be the wrong
-read of this data. This is flight's analogue of the CAN round-1 collapse.
+stateless net degrades? **Two rounds, same outcome:** every student arm (gated/clatch/ff)
+exits the envelope **100% in both conditions** (returns 15–70 vs teacher 440). Round 1
+(`d1_*`) looked like undertraining; **round 2 (`d1v2_*`, 4× the training + softer blackout)
+came back identical → it's NOT compute, it's the distillation.** Diagnosed from the per-round
+logs:
 
-**Recalibration is queued** (`run_queue_d1.sh`, tags `d1v2_*`): scale the distillation
-(hidden 432→864, iters 2000→8000, rounds 4→6, episodes 50→100) so the students first learn to
-fly the *control*, and soften the blackout (0.2–0.4 s → 0.13–0.27 s bursts) so a memory policy
-can bridge it. Round 1 (`d1_*`) preserved as the undertrained baseline.
+- **The training loss is unstable, not plateaued-low.** Starts at 2.20 (= ln 9, random over
+  9 bins/motor), dips to a best of **1.2–1.5**, then **drifts back up to ~1.6 by the end** —
+  non-monotone — and **4/18 runs hit NaN (all on the recurrent arms; zero on ff)**. So the
+  optimizer partially learns, then degrades/diverges; the final policy is worse than its own
+  mid-training best. lr 0.01 + BPTT-through-discrete-recurrence is the prime suspect.
+- **The target is achievable and the discretization is fine:** teacher-through-9-bins hovers
+  perfectly (return 464, 4% exit, quant-gate ratio 1.02). So 9 bins fly; the student just
+  can't hit them (best action-match ~50%, insufficient for a knife-edge-unstable hover).
+- **The method works on easy dynamics:** the mock 2D point-mass env trains fine (mock gate
+  5/5, loss decreases, students control it). So the logic+DAgger stack is sound — **it's
+  quadrotor hover specifically that the discrete logic policy can't track.**
+- **Recurrence HURT here:** the recurrent arms take all the NaNs and fly *worse* than the
+  stateless ff (control return ff 70 vs gated/clatch ~20) — the opposite of the memory
+  hypothesis. But moot, since nothing flies.
+
+**What this means:** the memory question is unanswerable (no arm flies the control), AND the
+pre-committed pivot ("verified *feedforward* flight controller") **also fails** — ff doesn't
+fly hover either. The drone-*hover* framing, as built, does not yield a flyable logic
+controller. This is a real finding, not a tuning bug; scale and blackout-softening both ruled
+out. **Implication for the Kyushu pitch:** don't promise "recurrent logic flight brain beats
+feedforward under occlusion" on hover — lead the pitch with the CAN/verification results that
+*work*, and treat the drone as a forgiving-task or exploratory rung.
+
+**Resume options (ranked), for when flight is un-parked:**
+1. **Move the memory demo to a task logic policies CAN fly** (most promising): the mock 2D
+   point-mass already trains; a rate-stabilized hover, waypoint-following, or slower dynamics
+   where the student reaches teacher-level — then add the occlusion to test memory. This puts
+   the memory comparison on solvable ground.
+2. **Optimization fixes** (cheap first try, likely insufficient alone): lr 0.01→0.001–0.003,
+   tighter grad-clip / verify the NaN step-skip guard fires, shorter BPTT window on the
+   recurrent arms. Might get below the 1.2 loss floor — but ff (no BPTT) plateaus too, so fit
+   precision is also a wall.
+3. **Reframe** the drone thesis away from unstable-hover control toward a task where logic
+   policies achieve flyable fidelity, or toward verified-control-on-a-simpler-platform.
+
+Round-1 `d1_*` and round-2 `d1v2_*` both committed as the record.
 
 ## 2. Where this becomes papers
 

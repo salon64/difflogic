@@ -242,8 +242,20 @@ A 13-agent recon→build→adversarial-verify workflow executed the in-lane part
   on a 4th family (reverse_light_off). Leakage-safe whole-capture holdout, input_dim=93.
   Real-data train.py smoke ran end-to-end (exit 0). The highest-risk silent-failure item is
   discharged. **Remaining = the gate itself (DUST GPU, hidden 1024–2048/20k iters).**
-- **D1 (flight) — RAN on DUST 2026-07-13; gate FAILS but INCONCLUSIVE (mis-calibrated,
-  do NOT fire the pivot).** `mlgn/flightgate/` closed-loop DAgger (gated/clatch/ff @ hidden
+- **D1 (flight) — v2 DIAGNOSED 2026-07-18: hover distillation does not converge to a
+  flyable policy (task/optimization, not memory).** Round 2 (`d1v2_*`, 4× training + softer
+  blackout) came back IDENTICAL to round 1 — every arm 100% envelope exit in both conditions.
+  Per-round logs: loss 2.20 (random) → best 1.2–1.5 → drifts back to ~1.6, **4/18 runs NaN
+  (all recurrent)** = unstable optimization (lr 0.01 + BPTT-through-discrete-recurrence).
+  Target IS achievable (teacher-through-9-bins flies, ret 464) and the method works on easy
+  dynamics (mock 2D trains) — so it's quadrotor-hover-specific. **The memory question is
+  unanswerable AND the pivot-to-feedforward ALSO fails (ff doesn't fly hover either)**;
+  recurrence actively HURT (all NaNs, worse return than ff). Resume options (findings §1.3):
+  (1) move the memory demo to a flyable task [best], (2) optimization fixes lr↓/clip/short-BPTT
+  [cheap, likely insufficient], (3) reframe. **Kyushu pitch: lead with CAN/verification (works),
+  drone = forgiving-task/exploratory.** [historical v1 note follows:]
+- **D1 round 1 — RAN on DUST 2026-07-13; FAILS but looked INCONCLUSIVE (superseded by the v2
+  diagnosis above).** `mlgn/flightgate/` closed-loop DAgger (gated/clatch/ff @ hidden
   432, matched 1,728 gates); `run_queue_d1.sh` 22 jobs; `gate_eval.py` table. Result: verdict
   FAIL (blackout return gated 20.8 / clatch 16.5 < ff 34.3), BUT **no arm actually flew —
   every student exits the envelope 100% in both conditions, returns 15–51 vs teacher 440, and
