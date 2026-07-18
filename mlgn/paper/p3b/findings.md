@@ -153,10 +153,19 @@ feedforward under occlusion" on hover — lead the pitch with the CAN/verificati
      picked-over → novelty).
    - Motor/prop/ESC **vibration/current fault** (the bearings-scout angle on drones); DVS/
      event-camera high-speed classification (LGN-native binary streams) = a bigger stretch.
-   **Kyushu pitch reshape:** "a verified, ns-latency on-board fault/attack detector for UAVs"
-   (fast, simple, on the FPGA already there) — NOT "logic flies the drone." Keeps a real
-   flight-data result in the LGN sweet spot + the Vargas robustness handshake, no control loop.
-   *(Needs a proper novelty scout + the recurrence-earns-its-keep check before committing.)*
+   **Kyushu pitch reshape:** "a verified on-board fault detector for UAVs" — NOT "logic flies
+   the drone." **SCOUTED 2026-07-18 → `../../research/25_uav_detector_scout.md`:** variant (a)
+   FAULT detection = **CONDITIONAL ~60%**; variant (b) GPS-spoofing = **NO-GO** (R2U2 +
+   accuracy saturation + Tsetlin race). Hard corrections from the scout: (i) **recurrence does
+   NOT earn its keep on UAV telemetry** (AeroTSBoost 2605.25639 refutes it on ALFA+UAV-SEAD) →
+   use a **windowed-feedforward LGN**, recurrence = ablation only; (ii) **drop FPGA-speed and
+   recurrent-LGN from the headline** — both pre-claimed (Princeton CLGN 2511.01908 "…and
+   beyond"; ETH RDDLGN 2508.06097 now published); (iii) the ONLY surviving moat is
+   **a machine-checked TEMPORAL detection theorem (bounded latency / no-false-trip) proved on a
+   LEARNED gate-level circuit** — vs R2U2 (Rozier), the must-cite competitor that owns
+   hand-authored verified on-board UAV monitors. **GATE before committing:** prove one
+   substantive, R2U2-hard temporal theorem on a windowed-FF UAV-SEAD/ALFA detector at real latch
+   count, at competitive AUPRC; if you can't, it collapses into R2U2 — drop.
 
 Round-1 `d1_*` and round-2 `d1v2_*` both committed as the record.
 
