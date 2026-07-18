@@ -134,8 +134,29 @@ feedforward under occlusion" on hover — lead the pitch with the CAN/verificati
    tighter grad-clip / verify the NaN step-skip guard fires, shorter BPTT window on the
    recurrent arms. Might get below the 1.2 loss floor — but ff (no BPTT) plateaus too, so fit
    precision is also a wall.
-3. **Reframe** the drone thesis away from unstable-hover control toward a task where logic
-   policies achieve flyable fidelity, or toward verified-control-on-a-simpler-platform.
+3. **Reframe the drone thesis from CONTROL to DETECTION** (the strongest option — 2026-07-18).
+   LGNs fit *fast, simple, supervised sub-components*, not the closed control loop (this run
+   is the evidence). The right drone task is the flight twin of the CAN-IDS carrier: a
+   streaming telemetry **fault/attack detector** — non-RL, per-sample, on-board, latency-
+   critical — which reuses the CAN recurrent-detection pipeline ~1:1 and keeps the
+   recurrence-earns-its-keep gate testable (stateful vs windowed-FF). Verified candidate data:
+   - **ALFA** (arXiv:1907.06268, CMU; kilthub repo + `castacks/alfa-dataset-tools`) — REAL
+     fixed-wing UAV flights with labeled engine + control-surface faults, ground-truth timing.
+     "Only dataset with real flight data with faults in such capacity." **Top pick** (fault
+     detection is ms-critical on-board = the LGN speed niche; direct pipeline reuse).
+   - **UAV cyber-attack / GPS-spoofing IDS** — the truest CAN-IDS analog, airborne: "Cyber-
+     Physical Dataset for UAVs Under Normal Operation and Attacks" (IEEE DataPort; DoS/MITM/
+     GPS-spoof + telemetry), plus GPS spoofing/jamming sets (PX4/Gazebo; XGBoost ~0.998 F1, so
+     learnable). Dovetails with Vargas's adversarial-robustness agenda (spoofing = sensor
+     attack).
+   - **UAV-SEAD** (arXiv:2602.13900, 2026) — fresh state-estimation-anomaly dataset (less
+     picked-over → novelty).
+   - Motor/prop/ESC **vibration/current fault** (the bearings-scout angle on drones); DVS/
+     event-camera high-speed classification (LGN-native binary streams) = a bigger stretch.
+   **Kyushu pitch reshape:** "a verified, ns-latency on-board fault/attack detector for UAVs"
+   (fast, simple, on the FPGA already there) — NOT "logic flies the drone." Keeps a real
+   flight-data result in the LGN sweet spot + the Vargas robustness handshake, no control loop.
+   *(Needs a proper novelty scout + the recurrence-earns-its-keep check before committing.)*
 
 Round-1 `d1_*` and round-2 `d1v2_*` both committed as the record.
 
