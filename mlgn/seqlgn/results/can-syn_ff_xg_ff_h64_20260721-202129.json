@@ -1,0 +1,230 @@
+{
+  "task": "can-syn",
+  "mechanism": "ff",
+  "seq_len": 1,
+  "test_seq_len": 1,
+  "input_dim": 120,
+  "num_classes": 2,
+  "latch_kind": null,
+  "hard_state": null,
+  "hard_control": null,
+  "anneal": null,
+  "hidden": 64,
+  "cell_layers": 2,
+  "keep_bias": null,
+  "tau": 30.0,
+  "grad_factor": 1.0,
+  "grad_clip": 1.0,
+  "lr": 0.01,
+  "lr_min": -1.0,
+  "entropy_reg": 0.0,
+  "entropy_ramp": 1.0,
+  "margin_reg": 0.0,
+  "deep_sup": 0.0,
+  "running_target": false,
+  "alphabet": 8,
+  "chunk": 1,
+  "delay": 0,
+  "distractors": 8,
+  "sel_flag": false,
+  "init_from": "",
+  "eval_freq": 500,
+  "tag": "xg_ff_h64",
+  "state_mushy_by_t": null,
+  "batch_size": 64,
+  "iters": 2000,
+  "seed": 0,
+  "device": "cpu",
+  "logic_gates": 128,
+  "best_val": 0.8540249433106576,
+  "test_acc": 0.8602111722768703,
+  "test_soft": 0.8865625846042776,
+  "discretization_gap": 0.026351412327407342,
+  "n_skipped": 0,
+  "train_minutes": 0.47461413145065307,
+  "can_source": "syn",
+  "can_file": null,
+  "can_attack": "all",
+  "can_ambient": false,
+  "can_window": 8,
+  "can_stride": 1,
+  "can_eval_stride": 1,
+  "can_id_enc": "onehot",
+  "can_top_ids": 20,
+  "can_dt_bins": 8,
+  "can_dt_global": false,
+  "can_dt_edges": [
+    0.009047260000001816,
+    0.012836830081243715,
+    0.018213714045433704,
+    0.025842780283704417,
+    0.03666738651578074,
+    0.05202602890005039,
+    0.07381785123801991,
+    0.10473747999999972
+  ],
+  "can_dt_edges_global": null,
+  "can_id_vocab": [
+    "0x0B0",
+    "0x110",
+    "0x185",
+    "0x224",
+    "0x2A9",
+    "0x333"
+  ],
+  "can_payload_bytes": 0,
+  "can_per_step": false,
+  "can_flatten": true,
+  "can_split": {
+    "syn_ambient_1": "time-split(0.7/0.1/0.2)",
+    "syn_masquerade_1": "train",
+    "syn_masquerade_2": "val",
+    "syn_masquerade_3": "test",
+    "syn_suspension_1": "train",
+    "syn_suspension_2": "val",
+    "syn_suspension_3": "test"
+  },
+  "can_split_boundaries": {
+    "syn_ambient_1": [
+      [
+        "train",
+        0.009384,
+        13.995053
+      ],
+      [
+        "val",
+        14.001286,
+        15.992112
+      ],
+      [
+        "test",
+        15.996029,
+        19.992561
+      ]
+    ],
+    "syn_masquerade_1": [
+      [
+        "train",
+        0.010483,
+        19.99822
+      ]
+    ],
+    "syn_masquerade_2": [
+      [
+        "val",
+        0.009418,
+        19.994027
+      ]
+    ],
+    "syn_masquerade_3": [
+      [
+        "test",
+        0.009063,
+        19.997929
+      ]
+    ],
+    "syn_suspension_1": [
+      [
+        "train",
+        0.010771,
+        19.997511
+      ]
+    ],
+    "syn_suspension_2": [
+      [
+        "val",
+        0.009645,
+        19.996976
+      ]
+    ],
+    "syn_suspension_3": [
+      [
+        "test",
+        0.009421,
+        19.995365
+      ]
+    ]
+  },
+  "can_frames": {
+    "train": 13645,
+    "val": 10605,
+    "test": 11102
+  },
+  "can_windows": {
+    "train": 13624,
+    "val": 10584,
+    "test": 11081
+  },
+  "can_attack_frac": {
+    "train": 0.13045071454745327,
+    "val": 0.1684111268269684,
+    "test": 0.1601513240857503
+  },
+  "can_attack_frac_windows_test": 0.16045483946800232,
+  "can_pos_weight": 6.665730337078652,
+  "test_tp": 474,
+  "test_fp": 245,
+  "test_tn": 9058,
+  "test_fn": 1304,
+  "test_fpr": 0.02633559066967645,
+  "test_recall": 0.26659167604049494,
+  "test_precision": 0.6592489568845619,
+  "test_f1": 0.37965558670404487,
+  "grad_profile": null,
+  "gate_totals": [
+    5,
+    4,
+    4,
+    14,
+    4,
+    14,
+    11,
+    8,
+    7,
+    11,
+    11,
+    3,
+    13,
+    9,
+    8,
+    2
+  ],
+  "gate_distribution": {
+    "cell.update.net.0": [
+      3,
+      3,
+      2,
+      5,
+      2,
+      8,
+      6,
+      4,
+      3,
+      7,
+      2,
+      3,
+      3,
+      7,
+      4,
+      2
+    ],
+    "cell.update.net.1": [
+      2,
+      1,
+      2,
+      9,
+      2,
+      6,
+      5,
+      4,
+      4,
+      4,
+      9,
+      0,
+      10,
+      2,
+      4,
+      0
+    ]
+  }
+}
