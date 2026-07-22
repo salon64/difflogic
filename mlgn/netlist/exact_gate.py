@@ -154,13 +154,66 @@ def declare_support_order(bdd: BDD, ordered_bits, n: int) -> None:
             bdd.declare(f"x{i}")
 
 
-def build_decision_bdd(bdd: BDD, net, budget: Budget, stats: dict, node_cap: int):
+def _check(bdd: BDD, budget: Budget, stats: dict, node_cap: int, where: str) -> None:
+    stats["nodes_peak"] = max(stats.get("nodes_peak", 0), len(bdd))
+    if len(bdd) > node_cap:
+        raise MemoryError(f"node cap {node_cap} exceeded at {where} ({len(bdd)} nodes)")
+    budget.check(where)
+
+
+def _ripple_add(bdd: BDD, a: list, b: list):
+    """Symbolic unsigned add of two LSB-first BDD bit-vectors."""
+    k = max(len(a), len(b))
+    a = a + [bdd.false] * (k - len(a))
+    b = b + [bdd.false] * (k - len(b))
+    out, carry = [], bdd.false
+    for i in range(k):
+        s = bdd.apply("xor", bdd.apply("xor", a[i], b[i]), carry)
+        carry = (a[i] & b[i]) | (carry & bdd.apply("xor", a[i], b[i]))
+        out.append(s)
+    out.append(carry)
+    return out
+
+
+def _popcount_tree(bdd: BDD, bits: list, budget: Budget, stats: dict,
+                   node_cap: int, label: str) -> list:
+    """Balanced adder tree over support-locality-ordered bits -> LSB-first sum vector.
+    Adjacent merges keep intermediate sums on localized variable clusters."""
+    level = [[u] for u in bits]
+    while len(level) > 1:
+        nxt = []
+        for i in range(0, len(level) - 1, 2):
+            nxt.append(_ripple_add(bdd, level[i], level[i + 1]))
+            _check(bdd, budget, stats, node_cap,
+                   f"{label} adder tree, {len(level)} nodes at this level")
+        if len(level) % 2:
+            nxt.append(level[-1])
+        level = nxt
+    return level[0]
+
+
+def _unsigned_gt(bdd: BDD, a: list, b: list):
+    """BDD for [a > b], a/b LSB-first bit-vectors."""
+    k = max(len(a), len(b))
+    a = a + [bdd.false] * (k - len(a))
+    b = b + [bdd.false] * (k - len(b))
+    gt, eq = bdd.false, bdd.true
+    for i in reversed(range(k)):
+        gt = gt | (eq & a[i] & ~b[i])
+        eq = eq & ~bdd.apply("xor", a[i], b[i])
+    return gt
+
+
+def build_decision_bdd(bdd: BDD, net, budget: Budget, stats: dict, node_cap: int,
+                       head_mode: str = "tree"):
     """Compile the ff netlist's argmax decision into a single BDD over x0..x{n-1}.
 
     Returns the BDD for f(x) = [class 1 wins]. Two-class heads only (CAN IDS).
     The head popcount comparator is the blow-up risk (measured: 216 -> 89M nodes with
-    natural order), so: greedy support-local bit order, sign-decided DP-state pruning,
-    per-bit garbage collection, and a hard node cap."""
+    natural order at h=64; flat DP stalls at h=512 even under CUDD), so: greedy
+    support-local bit order, then either a balanced adder tree + comparator
+    (head_mode='tree', default) or the flat partial-sum DP with sign-decided state
+    pruning (head_mode='dp'), under a wall budget and a hard node cap."""
     n = net.n_pi
     sig = {0: bdd.false, 1: bdd.true}
     for i in range(n):
@@ -179,43 +232,47 @@ def build_decision_bdd(bdd: BDD, net, budget: Budget, stats: dict, node_cap: int
     k, gs = net.head
     assert k == 2, f"decision compilation implemented for 2 classes, got {k}"
     sups = output_supports(net)
-    weighted = ([(gs + i, +1, sups[gs + i]) for i in range(gs)]
-                + [(i, -1, sups[i]) for i in range(gs)])
-    ordered = greedy_bit_order(weighted)
 
-    # partial-sum DP over the +-1-weighted hidden bits: dp[d] = BDD of "diff == d".
-    # States whose final sign is already decided leave the DP immediately:
-    #   d - neg_left  > 0  -> always class 1: accumulate into f, drop
-    #   d + pos_left <= 0  -> never  class 1: drop
     t = time.perf_counter()
-    pos_left = sum(1 for (_, w, _) in ordered if w > 0)
-    neg_left = len(ordered) - pos_left
-    dp = {0: bdd.true}
-    f = bdd.false
-    for step, (oi, w, _) in enumerate(ordered):
-        u = sig[net.outputs[oi]]
-        if w > 0:
-            pos_left -= 1
-        else:
-            neg_left -= 1
-        nxt: dict[int, object] = {}
-        for d, cond in dp.items():
-            for dn, br in ((d + w, cond & u), (d, cond & ~u)):
-                if br == bdd.false:
-                    continue
-                if dn - neg_left > 0:
-                    f = f | br
-                elif dn + pos_left > 0:
-                    nxt[dn] = (nxt[dn] | br) if dn in nxt else br
-        dp = nxt
-        if DD_ENGINE == "autoref":
-            bdd.collect_garbage()  # cudd GCs (and reorders) on its own
-        stats["nodes_peak"] = max(stats.get("nodes_peak", 0), len(bdd))
-        if len(bdd) > node_cap:
-            raise MemoryError(f"node cap {node_cap} exceeded at head DP bit "
-                              f"{step + 1}/{len(ordered)} ({len(bdd)} nodes)")
-        if step % 8 == 7:
-            budget.check(f"head DP bit {step + 1}/{len(ordered)}")
+    if head_mode == "tree":
+        # per-group support-local order, then popcount adder trees + comparator
+        g1 = greedy_bit_order([(gs + i, +1, sups[gs + i]) for i in range(gs)])
+        g0 = greedy_bit_order([(i, -1, sups[i]) for i in range(gs)])
+        s1 = _popcount_tree(bdd, [sig[net.outputs[oi]] for (oi, _, _) in g1],
+                            budget, stats, node_cap, "group1")
+        s0 = _popcount_tree(bdd, [sig[net.outputs[oi]] for (oi, _, _) in g0],
+                            budget, stats, node_cap, "group0")
+        f = _unsigned_gt(bdd, s1, s0)
+    else:
+        # flat partial-sum DP over the +-1-weighted hidden bits: dp[d] = "diff == d".
+        # States whose final sign is already decided leave the DP immediately:
+        #   d - neg_left  > 0  -> always class 1: accumulate into f, drop
+        #   d + pos_left <= 0  -> never  class 1: drop
+        ordered = greedy_bit_order([(gs + i, +1, sups[gs + i]) for i in range(gs)]
+                                   + [(i, -1, sups[i]) for i in range(gs)])
+        pos_left = sum(1 for (_, w, _) in ordered if w > 0)
+        neg_left = len(ordered) - pos_left
+        dp = {0: bdd.true}
+        f = bdd.false
+        for step, (oi, w, _) in enumerate(ordered):
+            u = sig[net.outputs[oi]]
+            if w > 0:
+                pos_left -= 1
+            else:
+                neg_left -= 1
+            nxt: dict[int, object] = {}
+            for d, cond in dp.items():
+                for dn, br in ((d + w, cond & u), (d, cond & ~u)):
+                    if br == bdd.false:
+                        continue
+                    if dn - neg_left > 0:
+                        f = f | br
+                    elif dn + pos_left > 0:
+                        nxt[dn] = (nxt[dn] | br) if dn in nxt else br
+            dp = nxt
+            if DD_ENGINE == "autoref":
+                bdd.collect_garbage()  # cudd GCs (and reorders) on its own
+            _check(bdd, budget, stats, node_cap, f"head DP bit {step + 1}/{len(ordered)}")
     stats["head_s"] = round(time.perf_counter() - t, 2)
     stats["nodes_after_head"] = len(bdd)
     stats["decision_bdd_nodes"] = f.dag_size
@@ -269,9 +326,9 @@ def mc_estimates(net, n: int, samples: int, seed: int = 0) -> dict:
 
 
 def analyze_run(tag: str, json_path: str, ckpt_path: str, budget_s: float,
-                equiv_batches: int, mc_samples: int,
-                node_cap: int) -> tuple[dict, BDD | None, object]:
-    rep: dict = {"tag": tag, "json": json_path, "ckpt": ckpt_path}
+                equiv_batches: int, mc_samples: int, node_cap: int,
+                head_mode: str) -> tuple[dict, BDD | None, object]:
+    rep: dict = {"tag": tag, "json": json_path, "ckpt": ckpt_path, "head_mode": head_mode}
     spec = spec_from_json(json_path)
     model = rebuild_model(spec, ckpt_path)
     net = extract_netlist_ff(model)
@@ -298,7 +355,7 @@ def analyze_run(tag: str, json_path: str, ckpt_path: str, budget_s: float,
     budget = Budget(budget_s)
     stats: dict = {}
     try:
-        f = build_decision_bdd(bdd, net, budget, stats, node_cap)
+        f = build_decision_bdd(bdd, net, budget, stats, node_cap, head_mode)
         rep["bdd_build"] = stats
         rep.update(exact_quantities(bdd, f, net.n_pi, budget))
         rep["mc_check"] = mc_estimates(net, net.n_pi, mc_samples)
@@ -323,6 +380,8 @@ def main() -> None:
     ap.add_argument("--mc-samples", type=int, default=20_000)
     ap.add_argument("--node-cap", type=int, default=8_000_000,
                     help="abort a model's BDD build past this many live nodes")
+    ap.add_argument("--head", choices=("tree", "dp"), default="tree",
+                    help="head compilation: balanced adder tree (default) or flat DP")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -333,7 +392,8 @@ def main() -> None:
     for tag, jp, cp in args.run:
         print(f"[exact_gate] analyzing {tag} ...", flush=True)
         rep, mgr, f = analyze_run(tag, jp, cp, args.budget_s,
-                                  args.equiv_batches, args.mc_samples, args.node_cap)
+                                  args.equiv_batches, args.mc_samples, args.node_cap,
+                                  args.head)
         reports.append(rep)
         if f is not None:
             passed[tag] = (mgr, f)
