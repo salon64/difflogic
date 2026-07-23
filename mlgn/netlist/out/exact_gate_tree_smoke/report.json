@@ -23,12 +23,12 @@
         "gates_s": 0.0,
         "nodes_after_gates": 200,
         "nodes_peak": 52177,
-        "head_s": 4.0,
+        "head_s": 4.37,
         "nodes_after_head": 450143,
         "decision_bdd_nodes": 7230
       },
       "class1_volume_exact": 0.40566793796054385,
-      "volume_s": 0.03,
+      "volume_s": 0.02,
       "influences": [
         0.08246469541909424,
         0.12480295882079799,
@@ -151,7 +151,7 @@
         0.0,
         0.0
       ],
-      "influences_s": 5.71,
+      "influences_s": 6.63,
       "avg_sensitivity_exact": 6.496114226954371,
       "boundary_edges_log2": 122.69957700093623,
       "n_influential_vars": 84,
@@ -160,7 +160,7 @@
         "class1_volume_mc": 0.39845,
         "avg_sensitivity_mc": 6.726
       },
-      "total_s": 9.8,
+      "total_s": 11.11,
       "status": "PASS"
     }
   ],

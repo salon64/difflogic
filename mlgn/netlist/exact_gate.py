@@ -189,6 +189,8 @@ def _popcount_tree(bdd: BDD, bits: list, budget: Budget, stats: dict,
         if len(level) % 2:
             nxt.append(level[-1])
         level = nxt
+        print(f"[exact_gate]   {label}: level width {len(level)}, "
+              f"{len(bdd)} live nodes, {budget.spent():.0f}s", flush=True)
     return level[0]
 
 
@@ -327,7 +329,8 @@ def mc_estimates(net, n: int, samples: int, seed: int = 0) -> dict:
 
 def analyze_run(tag: str, json_path: str, ckpt_path: str, budget_s: float,
                 equiv_batches: int, mc_samples: int, node_cap: int,
-                head_mode: str) -> tuple[dict, BDD | None, object]:
+                head_mode: str, max_mem_bytes: int,
+                reorder: bool) -> tuple[dict, BDD | None, object]:
     rep: dict = {"tag": tag, "json": json_path, "ckpt": ckpt_path, "head_mode": head_mode}
     spec = spec_from_json(json_path)
     model = rebuild_model(spec, ckpt_path)
@@ -343,9 +346,14 @@ def analyze_run(tag: str, json_path: str, ckpt_path: str, budget_s: float,
         return rep, None, None
 
     # own manager per run: vars declared in this net's support-local order
-    bdd = BDD()
     if DD_ENGINE == "cudd":
-        bdd.configure(reordering=True)  # dynamic sifting on top of the static order
+        bdd = BDD(memory_estimate=min(2 ** 30, max_mem_bytes))
+        # a starved CUDD thrashes (GC+sift loop at the ceiling, 100% CPU, no progress —
+        # observed 25h on h512 at the ~4 GiB default), so set the ceiling explicitly and
+        # keep dynamic sifting OFF during the build; the static support-local order stands
+        bdd.configure(max_memory=max_mem_bytes, reordering=bool(reorder))
+    else:
+        bdd = BDD()
     k, gs = net.head
     sups = output_supports(net)
     weighted = ([(gs + i, +1, sups[gs + i]) for i in range(gs)]
@@ -382,6 +390,11 @@ def main() -> None:
                     help="abort a model's BDD build past this many live nodes")
     ap.add_argument("--head", choices=("tree", "dp"), default="tree",
                     help="head compilation: balanced adder tree (default) or flat DP")
+    ap.add_argument("--max-mem-gb", type=float, default=16.0,
+                    help="CUDD max-memory ceiling in GiB (cudd engine only)")
+    ap.add_argument("--reorder", action="store_true",
+                    help="enable CUDD dynamic sifting during the build (default off; "
+                         "sifting at a memory ceiling can livelock)")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -393,7 +406,8 @@ def main() -> None:
         print(f"[exact_gate] analyzing {tag} ...", flush=True)
         rep, mgr, f = analyze_run(tag, jp, cp, args.budget_s,
                                   args.equiv_batches, args.mc_samples, args.node_cap,
-                                  args.head)
+                                  args.head, int(args.max_mem_gb * 2 ** 30),
+                                  args.reorder)
         reports.append(rep)
         if f is not None:
             passed[tag] = (mgr, f)
