@@ -75,6 +75,15 @@ Models: fresh CAN-syn IDS 'ff' LGNs (120 PIs, pos-weighted, non-degenerate): **h
 
 Verdict update: feasibility gate **PASSED at rung 1** — exact O'Donnell quantities on a real trained LGN are practical (seconds, laptop) once the head is compiled sensibly. GO confidence rises ~70% → ~80%, contingent on the DUST/CUDD rung clearing h512-class models (and later MNIST-scale).
 
+### Rung-2 post-mortem (2026-07-22/23): h512 kills ALL bottom-up compilation; pivot to #SAT
+- CUDD + flat DP: 25 CPU-h thrash at the default ~4 GiB ceiling (GC+sift livelock — diagnostic: 100% CPU, RSS pinned, no progress). Fix attempt: explicit 64 GiB ceiling + sifting off + **adder-tree head** (balanced, support-local merges).
+- Adder-tree + CUDD on h512: level node counts 19k → 546k (~28×/level) → kernel OOM-kill. Growth is ordering-independent and doubly-exponential-looking mid-tree ⇒ **monolithic BDD/SDD compilation of the 512-bit popcount comparator over 120 correlated inputs is intrinsically dead**, not a tuning problem. (h64 remains fine: tree head reproduces DP-head numbers bit-identically, 7,230-node canonical BDD both ways.)
+- pysdd (balanced vtree + auto-minimize, then right vtree no-minimize): both stall before 500 clauses — bottom-up SDD hits the same wall.
+- **Pivot** (`mlgn/netlist/exact_count.py`): quantities recast as pure model counting. Head realized in gates (adder tree + comparator), Tseitin CNF with functionally-defined aux vars (counts project exactly onto inputs); **selector-miter trick**: one CNF whose count = 2^n × avg sensitivity (7-bit selector chooses which input to flip; per-var influences by conditioning the selector). DIMACS written: h64 vol 46 KB / h512 sens 1 MB (~29k vars). Counter: **ganak v2.6.3** (Meel group; won all MC-competition tracks 2024+2025; static Linux binaries). Windows binary needs a FLINT DLL chain — server-only.
+- Validation protocol: ganak must reproduce h64's BDD-exact numbers (volume 0.40566793796054385 = count/2^120; avg sens 6.496114226954371 = sens-count/2^120) before its h512 outputs are trusted.
+- 2026-07-24 local closure: (a) pysdd given a FAIR trial (support-greedy popcount leaves + first-use vtree var order — the fix that saved the BDD) still explodes before 500 clauses on the h64 VOLUME cnf → bottom-up compilation ruled out, engine-independent; (b) ganak-on-Windows dead even with the full MSYS2 DLL chain rebuilt (flint-3.5/libflint-23, gcc-libs 16.1, gfortran, gmp/mpfr/openblas): exit 127 (PROC_NOT_FOUND-class) on a trivial CNF. **Counting runs on DUST/Linux only.** `exact_count.py` gained: support-greedy leaf order, first-use vtree order, incremental report.json.
+- **Paper-relevant lesson**: decision-verify (SAT, Kresse) trivially scales; exact *counting* on LGNs is bottlenecked solely by the popcount head, and compilation ≠ counting — component-caching counters are the right tool class. This tooling asymmetry is itself reportable.
+
 ## Relation to roadmap
 - Reuses: P3a netlist exporter + formal tooling (20_program_validation).
 - Feeds: outreach (Emily Yu artifact), "why-random-wiring-works" theory sliver, P3a interpretability story.

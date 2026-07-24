@@ -1,0 +1,62 @@
+[
+  {
+    "tag": "h64",
+    "json": "mlgn/seqlgn/results/can-syn_ff_xg_ff_h64_20260721-202129.json",
+    "ckpt": "mlgn/seqlgn/results/ckpt_xg_ff_h64.pt",
+    "equivalence_base": true,
+    "equivalence_decision_head": true,
+    "n_pi": 120,
+    "decision_gates": 728,
+    "mc_check": {
+      "samples": 4096,
+      "class1_volume_mc": 0.3955078125,
+      "avg_sensitivity_mc": 6.123046875
+    },
+    "cnf": {
+      "volume": {
+        "vars": 850,
+        "clauses": 2894
+      },
+      "sensitivity": {
+        "vars": 2433,
+        "clauses": 9177
+      }
+    },
+    "dimacs": {
+      "volume": "mlgn/netlist/out/exact_count\\h64_volume.cnf",
+      "sensitivity": "mlgn/netlist/out/exact_count\\h64_sensitivity.cnf",
+      "note": "exact count / 2^120 = volume; sensitivity count / 2^120 = avg sensitivity (selector vars 121..127 inside)"
+    },
+    "status": "DIMACS_WRITTEN"
+  },
+  {
+    "tag": "h512",
+    "json": "mlgn/seqlgn/results/can-syn_ff_xg_ff_h512_20260721-202209.json",
+    "ckpt": "mlgn/seqlgn/results/ckpt_xg_ff_h512.pt",
+    "equivalence_base": true,
+    "equivalence_decision_head": true,
+    "n_pi": 120,
+    "decision_gates": 6089,
+    "mc_check": {
+      "samples": 4096,
+      "class1_volume_mc": 0.714111328125,
+      "avg_sensitivity_mc": 5.625
+    },
+    "cnf": {
+      "volume": {
+        "vars": 6211,
+        "clauses": 24227
+      },
+      "sensitivity": {
+        "vars": 13155,
+        "clauses": 51843
+      }
+    },
+    "dimacs": {
+      "volume": "mlgn/netlist/out/exact_count\\h512_volume.cnf",
+      "sensitivity": "mlgn/netlist/out/exact_count\\h512_sensitivity.cnf",
+      "note": "exact count / 2^120 = volume; sensitivity count / 2^120 = avg sensitivity (selector vars 121..127 inside)"
+    },
+    "status": "DIMACS_WRITTEN"
+  }
+]
